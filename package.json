@@ -10,5 +10,9 @@
   "peerDependencies": {
     "typescript": "^5"
   },
-  "private": true
+  "private": true,
+  "trustedDependencies": [
+    "openfront-client",
+    "protobufjs"
+  ]
 }
