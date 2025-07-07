@@ -1,0 +1,3 @@
+[submodule "packages/openfront-client"]
+	path = packages/openfront-client
+	url = https://github.com/openfrontio/OpenFrontIO
