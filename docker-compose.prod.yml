@@ -14,5 +14,19 @@ services:
     networks:
       - cloudflare
 
+  backend:
+    image: mirvworld/backend
+    restart: always
+    build:
+      context: .
+      dockerfile: packages/backend/Dockerfile
+    volumes:
+      - backend-db:/app/storage/db
+      - backend-replays:/app/storage/replays
+
 networks:
   cloudflare:
+
+volumes:
+  backend-db:
+  backend-replays:
