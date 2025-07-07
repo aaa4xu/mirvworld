@@ -1,0 +1,18 @@
+services:
+  tunnel:
+    image: cloudflare/cloudflared
+    restart: always
+    env_file:
+      - .env.production.local
+    command: tunnel run
+    networks:
+      - cloudflare
+
+  frontend:
+    image: nginx:1.29-alpine
+    restart: always
+    networks:
+      - cloudflare
+
+networks:
+  cloudflare:
