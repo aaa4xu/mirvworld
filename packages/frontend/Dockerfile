@@ -9,7 +9,7 @@ FROM oven/bun:1
 WORKDIR /app
 ENV PORT=80
 COPY --from=build /usr/src/app/packages/frontend/build /app
-COPY --from=build /usr/src/app/node_modules /app/node_modules
+RUN bun install
 
 EXPOSE 80
 ENTRYPOINT ["bun", "index.js"]
