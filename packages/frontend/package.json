@@ -24,6 +24,7 @@
 	"dependencies": {
 		"@inlang/paraglide-js": "^2.0.0",
 		"arctic": "^3.7.0",
-		"clsx": "^2.1.1"
+		"clsx": "^2.1.1",
+		"zod": "^3.25.76"
 	}
 }

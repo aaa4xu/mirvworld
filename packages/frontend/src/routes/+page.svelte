@@ -3,6 +3,7 @@
     import { page } from '$app/state';
     import { goto } from '$app/navigation';
     import { m } from '$lib/paraglide/messages.js';
+    import DiscordLoginButton from "$lib/components/DiscordLoginButton.svelte";
 </script>
 
 
@@ -16,4 +17,4 @@
 </p>
 
 <h2>Auth</h2>
-<a href="/auth/discord/">Login with Discord</a>
+<DiscordLoginButton />
