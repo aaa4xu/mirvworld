@@ -41,8 +41,7 @@ export class MatchesRepository {
   public async popQueue() {
     const now = Date.now();
 
-    // прошло 30 минут
-    const thirtyMinutesAgo = new Date(now - 30 * 60 * 1_000);
+    const intervalDuration = new Date(now - 15 * 60 * 1_000);
     const fourHoursAgo = new Date(now - config.maxGameDuration * 1.25);
 
     const result = await this.db
@@ -51,8 +50,8 @@ export class MatchesRepository {
       .where(
         and(
           isNull(matches.importedAt), // Данные еще не импортированы
-          lte(matches.startedAt, thirtyMinutesAgo), // игра началась ≥ 30 мин назад
-          or(isNull(matches.lastFetchAt), lte(matches.lastFetchAt, thirtyMinutesAgo)), // или никогда не проверяли, или проверяли ≥ 30 мин назад
+          lte(matches.startedAt, intervalDuration), // игра началась ≥ 15 мин назад
+          or(isNull(matches.lastFetchAt), lte(matches.lastFetchAt, intervalDuration)), // или никогда не проверяли, или проверяли ≥ 15 мин назад
           gt(matches.startedAt, fourHoursAgo), // игра стартовала НЕ более 4 часов назад
         ),
       )
