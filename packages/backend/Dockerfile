@@ -1,7 +1,7 @@
 FROM oven/bun:1 AS build
 WORKDIR /usr/src/app
 COPY . .
-RUN bun install --frozen-lockfile
+RUN bun install
 
 # build into binary
 # @see https://bun.sh/docs/bundler/executables

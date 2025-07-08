@@ -1,7 +1,7 @@
 FROM oven/bun:1 AS build
 WORKDIR /usr/src/app
 COPY . .
-RUN bun install --frozen-lockfile
+RUN bun install
 
 RUN cd packages/frontend && bun --bun run build
 
