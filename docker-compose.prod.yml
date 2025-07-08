@@ -9,8 +9,11 @@ services:
       - cloudflare
 
   frontend:
-    image: nginx:1.29-alpine
+    image: mirvworld/frontend
     restart: always
+    build:
+      context: .
+      dockerfile: packages/frontend/Dockerfile
     networks:
       - cloudflare
 
