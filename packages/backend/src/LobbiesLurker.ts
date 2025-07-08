@@ -33,7 +33,7 @@ export class LobbiesLurker {
           'User-Agent': 'MIRVWorldBot/0.2',
           'Accept-Encoding': 'gzip, deflate',
         },
-        signal: this.abortController.signal,
+        signal: AbortSignal.timeout(5000),
       });
 
       if (!response.ok) {

@@ -31,7 +31,7 @@ export class ReplayLurker {
           'User-Agent': 'MIRVWorldBot/0.2',
           'Accept-Encoding': 'gzip',
         },
-        signal: this.abortController.signal,
+        signal: AbortSignal.timeout(5000),
         // @ts-expect-error Incorrect typings for bun's fetch
         decompress: false,
       });
