@@ -12,9 +12,11 @@ WORKDIR /app
 VOLUME /app/storage
 ENV MIRVWORLD_DATABASE=/app/storage/db/lurker.db
 ENV MIRVWORLD_REPLAYS_PATH=/app/storage/replays
+ENV MIRVWORLD_HTTP_PORT=80
 
 COPY --from=build /usr/src/app/backend /app/
 COPY --from=build /usr/src/app/packages/backend/drizzle /app/drizzle
 RUN chmod +x /app/backend
 
+EXPOSE 80
 ENTRYPOINT ["/app/backend"]

@@ -4,6 +4,9 @@ export const config = {
   database: env('MIRVWORLD_DATABASE', '../../storage/db/lurker.db'),
   replaysPath: env('MIRVWORLD_REPLAYS_PATH', '../../storage/replays'),
   migrationsPath: env('MIRVWORLD_MIGRATIONS_PATH', './drizzle'),
+  http: {
+    port: parseInt(env('MIRVWORLD_HTTP_PORT', '4000'), 10),
+  },
 };
 
 function env(name: string, defaultValue?: string): string {

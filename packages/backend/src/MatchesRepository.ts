@@ -1,10 +1,23 @@
 import type { BunSQLiteDatabase } from 'drizzle-orm/bun-sqlite';
 import { matches } from './db/schema.ts';
-import { eq, gt, isNull, lte, or, sql, and } from 'drizzle-orm';
+import { eq, gt, isNull, lte, or, sql, and, desc, isNotNull } from 'drizzle-orm';
 import { config } from '../config.ts';
 
 export class MatchesRepository {
   public constructor(private readonly db: BunSQLiteDatabase) {}
+
+  public latest(limit = 20) {
+    return this.db
+      .select()
+      .from(matches)
+      .where(isNotNull(matches.importedAt))
+      .orderBy(desc(matches.startedAt))
+      .limit(limit);
+  }
+
+  public read(id: string) {
+    return this.db.select().from(matches).where(eq(matches.id, id));
+  }
 
   public async addToQueue(id: string, startedAt: number) {
     await this.db
