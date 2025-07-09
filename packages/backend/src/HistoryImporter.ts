@@ -1,6 +1,6 @@
 import type { MatchesRepository } from './MatchesRepository.ts';
 import type { ReplayStorage } from './ReplayStorage.ts';
-import type { GameRecord } from 'openfront-client/src/core/Schemas.ts';
+import { type GameRecord, GameRecordSchema } from 'openfront-client/src/core/Schemas.ts';
 
 export class HistoryImporter {
   public constructor(
@@ -24,7 +24,7 @@ export class HistoryImporter {
         });
 
         if (!response.ok) continue;
-        const gameRecord: GameRecord = await response.json();
+        const gameRecord = GameRecordSchema.parse(await response.json());
 
         await this.storage.saveFromGamesApi(id, gameRecord);
         await this.matches.add(id, gameRecord.info.start);
