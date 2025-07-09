@@ -38,7 +38,7 @@ export class ReplayLurker {
 
       if (response.status !== 200) return; // Match is still in progress
 
-      await this.storage.save(match.id, response);
+      await this.storage.saveFromHttp(match.id, response);
       await this.matches.markAsImported(match.id);
       console.log(`[ReplayLurker] Saved replay for ${match.id}`);
     } catch (err) {

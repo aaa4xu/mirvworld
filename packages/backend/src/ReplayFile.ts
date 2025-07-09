@@ -41,4 +41,8 @@ export class ReplayFile {
   public get players() {
     return this.replay.info.players;
   }
+
+  public get startedAt() {
+    return this.replay.info.start;
+  }
 }

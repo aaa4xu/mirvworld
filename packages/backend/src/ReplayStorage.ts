@@ -1,5 +1,6 @@
 import path from 'node:path';
 import { ReplayFile } from './ReplayFile.ts';
+import type { GameRecord } from 'openfront-client/src/core/Schemas.ts';
 
 export class ReplayStorage {
   public constructor(private readonly root: string) {}
@@ -21,7 +22,19 @@ export class ReplayStorage {
     throw new Error(`Replay not found: ${id}`);
   }
 
-  public async save(id: string, response: Response) {
+  public async saveFromGamesApi(id: string, gameRecord: GameRecord) {
+    const filename = path.join(this.root, `${id}.json.gz`);
+    const content = {
+      success: true,
+      exists: true,
+      gameRecord,
+    };
+    const json = JSON.stringify(content);
+    const buffer = Bun.gzipSync(Buffer.from(json));
+    await Bun.file(filename).write(buffer);
+  }
+
+  public async saveFromHttp(id: string, response: Response) {
     const contentEncoding = response.headers.get('Content-Encoding');
     const contentType = response.headers.get('Content-Type')?.split(';')[0];
 

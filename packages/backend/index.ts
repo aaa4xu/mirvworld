@@ -12,6 +12,7 @@ import * as jose from 'jose';
 import { contextFactory } from './src/trpc/context.ts';
 import { TokenPayload } from './src/Schema/TokenPayload.ts';
 import { TRPCError } from '@trpc/server';
+import { HistoryImporter } from './src/HistoryImporter.ts';
 
 const replayStorage = new ReplayStorage(config.replaysPath);
 const matchesRepository = new MatchesRepository(db);
@@ -19,6 +20,20 @@ const usersRepository = new UsersRepository(db);
 
 const lobbiesLurker = new LobbiesLurker(config.endpoint, matchesRepository);
 const replaysLurker = new ReplayLurker(config.endpoint, replayStorage, matchesRepository);
+
+const content = await Bun.file('import.csv')
+  .text()
+  .catch(() => '');
+const queue = content
+  .split('\n')
+  .map((l) => l.split(';').pop()?.trim())
+  .filter((l): l is string => l?.length === 8);
+
+if (queue.length > 0) {
+  console.log(`Importing ${queue.length} matches from history`);
+  const historyImporter = new HistoryImporter(matchesRepository, replayStorage);
+  historyImporter.import(queue);
+}
 
 const jwtSecret = new TextEncoder().encode(config.http.secret);
 if (config.http.secret === 'secret') {

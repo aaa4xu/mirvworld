@@ -1,6 +1,6 @@
 import type { BunSQLiteDatabase } from 'drizzle-orm/bun-sqlite';
 import { matches } from './db/schema.ts';
-import { eq, gt, isNull, lte, or, sql, and, desc, isNotNull } from 'drizzle-orm';
+import { eq, gt, isNull, lte, or, sql, and, desc, isNotNull, inArray, type InferSelectModel } from 'drizzle-orm';
 import { config } from '../config.ts';
 
 export class MatchesRepository {
@@ -33,6 +33,17 @@ export class MatchesRepository {
           startedAt: new Date(startedAt),
         },
       });
+  }
+
+  public async add(id: string, startedAt: number) {
+    await this.db
+      .insert(matches)
+      .values({
+        id,
+        startedAt: new Date(startedAt),
+        importedAt: new Date(),
+      })
+      .onConflictDoNothing();
   }
 
   public async markAsImported(id: string) {
