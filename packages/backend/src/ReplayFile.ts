@@ -37,4 +37,8 @@ export class ReplayFile {
   public get turns() {
     return this.replay.turns;
   }
+
+  public get players() {
+    return this.replay.info.players;
+  }
 }

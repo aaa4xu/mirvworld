@@ -66,6 +66,7 @@ const appRouter = router({
         map: replay.map,
         mode: replay.mode,
         duration: replay.duration,
+        players: replay.players,
       };
     }
   }),
