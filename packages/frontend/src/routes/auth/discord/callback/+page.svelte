@@ -1,38 +1,8 @@
 <script lang="ts">
   import type { PageProps } from './$types';
-  import { page } from '$app/state';
+  import { m } from '$lib/paraglide/messages.js';
 
   let { data }: PageProps = $props();
-
-  const selfxss = `async () => {
-        try {
-            if(location.host !== 'openfront.io') {
-                throw new Error('Switch to openfront.io tab before clicking the bookmarklet');
-            }
-
-            const token = localStorage.getItem('token');
-            if (!token) {
-                throw new Error('You are not logged in');
-            }
-
-            const response = await fetch("https://api.openfront.io/users/@me", {
-                headers: {
-                    authorization: 'Bearer '+ token,
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch user info: status=' + response.status);
-            }
-
-            const user = await response.json();
-            alert(user.player.publicId);
-        } catch(err) {
-            alert('Failed to fetch user info: ' + err)
-        }
-    }`;
-
-  const selfxssLink = `javascript:(${selfxss})()`;
 </script>
 
 {#if data.error}
@@ -80,17 +50,3 @@
     </form>
   </section>-->
 {/if}
-
-<style>
-  .discord-user {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .discord-user img {
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-  }
-</style>
