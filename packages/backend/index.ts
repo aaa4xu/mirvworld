@@ -17,7 +17,7 @@ const matchesRepository = new MatchesRepository(db);
 const usersRepository = new UsersRepository(db);
 
 const lobbiesLurker = new LobbiesLurker(config.endpoint, matchesRepository);
-const replaysLurker = new ReplayLurker(config.endpoint, config.replaysPath, matchesRepository);
+const replaysLurker = new ReplayLurker(config.endpoint, replayStorage, matchesRepository);
 
 const jwtSecret = new TextEncoder().encode(config.http.secret);
 if (config.http.secret === 'secret') {

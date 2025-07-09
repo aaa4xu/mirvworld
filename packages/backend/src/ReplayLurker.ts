@@ -1,5 +1,5 @@
-import path from 'node:path';
 import type { MatchesRepository } from './MatchesRepository.ts';
+import type { ReplayStorage } from './ReplayStorage.ts';
 
 export class ReplayLurker {
   private readonly abortController = new AbortController();
@@ -7,7 +7,7 @@ export class ReplayLurker {
 
   public constructor(
     private readonly endpoint: string,
-    private readonly storage: string,
+    private readonly storage: ReplayStorage,
     private readonly matches: MatchesRepository,
   ) {
     this.abortController.signal.addEventListener('abort', () => {
@@ -36,25 +36,11 @@ export class ReplayLurker {
         decompress: false,
       });
 
-      if (response.status !== 200) return;
+      if (response.status !== 200) return; // Match is still in progress
 
-      const contentEncoding = response.headers.get('Content-Encoding');
-      switch (contentEncoding) {
-        case 'gzip':
-          await Bun.file(path.join(this.storage, `${match.id}.json.gz`)).write(response);
-          await this.matches.markAsImported(match.id);
-          console.log(`[ReplayLurker] Imported replay for ${match.id} in gzip format`);
-          break;
-
-        case null:
-          await Bun.file(path.join(this.storage, `${match.id}.json`)).write(response);
-          await this.matches.markAsImported(match.id);
-          console.log(`[ReplayLurker] Imported replay for ${match.id} without compression`);
-          break;
-
-        default:
-          console.error(`[ReplayLurker] Unknown replay encoding: ${contentEncoding}`);
-      }
+      await this.storage.save(match.id, response);
+      await this.matches.markAsImported(match.id);
+      console.log(`[ReplayLurker] Saved replay for ${match.id}`);
     } catch (err) {
       console.error(`[ReplayLurker] Error in tick:`, err);
     } finally {
