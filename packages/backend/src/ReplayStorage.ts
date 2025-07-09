@@ -4,7 +4,7 @@ import { type ArchivedGameRecord, ArchivedGameRecordSchema } from './Schema/Arch
 
 /**
  * ReplayStorage is a class designed to manage the saving and reading of game replay data.
- * It handles compression and decompression of replay files using `zstd` to optimize storage,
+ * It handles compression and decompression of replay files using `gzip` to optimize storage,
  * and validates parsed data using a schema.
  */
 export class ReplayStorage {
@@ -16,20 +16,19 @@ export class ReplayStorage {
     const archive = await Bun.file(this.filename(id)).bytes();
     const content = await Bun.zstdDecompress(archive);
     const json = this.decoder.decode(content);
-    await Bun.file('test.json').write(json);
     const replay = ArchivedGameRecordSchema.parse(JSON.parse(json));
     return new ReplayFile(replay);
   }
 
   public async save(id: string, replay: ArchivedGameRecord) {
     const content = JSON.stringify(replay, (key, value) => (typeof value === 'bigint' ? value.toString() : value));
-    const buffer = await Bun.zstdCompress(content, {
-      level: 19,
+    const buffer = Bun.gzipSync(content, {
+      level: 9,
     });
     await Bun.file(this.filename(id)).write(buffer);
   }
 
   private filename(id: string) {
-    return path.join(this.root, `${id}.json.zst`);
+    return path.join(this.root, `${id}.json.gz`);
   }
 }
