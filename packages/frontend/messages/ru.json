@@ -1,4 +1,5 @@
 {
 	"$schema": "https://inlang.com/schema/inlang-message-format",
-	"hello_world": "Привет, {name}!"
+	"hello_world": "Привет, {name}!",
+	"login_failedHeader": "Не удалось авторизоваться"
 }
