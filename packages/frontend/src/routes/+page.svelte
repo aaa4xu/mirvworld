@@ -34,12 +34,10 @@
   {#each data.matches as match}
     {#if 'map' in match}
       <li>
-        <a href="https://openfront.io/join/{match.id}" target="_blank">{match.id}</a> - {match.map} / {match.mode} / {Math.floor(
+        <a href="/match/{match.id}">{match.id}</a> - {match.map} / {match.mode} / {Math.floor(
           match.duration / 1000 / 60,
         )}min
       </li>
-    {:else}
-      <li><a href="https://openfront.io/join/{match.id}" target="_blank">{match.id}</a></li>
     {/if}
   {/each}
 </ul>
