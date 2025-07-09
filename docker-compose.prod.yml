@@ -26,6 +26,8 @@ services:
     build:
       context: .
       dockerfile: packages/backend/Dockerfile
+    env_file:
+      - .env.production.local
     volumes:
       - backend-db:/app/storage/db
       - backend-replays:/app/storage/replays
