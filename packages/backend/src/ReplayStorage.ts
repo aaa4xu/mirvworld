@@ -1,59 +1,35 @@
 import path from 'node:path';
 import { ReplayFile } from './ReplayFile.ts';
-import type { GameRecord } from 'openfront-client/src/core/Schemas.ts';
+import { type ArchivedGameRecord, ArchivedGameRecordSchema } from './Schema/ArchivedGameResponse.ts';
 
+/**
+ * ReplayStorage is a class designed to manage the saving and reading of game replay data.
+ * It handles compression and decompression of replay files using `zstd` to optimize storage,
+ * and validates parsed data using a schema.
+ */
 export class ReplayStorage {
+  private readonly decoder = new TextDecoder();
+
   public constructor(private readonly root: string) {}
 
-  public async load(id: string) {
-    const base = path.join(this.root, id);
-
-    const jsonFilename = `${base}.json`;
-    const gzJsonFilename = `${base}.json.gz`;
-
-    if (await Bun.file(gzJsonFilename).exists()) {
-      return ReplayFile.fromFile(gzJsonFilename);
-    }
-
-    if (await Bun.file(jsonFilename).exists()) {
-      return ReplayFile.fromFile(jsonFilename);
-    }
-
-    throw new Error(`Replay not found: ${id}`);
+  public async read(id: string) {
+    const archive = await Bun.file(this.filename(id)).bytes();
+    const content = await Bun.zstdDecompress(archive);
+    const json = this.decoder.decode(content);
+    await Bun.file('test.json').write(json);
+    const replay = ArchivedGameRecordSchema.parse(JSON.parse(json));
+    return new ReplayFile(replay);
   }
 
-  public async saveFromGamesApi(id: string, gameRecord: GameRecord) {
-    const filename = path.join(this.root, `${id}.json.gz`);
-    const content = {
-      success: true,
-      exists: true,
-      gameRecord,
-    };
-    const json = JSON.stringify(content);
-    const buffer = Bun.gzipSync(Buffer.from(json));
-    await Bun.file(filename).write(buffer);
+  public async save(id: string, replay: ArchivedGameRecord) {
+    const content = JSON.stringify(replay, (key, value) => (typeof value === 'bigint' ? value.toString() : value));
+    const buffer = await Bun.zstdCompress(content, {
+      level: 19,
+    });
+    await Bun.file(this.filename(id)).write(buffer);
   }
 
-  public async saveFromHttp(id: string, response: Response) {
-    const contentEncoding = response.headers.get('Content-Encoding');
-    const contentType = response.headers.get('Content-Type')?.split(';')[0];
-
-    if (contentType !== 'application/json') {
-      throw new Error(`Replay content type must be application/json, got ${contentType}`);
-    }
-
-    switch (contentEncoding) {
-      case 'gzip':
-        await Bun.file(path.join(this.root, `${id}.json.gz`)).write(response);
-        break;
-
-      case null:
-        await Bun.file(path.join(this.root, `${id}.json`)).write(response);
-        console.log(`[ReplayLurker] Imported replay for ${id} without compression`);
-        break;
-
-      default:
-        throw new Error(`Unknown replay content encoding: ${contentEncoding}`);
-    }
+  private filename(id: string) {
+    return path.join(this.root, `${id}.json.zst`);
   }
 }

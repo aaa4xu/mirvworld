@@ -1,22 +1,7 @@
-import type { GameRecord } from 'openfront-client/src/core/Schemas.ts';
+import type { ArchivedGameRecord } from './Schema/ArchivedGameResponse.ts';
 
 export class ReplayFile {
-  public static async fromFile(filepath: string) {
-    if (filepath.endsWith('.gz')) {
-      const decoder = new TextDecoder();
-      const content = JSON.parse(decoder.decode(Bun.gunzipSync(await Bun.file(filepath).arrayBuffer())));
-      return new ReplayFile(content.gameRecord);
-    }
-
-    if (filepath.endsWith('.json')) {
-      const content = await Bun.file(filepath).json();
-      return new ReplayFile(content.gameRecord);
-    }
-
-    throw new Error(`Unsupported file type: ${filepath}`);
-  }
-
-  public constructor(private readonly replay: GameRecord) {}
+  public constructor(private readonly replay: ArchivedGameRecord) {}
 
   public get mode() {
     return this.replay.info.config.gameMode;

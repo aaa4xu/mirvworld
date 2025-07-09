@@ -19,12 +19,12 @@
   let showMore = $state(false);
   let progress = $state(0);
 
-  const formatNumber = (num: number | undefined) => {
-    num = num ?? 0;
+  const formatNumber = (num: bigint | undefined) => {
+    num = num ?? 0n;
 
-    if (num < 1000) return num;
+    if (num < 1000n) return num;
 
-    return Math.round(num / 1000) + 'k';
+    return Math.round(Number(num / 1000n)) + 'k';
   };
 
   async function analyze() {

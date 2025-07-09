@@ -13,13 +13,15 @@ import { contextFactory } from './src/trpc/context.ts';
 import { TokenPayload } from './src/Schema/TokenPayload.ts';
 import { TRPCError } from '@trpc/server';
 import { HistoryImporter } from './src/HistoryImporter.ts';
+import { OpenFrontWorkerClient } from './src/OpenFrontWorkerClient.ts';
 
 const replayStorage = new ReplayStorage(config.replaysPath);
 const matchesRepository = new MatchesRepository(db);
 const usersRepository = new UsersRepository(db);
 
+const workerClient = new OpenFrontWorkerClient(config.endpoint);
 const lobbiesLurker = new LobbiesLurker(config.endpoint, matchesRepository);
-const replaysLurker = new ReplayLurker(config.endpoint, replayStorage, matchesRepository);
+const replaysLurker = new ReplayLurker(workerClient, replayStorage, matchesRepository);
 
 Bun.file('import.csv')
   .text()
@@ -31,7 +33,7 @@ Bun.file('import.csv')
 
     if (queue.length > 0) {
       console.log(`Importing ${queue.length} matches from history`);
-      const historyImporter = new HistoryImporter(matchesRepository, replayStorage);
+      const historyImporter = new HistoryImporter(workerClient, matchesRepository, replayStorage);
       historyImporter.import(queue);
     }
   })
@@ -47,7 +49,7 @@ const appRouter = router({
     const matches = await matchesRepository.latest();
 
     const promises = matches.map(async (info) => {
-      const replay = await replayStorage.load(info.id).catch(() => null);
+      const replay = await replayStorage.read(info.id).catch(() => null);
 
       if (!replay) {
         return info;
@@ -73,7 +75,10 @@ const appRouter = router({
       });
     }
 
-    const replay = await replayStorage.load(info.id).catch(() => null);
+    const replay = await replayStorage.read(info.id).catch((e) => {
+      console.warn('Failed to read replay', e);
+      return null;
+    });
 
     if (!replay) {
       return info;

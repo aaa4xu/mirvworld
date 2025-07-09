@@ -1,12 +1,13 @@
 import type { MatchesRepository } from './MatchesRepository.ts';
 import type { ReplayStorage } from './ReplayStorage.ts';
+import type { OpenFrontWorkerClient } from './OpenFrontWorkerClient.ts';
 
 export class ReplayLurker {
   private readonly abortController = new AbortController();
   private timerId: NodeJS.Timeout | null = null;
 
   public constructor(
-    private readonly endpoint: string,
+    private readonly client: OpenFrontWorkerClient,
     private readonly storage: ReplayStorage,
     private readonly matches: MatchesRepository,
   ) {
@@ -26,21 +27,13 @@ export class ReplayLurker {
       const match = await this.matches.popQueue();
       if (!match) return;
 
-      const response = await fetch(this.replayUrl(match.id), {
-        headers: {
-          'User-Agent': 'MIRVWorldBot/0.2',
-          'Accept-Encoding': 'gzip',
-        },
-        signal: AbortSignal.timeout(5000),
-        // @ts-expect-error Incorrect typings for bun's fetch
-        decompress: false,
-      });
+      const gameRecord = await this.client.archivedGame(match.id);
+      if (!gameRecord) return;
 
-      if (response.status !== 200) return; // Match is still in progress
-
-      await this.storage.saveFromHttp(match.id, response);
+      const startAt = performance.now();
+      await this.storage.save(match.id, gameRecord);
       await this.matches.markAsImported(match.id);
-      console.log(`[ReplayLurker] Saved replay for ${match.id}`);
+      console.log(`[ReplayLurker] Saved replay for ${match.id} in ${performance.now() - startAt}ms`);
     } catch (err) {
       console.error(`[ReplayLurker] Error in tick:`, err);
     } finally {
@@ -52,11 +45,5 @@ export class ReplayLurker {
 
   public dispose() {
     this.abortController.abort();
-  }
-
-  private replayUrl(gameId: string) {
-    const url = new URL(this.endpoint);
-    url.pathname = `/w0/api/archived_game/${gameId}`;
-    return url;
   }
 }
