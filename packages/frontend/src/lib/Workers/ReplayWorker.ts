@@ -12,7 +12,7 @@ self.onmessage = async (event: MessageEvent<IncomingMessage>) => {
 
   let places = new Set<string>();
   const game = await player.play({
-    replay: replay.gameRecord,
+    replay: replay,
     onProgress: (p) => {
       const humans = p.game.allPlayers().filter((p) => p.type() === PlayerType.Human);
 
@@ -24,7 +24,7 @@ self.onmessage = async (event: MessageEvent<IncomingMessage>) => {
             clientID: player.clientID() ?? 'unknown',
             index: humans.length - places.size,
             tiles: player.numTilesOwned(),
-            progress: p.turn / replay.gameRecord.turns.length,
+            progress: p.turn / replay.turns.length,
           } satisfies ReplayWorkerInfoEvent);
           places.add(player.id());
         }
