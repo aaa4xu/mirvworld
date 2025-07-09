@@ -41,7 +41,7 @@ services:
       - backend-replays:/replays:ro
       - ./docker/replays-nginx.conf:/etc/nginx/templates/replays.conf.template:ro
     environment:
-      - NGINX_HOST=replays
+      - NGINX_HOST=replays.mirv.world
       - NGINX_ALLOWED_ORIGIN=mirv.world
     networks:
       - cloudflare
