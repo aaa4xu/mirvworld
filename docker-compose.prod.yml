@@ -34,6 +34,17 @@ services:
     networks:
       - default
 
+  replays:
+    image: nginx:1.29-alpine
+    restart: always
+    volumes:
+      - backend-replays:/replays:ro
+      - ./docker/replays-nginx.conf:/etc/nginx/templates/replays.conf.template:ro
+    environment:
+      - NGINX_HOST=replays
+    networks:
+      - cloudflare
+
 networks:
   cloudflare:
 
