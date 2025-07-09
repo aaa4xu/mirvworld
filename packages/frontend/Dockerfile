@@ -3,7 +3,7 @@ WORKDIR /usr/src/app
 COPY . .
 RUN bun install
 
-COPY packages/openfront-client/static/maps packages/frontend/static/maps
+COPY packages/openfront-client/resources/maps packages/frontend/static/maps
 RUN cd packages/frontend && bun --bun run build
 
 FROM oven/bun:1
