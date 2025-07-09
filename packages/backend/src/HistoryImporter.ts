@@ -10,8 +10,8 @@ export class HistoryImporter {
 
   public async import(queue: string[]) {
     for (const id of queue) {
-      const exists = await this.matches.read(id);
-      if (exists) continue;
+      // const exists = await this.matches.read(id);
+      // if (exists) continue;
 
       const startAt = Date.now();
       try {
@@ -24,7 +24,9 @@ export class HistoryImporter {
         });
 
         if (!response.ok) continue;
-        const gameRecord = GameRecordSchema.parse(await response.json());
+        const json: GameRecord = await response.json();
+        json.info.players.forEach((player) => (player.persistentID = 'REDACTED'));
+        const gameRecord = GameRecordSchema.parse(json);
 
         await this.storage.saveFromGamesApi(id, gameRecord);
         await this.matches.add(id, gameRecord.info.start);
