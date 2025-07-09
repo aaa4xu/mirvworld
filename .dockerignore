@@ -1,0 +1,11 @@
+.idea
+docker
+node_modules
+storage
+docker-compose.prod.yml
+README.md
+.env
+.env.production.local
+.gitignore
+.gitmodules
+.dockerignore
