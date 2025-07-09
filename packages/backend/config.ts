@@ -6,6 +6,7 @@ export const config = {
   migrationsPath: env('MIRVWORLD_MIGRATIONS_PATH', './drizzle'),
   http: {
     port: parseInt(env('MIRVWORLD_HTTP_PORT', '4000'), 10),
+    secret: env('MIRVWORLD_HTTP_SECRET', 'secret'),
   },
 };
 

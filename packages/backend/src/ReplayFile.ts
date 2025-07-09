@@ -33,4 +33,8 @@ export class ReplayFile {
   public get map() {
     return this.replay.info.config.gameMap;
   }
+
+  public get turns() {
+    return this.replay.turns;
+  }
 }

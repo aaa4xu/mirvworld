@@ -21,16 +21,25 @@
   > for a better i18n experience.
 </p>
 
-<h2>Auth</h2>
-<DiscordLoginButton />
+{#if data.user}
+  <h2>{data.user.name}</h2>
+  <a href="/auth/logout">Logout</a>
+{:else}
+  <h2>Auth</h2>
+  <DiscordLoginButton />
+{/if}
 
 <h2>Latest finished matches</h2>
 <ul>
   {#each data.matches as match}
     {#if 'map' in match}
-      <li>{match.id} - {match.mode} at {match.map} for {Math.floor(match.duration / 1000 / 60)}min</li>
+      <li>
+        <a href="https://openfront.io/join/{match.id}" target="_blank">{match.id}</a> - {match.map} / {match.mode} / {Math.floor(
+          match.duration / 1000 / 60,
+        )}min
+      </li>
     {:else}
-      <li>{match.id} - (importing)</li>
+      <li><a href="https://openfront.io/join/{match.id}" target="_blank">{match.id}</a></li>
     {/if}
   {/each}
 </ul>

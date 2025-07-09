@@ -39,7 +39,11 @@
   <h1>Ошибка авторизации</h1>
   <div>Ошибка: {data.error}. Please <a href="/auth/discord/">try again</a>.</div>
 {:else if data.user}
-  <h1>Доступ к игровому профилю</h1>
+  <pre>
+    {data.user}
+  </pre>
+
+  <!--<h1>Доступ к игровому профилю</h1>
   <div class="discord-user">
     <img src="https://cdn.discordapp.com/avatars/{data.user.id}/{data.user.avatar}.png" alt="Avatar" />
     {data.user.global_name}
@@ -74,7 +78,7 @@
       <input type="text" placeholder="Player id" />
       <button>Сохранить</button>
     </form>
-  </section>
+  </section>-->
 {/if}
 
 <style>

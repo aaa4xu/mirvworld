@@ -6,3 +6,11 @@ export const matches = sqliteTable('matches', {
   lastFetchAt: integer({ mode: 'timestamp_ms' }),
   importedAt: integer({ mode: 'timestamp_ms' }),
 });
+
+export const users = sqliteTable('users', {
+  id: integer({ mode: 'number' }).primaryKey({ autoIncrement: true }),
+  name: text('name').notNull(),
+  discordId: text('discordId').notNull().unique(),
+  discordAvatar: text('discordAvatar'),
+  createdAt: integer({ mode: 'timestamp_ms' }).notNull(),
+});

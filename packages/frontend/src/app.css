@@ -1,12 +1,40 @@
-html, body {
-    padding: 0;
-    margin: 0;
+:root {
+  --main-background-color: #1f1f1f;
+  --main-border-color: #2a2a2a;
+
+  --accent-color1-background: #ebb409;
+  --accent-color1-color: #000;
+
+  --accent-color2-background: #901705;
+  --accent-color2-color: #fffad0;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
 }
 
 body {
-    font-family: "Open Sans", sans-serif;
-    font-optical-sizing: auto;
-    font-weight: 400;
-    font-style: normal;
-    font-variation-settings: "wdth" 100;
+  font-family: 'Open Sans', sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings: 'wdth' 100;
+
+  background: var(--main-background-color);
+  color: #bbb;
+}
+
+a {
+  text-decoration: none;
+  color: var(--accent-color1-background);
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.container {
+  padding: 0 1rem;
 }

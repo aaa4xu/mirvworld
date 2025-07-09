@@ -1,5 +1,9 @@
 {
   "name": "mirvworld",
+  "scripts": {
+    "sync:replays": "rsync -va --progress mirv.world:/var/lib/docker/volumes/mirvworld_backend-replays/_data/ ./storage/replays",
+    "sync:db": "rsync -va --progress mirv.world:/var/lib/docker/volumes/mirvworld_backend-db/_data/ ./storage/db"
+  },
   "workspaces": [
     "packages/*"
   ],
