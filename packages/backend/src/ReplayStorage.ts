@@ -14,7 +14,7 @@ export class ReplayStorage {
 
   public async read(id: string) {
     const archive = await Bun.file(this.filename(id)).bytes();
-    const content = await Bun.zstdDecompress(archive);
+    const content = Bun.gunzipSync(archive);
     const json = this.decoder.decode(content);
     const replay = ArchivedGameRecordSchema.parse(JSON.parse(json));
     return new ReplayFile(replay);
