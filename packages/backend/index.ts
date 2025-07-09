@@ -11,6 +11,7 @@ import { UsersRepository } from './src/UsersRepository.ts';
 import * as jose from 'jose';
 import { contextFactory } from './src/trpc/context.ts';
 import { TokenPayload } from './src/Schema/TokenPayload.ts';
+import { TRPCError } from '@trpc/server';
 
 const replayStorage = new ReplayStorage(config.replaysPath);
 const matchesRepository = new MatchesRepository(db);
@@ -45,7 +46,29 @@ const appRouter = router({
 
     return Promise.all(promises);
   }),
-  match: publicProcedure.input(z.string()).query((opts) => matchesRepository.read(opts.input)),
+  match: publicProcedure.input(z.string()).query(async (opts) => {
+    const info = await matchesRepository.read(opts.input);
+
+    if (!info) {
+      throw new TRPCError({
+        message: 'Match not found',
+        code: 'NOT_FOUND',
+      });
+    }
+
+    const replay = await replayStorage.load(info.id).catch(() => null);
+
+    if (!replay) {
+      return info;
+    } else {
+      return {
+        ...info,
+        map: replay.map,
+        mode: replay.mode,
+        duration: replay.duration,
+      };
+    }
+  }),
   discordLogin: publicProcedure
     .input(
       z.object({

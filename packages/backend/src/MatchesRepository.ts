@@ -15,8 +15,9 @@ export class MatchesRepository {
       .limit(limit);
   }
 
-  public read(id: string) {
-    return this.db.select().from(matches).where(eq(matches.id, id));
+  public async read(id: string) {
+    const results = await this.db.select().from(matches).where(eq(matches.id, id));
+    return results.length === 1 ? results[0]! : null;
   }
 
   public async addToQueue(id: string, startedAt: number) {
