@@ -29,6 +29,7 @@ services:
       - v4.env
     environment:
       - LURKER_LOBBY_INTERVAL=1000
+      - LURKER_REDIS_URL=redis://redis:6379
 
   redis:
     restart: always
