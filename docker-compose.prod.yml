@@ -46,6 +46,17 @@ services:
     networks:
       - cloudflare
 
+  game-v0_23_16:
+    image: mirvworld/game:v0.23.16
+    build:
+      context: .
+      dockerfile: docker/game.Dockerfile
+      args:
+        - GIT_BRANCH=v0.23.16
+    restart: always
+    networks:
+      - cloudflare
+
 networks:
   cloudflare:
 
