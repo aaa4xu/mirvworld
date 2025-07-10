@@ -7,17 +7,16 @@ export class DownloadQueue {
     }
   }
 
-  public push(id: string, startedAt: number) {
+  public async push(id: string, startedAt: number) {
     this.state.push({
       id,
       startedAt,
       lastAttemptAt: startedAt,
       attempts: 0,
     });
-    return this;
   }
 
-  public pop() {
+  public async pop() {
     const now = Date.now();
     const entry = this.state
       .filter((e) => {
@@ -38,7 +37,7 @@ export class DownloadQueue {
     }
   }
 
-  public remove(id: string) {
+  public async remove(id: string) {
     this.state = this.state.filter((e) => e.id !== id);
     return this;
   }

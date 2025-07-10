@@ -18,7 +18,7 @@ export class ReplayLurker {
     this.abortController.signal.throwIfAborted();
 
     try {
-      const id = this.queue.pop();
+      const id = await this.queue.pop();
       if (!id) return;
 
       const gameRecord = await this.client.archivedGame(id);
@@ -26,7 +26,7 @@ export class ReplayLurker {
 
       const startAt = performance.now();
       await this.storage.save(id, gameRecord);
-      this.queue.remove(id);
+      await this.queue.remove(id);
       console.log(`[ReplayLurker] Saved replay for ${id} in ${performance.now() - startAt}ms`);
     } catch (err) {
       console.error(`[ReplayLurker] Failed to download replay:`, err);

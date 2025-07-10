@@ -29,7 +29,7 @@ export class LobbiesLurker {
         if (this.lastTickLobbies.includes(lobby.gameID)) continue;
 
         console.log(`[LobbiesLurker] Detected lobby ${lobby.gameID}`);
-        this.queue.push(lobby.gameID, baseTime + (lobby.msUntilStart ?? 0));
+        await this.queue.push(lobby.gameID, baseTime + (lobby.msUntilStart ?? 0));
       }
 
       this.lastTickLobbies = lobbies.map((l) => l.gameID);
