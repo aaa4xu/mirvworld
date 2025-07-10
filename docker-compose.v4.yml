@@ -5,6 +5,11 @@ services:
     command: server /data --console-address ":9001"
     environment:
       - MINIO_COMPRESSION_ENABLE=on
+      - MINIO_NOTIFY_REDIS_ENABLE_PRIMARY=on
+      - MINIO_NOTIFY_REDIS_ADDRESS_PRIMARY=redis:6379
+      - MINIO_NOTIFY_REDIS_KEY_PRIMARY=storage/bucketevents
+      - MINIO_NOTIFY_REDIS_FORMAT_PRIMARY=access
+      - MINIO_NOTIFY_REDIS_QUEUE_DIR_PRIMARY=/opt/minio/events
 
   lurker:
     image: mirvworld/lurker
@@ -12,3 +17,8 @@ services:
       context: .
       dockerfile: packages/lurker/Dockerfile
     restart: unless-stopped
+
+  redis:
+    image: redis:8-alpine
+    restart: unless-stopped
+    command: redis-server --save 60 1 --loglevel warning

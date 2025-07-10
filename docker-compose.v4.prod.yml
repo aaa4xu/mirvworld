@@ -12,6 +12,7 @@ services:
     restart: always
     volumes:
       - storage:/data
+      - storage-events:/opt/minio/events
     env_file:
       - v4.env
     environment:
@@ -20,7 +21,7 @@ services:
       - cloudflare
       - default
     ports:
-      - 127.0.0.1:9001:9001
+      - 127.0.0.1:10001:9001
 
   lurker:
     restart: always
@@ -29,9 +30,18 @@ services:
     volumes:
       - lurker:/app/storage
 
+  redis:
+    restart: always
+    volumes:
+      - redis:/data
+    ports:
+      - 127.0.0.1:10002:6379
+
 volumes:
   storage:
+  storage-events:
   lurker:
+  redis:
 
 networks:
   cloudflare:

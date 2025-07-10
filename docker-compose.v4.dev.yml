@@ -4,7 +4,8 @@ services:
       - 9000:9000
       - 9001:9001
     volumes:
-      - ./storage/docker/storage:/data
+      - ./storage/docker/storage/data:/data
+      - ./storage/docker/storage/events:/opt/minio/events
     environment:
       - MINIO_ROOT_USER=minioadmin
       - MINIO_ROOT_PASSWORD=minioadmin
@@ -15,3 +16,9 @@ services:
     environment:
       - LURKER_S3_KEY_ID=minioadmin
       - LURKER_S3_SECRET=minioadmin
+
+  redis:
+    volumes:
+      - ./storage/docker/redis:/data
+    ports:
+      - 9002:6379
