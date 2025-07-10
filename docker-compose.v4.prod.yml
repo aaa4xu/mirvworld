@@ -14,9 +14,13 @@ services:
       - storage:/data
     env_file:
       - v4.env
+    environment:
+      - MINIO_COMPRESSION_ENABLE=on
     networks:
       - cloudflare
       - default
+    ports:
+      - 127.0.0.1:9001:9001
 
   lurker:
     restart: always
