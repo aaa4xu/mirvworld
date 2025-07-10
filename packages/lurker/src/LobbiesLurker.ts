@@ -16,6 +16,7 @@ export class LobbiesLurker {
     private readonly queue: DownloadQueue,
     private readonly interval = 1_000,
   ) {
+    console.log(`[LobbiesLurker] Starting with ${interval}ms interval`);
     this.tick();
   }
 
@@ -37,7 +38,7 @@ export class LobbiesLurker {
       console.error(`[LobbiesLurker] Error fetching lobbies:`, err);
     } finally {
       if (!this.abortController.signal.aborted) {
-        this.timerId = setTimeout(() => this.tick(), startAt + this.interval - Date.now());
+        this.timerId = setTimeout(() => this.tick(), Math.max(startAt + this.interval - Date.now(), 250));
       }
     }
   }

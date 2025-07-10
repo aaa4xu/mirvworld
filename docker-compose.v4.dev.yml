@@ -21,4 +21,4 @@ services:
     volumes:
       - ./storage/docker/redis:/data
     ports:
-      - 9002:6379
+      - 6379:6379
