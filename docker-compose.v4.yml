@@ -1,0 +1,14 @@
+services:
+  storage:
+    image: quay.io/minio/minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      - MINIO_COMPRESSION_ENABLE=on
+
+  lurker:
+    image: mirvworld/lurker
+    build:
+      context: .
+      dockerfile: packages/lurker/Dockerfile
+    restart: unless-stopped

@@ -1,0 +1,33 @@
+services:
+  tunnel:
+    image: cloudflare/cloudflared
+    restart: always
+    env_file:
+      - v4.env
+    command: tunnel run
+    networks:
+      - cloudflare
+
+  storage:
+    restart: always
+    volumes:
+      - storage:/data
+    env_file:
+      - v4.env
+    networks:
+      - cloudflare
+      - default
+
+  lurker:
+    restart: always
+    env_file:
+      - v4.env
+    volumes:
+      - lurker:/app/storage
+
+volumes:
+  storage:
+  lurker:
+
+networks:
+  cloudflare:
