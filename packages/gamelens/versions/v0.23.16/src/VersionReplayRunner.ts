@@ -11,12 +11,12 @@ import { createGame } from '../game/src/core/game/GameImpl.ts';
 import { GameRunner } from '../game/src/core/GameRunner.ts';
 import { Executor } from '../game/src/core/execution/ExecutionManager.ts';
 import type { LensStats } from '../../../src/LensStats.ts';
-import { LensPluginWrapper } from '../../../src/LensPluginWrapper.ts';
-import { PlayersLensPlugin } from './LensPlugins/PlayersLensPlugin.ts';
 import path from 'node:path';
-import { PlaybackDurationLensPlugin } from '../../../src/LensPlugins/PlaybackDurationLensPlugin.ts';
-import { PlaybackDurationInTicksLensPlugin } from './LensPlugins/PlaybackDurationInTicksLensPlugin.ts';
 import type { ReplayRunner } from '../../../src/ReplayRunner.ts';
+import { LensTrackerGroup } from '../../../src/LensTrackers/LensTrackerGroup.ts';
+import { PlayersTrackers } from './LensTrackers/PlayersTrackers.ts';
+import { PlaybackDurationTracker } from '../../../src/LensTrackers/PlaybackDurationTracker.ts';
+import { PlaybackDurationInTicksTracker } from './LensTrackers/PlaybackDurationInTicksTracker.ts';
 
 export class VersionReplayRunner implements ReplayRunner<GameRecord> {
   public constructor(private readonly mapsPath: string) {}
@@ -41,10 +41,10 @@ export class VersionReplayRunner implements ReplayRunner<GameRecord> {
   }
 
   private createStatsPlugin(stats: LensStats) {
-    return new LensPluginWrapper([
-      new PlayersLensPlugin(stats),
-      new PlaybackDurationLensPlugin(stats),
-      new PlaybackDurationInTicksLensPlugin(stats),
+    return new LensTrackerGroup([
+      new PlayersTrackers(stats),
+      new PlaybackDurationTracker(stats),
+      new PlaybackDurationInTicksTracker(stats),
     ]);
   }
 

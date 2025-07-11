@@ -1,8 +1,8 @@
-import { TypedLensPlugin } from './TypedLensPlugin.ts';
+import { TypedLensTracker } from './TypedLensTracker.ts';
 import type { GameRunner } from '../../game/src/core/GameRunner.ts';
 import { PlayerType } from '../../game/src/core/game/Game.ts';
 
-export class PlayersLensPlugin extends TypedLensPlugin {
+export class PlayersTrackers extends TypedLensTracker {
   override onGameStart(runner: GameRunner) {
     super.onGameStart(runner);
 

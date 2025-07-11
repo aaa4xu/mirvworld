@@ -1,10 +1,10 @@
 import type { GameRunner } from '../../game/src/core/GameRunner.ts';
 import type { Turn } from '../../game/src/core/Schemas.ts';
-import { BaseLensPlugin } from '../../../../src/BaseLensPlugin.ts';
 import { type LensStats } from '../../../../src/LensStats.ts';
 import { PlayerType } from '../../game/src/core/game/Game.ts';
+import { BaseLensTracker } from '../../../../src/LensTrackers/BaseLensTracker.ts';
 
-export class PlayersLensPlugin extends BaseLensPlugin<GameRunner, Turn> {
+export class PlayersLensPlugin extends BaseLensTracker<GameRunner, Turn> {
   public constructor(stats: LensStats) {
     super(stats);
   }

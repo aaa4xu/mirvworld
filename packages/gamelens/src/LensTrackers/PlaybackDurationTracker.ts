@@ -1,6 +1,6 @@
-import { BaseLensPlugin } from '../BaseLensPlugin.ts';
+import { BaseLensTracker } from './BaseLensTracker.ts';
 
-export class PlaybackDurationLensPlugin extends BaseLensPlugin<unknown, unknown> {
+export class PlaybackDurationTracker extends BaseLensTracker<unknown, unknown> {
   private turns = 0;
   private startAt = 0;
 

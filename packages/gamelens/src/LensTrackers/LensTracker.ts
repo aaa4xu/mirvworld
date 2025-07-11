@@ -1,4 +1,4 @@
-export interface LensPlugin<GameRunner, Turn> {
+export interface LensTracker<GameRunner, Turn> {
   onGameStart(runner: GameRunner): void;
 
   onGameEnd(runner: GameRunner): void;

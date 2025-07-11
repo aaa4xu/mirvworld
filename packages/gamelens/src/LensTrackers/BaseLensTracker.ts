@@ -1,7 +1,7 @@
-import { LensStats } from './LensStats.ts';
-import type { LensPlugin } from './LensPlugin.ts';
+import { LensStats } from '../LensStats.ts';
+import type { LensTracker } from './LensTracker.ts';
 
-export class BaseLensPlugin<GameRunner, Turn> implements LensPlugin<GameRunner, Turn> {
+export class BaseLensTracker<GameRunner, Turn> implements LensTracker<GameRunner, Turn> {
   public constructor(protected readonly stats: LensStats) {}
 
   onGameStart(runner: GameRunner) {}

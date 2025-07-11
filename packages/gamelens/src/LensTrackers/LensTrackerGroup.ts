@@ -1,7 +1,7 @@
-import type { LensPlugin } from './LensPlugin.ts';
+import type { LensTracker } from './LensTracker.ts';
 
-export class LensPluginWrapper<GameRunner, Turn> implements LensPlugin<GameRunner, Turn> {
-  public constructor(protected readonly plugins: ReadonlyArray<LensPlugin<GameRunner, Turn>>) {}
+export class LensTrackerGroup<GameRunner, Turn> implements LensTracker<GameRunner, Turn> {
+  public constructor(protected readonly plugins: ReadonlyArray<LensTracker<GameRunner, Turn>>) {}
 
   public onGameStart(runner: GameRunner) {
     for (const plugin of this.plugins) {

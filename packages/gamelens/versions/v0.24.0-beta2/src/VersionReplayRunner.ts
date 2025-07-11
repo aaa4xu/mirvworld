@@ -1,5 +1,4 @@
 import path from 'node:path';
-import { LensPluginWrapper } from '../../../src/LensPluginWrapper.ts';
 import type { LensStats } from '../../../src/LensStats.ts';
 import { DefaultConfig } from '../game/src/core/configuration/DefaultConfig.ts';
 import { prodConfig } from '../game/src/core/configuration/ProdConfig.ts';
@@ -13,9 +12,10 @@ import { PseudoRandom } from '../game/src/core/PseudoRandom.ts';
 import { type GameEndInfo, type GameRecord, type GameStartInfo } from '../game/src/core/Schemas.ts';
 import { decompressGameRecord, simpleHash } from '../game/src/core/Util.ts';
 import { PlayersLensPlugin } from './LensPlugins/PlayersLensPlugin.ts';
-import { PlaybackDurationLensPlugin } from '../../../src/LensPlugins/PlaybackDurationLensPlugin.ts';
-import { PlaybackDurationInTicksLensPlugin } from './LensPlugins/PlaybackDurationInTicksLensPlugin.ts';
+import { PlaybackDurationInTicksTracker } from './LensPlugins/PlaybackDurationInTicksTracker.ts';
 import type { ReplayRunner } from '../../../src/ReplayRunner.ts';
+import { LensTrackerGroup } from '../../../src/LensTrackers/LensTrackerGroup.ts';
+import { PlaybackDurationTracker } from '../../../src/LensTrackers/PlaybackDurationTracker.ts';
 
 export class VersionReplayRunner implements ReplayRunner<GameRecord> {
   public constructor(private readonly mapsPath: string) {}
@@ -40,10 +40,10 @@ export class VersionReplayRunner implements ReplayRunner<GameRecord> {
   }
 
   private createStatsPlugin(stats: LensStats) {
-    return new LensPluginWrapper([
+    return new LensTrackerGroup([
       new PlayersLensPlugin(stats),
-      new PlaybackDurationLensPlugin(stats),
-      new PlaybackDurationInTicksLensPlugin(stats),
+      new PlaybackDurationTracker(stats),
+      new PlaybackDurationInTicksTracker(stats),
     ]);
   }
 
