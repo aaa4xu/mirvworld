@@ -1,4 +1,4 @@
-export class OpenFrontAPIClient {
+export class OpenFrontClient {
   protected readonly userAgent = 'MIRVWorldBot/0.4';
   protected readonly acceptEncoding = 'gzip, deflate, br, zstd';
 
@@ -20,5 +20,15 @@ export class OpenFrontAPIClient {
     if (!response.headers.get('Content-Type')?.startsWith(type)) {
       throw new Error(`Invalid content type: expected=${type} actual=${contentType}`);
     }
+  }
+
+  protected request(url: URL, signal?: AbortSignal) {
+    return fetch(url, {
+      headers: {
+        'User-Agent': this.userAgent,
+        'Accept-Encoding': this.acceptEncoding,
+      },
+      signal: this.withTimeout(signal),
+    });
   }
 }

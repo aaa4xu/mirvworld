@@ -1,11 +1,11 @@
 import { type ArchivedGameRecord, ArchivedGameResponseSchema } from './Schema/ArchivedGameResponse.ts';
 import { LobbiesResponse } from './Schema/LobbiesResponse.ts';
-import { OpenFrontAPIClient } from './OpenFrontAPIClient.ts';
+import { OpenFrontClient } from './OpenFrontClient.ts';
 
 /**
  * Client for interacting with the OpenFront server API
  */
-export class OpenFrontServerAPI extends OpenFrontAPIClient {
+export class OpenFrontServerAPI extends OpenFrontClient {
   public async publicLobbies(signal?: AbortSignal) {
     const response = await this.request(this.publicLobbiesUrl(), signal);
 
@@ -50,15 +50,5 @@ export class OpenFrontServerAPI extends OpenFrontAPIClient {
 
   private publicLobbiesUrl() {
     return this.url('/api/public_lobbies');
-  }
-
-  private request(url: URL, signal?: AbortSignal) {
-    return fetch(url, {
-      headers: {
-        'User-Agent': this.userAgent,
-        'Accept-Encoding': this.acceptEncoding,
-      },
-      signal: this.withTimeout(signal),
-    });
   }
 }
