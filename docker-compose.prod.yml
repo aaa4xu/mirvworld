@@ -34,29 +34,6 @@ services:
     networks:
       - default
 
-  replays:
-    image: nginx:1.29-alpine
-    restart: always
-    volumes:
-      - backend-replays:/replays:ro
-      - ./docker/replays-nginx.conf:/etc/nginx/templates/replays.conf.template:ro
-    environment:
-      - NGINX_HOST=replays.mirv.world
-      - NGINX_ALLOWED_ORIGIN=https://mirv.world
-    networks:
-      - cloudflare
-
-  game-v0_23_16:
-    image: mirvworld/game:v0.23.16
-    build:
-      context: .
-      dockerfile: docker/game.Dockerfile
-      args:
-        - GIT_BRANCH=v0.23.16
-    restart: always
-    networks:
-      - cloudflare
-
 networks:
   cloudflare:
 
