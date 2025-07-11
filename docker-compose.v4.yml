@@ -22,3 +22,14 @@ services:
     image: redis:8-alpine
     restart: unless-stopped
     command: redis-server --save 60 1 --loglevel warning
+
+  game-snapshot-v0-23-16:
+    image: mirvworld/game-snapshot:v0.23.16
+    build:
+      context: .
+      dockerfile: packages/game-snapshot/Dockerfile
+      args:
+        - GIT_BRANCH=v0.23.16
+    restart: unless-stopped
+    environment:
+      - NGINX_STORAGE_PREFIX=http://storage:9000/replays/4339644

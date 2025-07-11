@@ -22,3 +22,7 @@ services:
       - ./storage/docker/redis:/data
     ports:
       - 6379:6379
+
+  game-snapshot-v0-23-16:
+    ports:
+      - 12316:80

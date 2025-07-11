@@ -38,6 +38,11 @@ services:
     ports:
       - 127.0.0.1:10002:6379
 
+  game-snapshot-v0-23-16:
+    restart: always
+    networks:
+      - cloudflare
+
 volumes:
   storage:
   storage-events:

@@ -1,0 +1,15 @@
+diff --git a/src/client/index.html b/src/client/index.html
+index 52e7bb7f..d036ae05 100644
+--- a/src/client/index.html
++++ b/src/client/index.html
+@@ -49,6 +49,10 @@
+       .component-hideable:has(> .parent-hidden) {
+         display: none;
+       }
++
++      #login-discord, #host-lobby-button {
++        display: none;
++      }
+     </style>
+ 
+     <!-- Immediate execution to prevent FOUC -->

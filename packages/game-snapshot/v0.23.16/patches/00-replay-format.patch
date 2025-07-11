@@ -1,0 +1,56 @@
+diff --git a/src/client/JoinPrivateLobbyModal.ts b/src/client/JoinPrivateLobbyModal.ts
+index 01424e26..3311d132 100644
+--- a/src/client/JoinPrivateLobbyModal.ts
++++ b/src/client/JoinPrivateLobbyModal.ts
+@@ -214,38 +214,21 @@ export class JoinPrivateLobbyModal extends LitElement {
+ 
+     const archiveData = await archiveResponse.json();
+ 
+-    if (
+-      archiveData.success === false &&
+-      archiveData.error === "Version mismatch"
+-    ) {
+-      consolex.warn(
+-        `Git commit hash mismatch for game ${lobbyId}`,
+-        archiveData.details,
+-      );
+-      this.message =
+-        "This game was created with a different version. Cannot join.";
+-      return true;
+-    }
++    const gameRecord = archiveData as GameRecord;
+ 
+-    if (archiveData.exists) {
+-      const gameRecord = archiveData.gameRecord as GameRecord;
+-
+-      this.dispatchEvent(
+-        new CustomEvent("join-lobby", {
+-          detail: {
+-            gameID: lobbyId,
+-            gameRecord: gameRecord,
+-            clientID: generateID(),
+-          } as JoinLobbyEvent,
+-          bubbles: true,
+-          composed: true,
+-        }),
+-      );
+-
+-      return true;
+-    }
++    this.dispatchEvent(
++      new CustomEvent("join-lobby", {
++        detail: {
++          gameID: lobbyId,
++          gameRecord: gameRecord,
++          clientID: generateID(),
++        } as JoinLobbyEvent,
++        bubbles: true,
++        composed: true,
++      }),
++    );
+ 
+-    return false;
++    return true;
+   }
+ 
+   private async pollPlayers() {
