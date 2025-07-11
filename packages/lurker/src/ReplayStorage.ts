@@ -1,4 +1,4 @@
-import { type ArchivedGameRecord } from './Schema/ArchivedGameResponse.ts';
+import { type ArchivedGameRecord } from './OpenFront/Schema/ArchivedGameResponse.ts';
 import { S3Client } from 'bun';
 
 export class ReplayStorage {

@@ -2,7 +2,7 @@ import { RedisClient } from 'bun';
 import { config } from './config';
 import { DownloadQueue } from './src/DownloadQueue.ts';
 import { LobbiesLurker } from './src/LobbiesLurker.ts';
-import { OpenFrontServerAPI } from './src/OpenFrontServerAPI.ts';
+import { OpenFrontServerAPI } from './src/OpenFront/OpenFrontServerAPI.ts';
 import { S3Client } from 'bun';
 import { ReplayLurker } from './src/ReplayLurker.ts';
 import { ReplayStorage } from './src/ReplayStorage.ts';

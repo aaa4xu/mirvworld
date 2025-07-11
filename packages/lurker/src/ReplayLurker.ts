@@ -1,4 +1,4 @@
-import type { OpenFrontServerAPI } from './OpenFrontServerAPI.ts';
+import type { OpenFrontServerAPI } from './OpenFront/OpenFrontServerAPI.ts';
 import type { DownloadQueue } from './DownloadQueue.ts';
 import type { ReplayStorage } from './ReplayStorage.ts';
 
