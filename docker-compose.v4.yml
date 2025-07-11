@@ -29,7 +29,7 @@ services:
       context: .
       dockerfile: packages/game-snapshot/Dockerfile
       args:
-        - GIT_BRANCH=v0.23.16
+        - GIT_COMMIT=4339644
     restart: unless-stopped
     environment:
       - NGINX_STORAGE_PREFIX=http://storage:9000/replays/4339644

@@ -2,11 +2,10 @@ FROM node:24-slim AS builder
 WORKDIR /usr/local/src/openfront
 RUN apt-get update && apt-get install -y git
 
-ARG GIT_BRANCH
-RUN git clone --depth 1 --branch $GIT_BRANCH https://github.com/openfrontio/OpenFrontIO.git /usr/local/src/openfront
+ARG GIT_COMMIT
+RUN git clone https://github.com/openfrontio/OpenFrontIO.git /usr/local/src/openfront && git reset --hard $GIT_COMMIT
 RUN npm install
-
-COPY packages/game-snapshot/$GIT_BRANCH/patches/ patches/
+COPY packages/game-snapshot/$GIT_COMMIT/patches/ patches/
 RUN set -eux; \
     if [ -d patches ] && ls patches/*.patch >/dev/null 2>&1; then \
         for p in $(ls -1 patches/*.patch | sort); do \
