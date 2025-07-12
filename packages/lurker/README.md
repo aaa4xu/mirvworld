@@ -1,15 +1,16 @@
-# lurker
+# Lurker
+Lurker is a lightweight, self‑contained service that monitors OpenFront.io public game lobbies, downloads their replays once they finish, and archives them to an S3‑compatible object store.
 
-To install dependencies:
+## Requirements
+- Bun (v1.x or later) for development and runtime
+- Redis server for queuing
+- S3-compatible storage for replay storage
 
-```bash
+## Running from Source
+```shell
 bun install
-```
-
-To run:
-
-```bash
 bun run index.ts
 ```
 
-This project was created using `bun init` in bun v1.2.18. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+## Importing Historical Matches
+Place a JSON array of match IDs at the path specified by `LURKER_IMPORT_PATH` (`import.json` by default).  On launch, `HistoryImporter` will iterate the list, fetch each replay through the public API, and archive it just like live games.
