@@ -2,7 +2,7 @@ import cluster from 'node:cluster';
 import os from 'node:os';
 import { RedisClient, S3Client } from 'bun';
 import { type PlaybackEngine } from './PlaybackEngine';
-// @ts-expect-error файл существует только в целевой папке
+// @ts-ignore файл существует только в целевой папке
 import { ReplayPlaybackEngine } from '../ReplayPlaybackEngine';
 
 if (cluster.isPrimary) {

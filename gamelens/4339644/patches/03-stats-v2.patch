@@ -1,0 +1,74 @@
+diff --git a/src/ReplayPlaybackEngine.ts b/src/ReplayPlaybackEngine.ts
+index 21d7daa0..0c38e697 100644
+--- a/src/ReplayPlaybackEngine.ts
++++ b/src/ReplayPlaybackEngine.ts
+@@ -18,7 +18,7 @@ import { createGame } from "./core/game/GameImpl";
+ import { GameMap, GameMapImpl } from "./core/game/GameMap";
+ import { MAP_FILE_NAMES } from "./core/game/TerrainMapFileLoader";
+ import { NationMap } from "./core/game/TerrainMapLoader";
+-import { LensStats, LensStatsTurn } from "./gamelens/LensStats";
++import { LensStats, LensStatsPlayerTurn } from "./gamelens/LensStats";
+ import { PlaybackEngine } from "./gamelens/PlaybackEngine";
+ 
+ export class ReplayPlaybackEngine implements PlaybackEngine<GameRecord> {
+@@ -40,8 +40,13 @@ export class ReplayPlaybackEngine implements PlaybackEngine<GameRecord> {
+     const record = decompressGameRecord(replay);
+     const runner = await this.createGameRunner(record.info);
+ 
++    const winner = record.info.winner;
++    if (!winner) {
++      throw new Error("No winner found in replay");
++    }
++
+     const spawns = new Map<string, [number, number]>();
+-    const turns: LensStatsTurn[] = [];
++    const turns: Array<Record<string, LensStatsPlayerTurn>> = [];
+ 
+     for (let i = 0; i < record.turns.length; i++) {
+       signal.throwIfAborted();
+@@ -60,27 +65,35 @@ export class ReplayPlaybackEngine implements PlaybackEngine<GameRecord> {
+       const turnStats = runner.game
+         .allPlayers()
+         .filter((p) => p.type() === PlayerType.Human)
+-        .reduce((acc, player) => {
+-          const clientId = player.clientID();
+-
+-          if (clientId) {
+-            acc[clientId] = player.numTilesOwned();
+-          }
+-
+-          return acc;
+-        }, {} as LensStatsTurn);
++        .reduce(
++          (acc, player) => {
++            const clientId = player.clientID();
++
++            if (clientId) {
++              acc[clientId] = {
++                territory: player.numTilesOwned(),
++                workers: player.workers(),
++                troops: player.troops(),
++              };
++            }
++
++            return acc;
++          },
++          {} as Record<string, LensStatsPlayerTurn>,
++        );
+       turns.push(turnStats);
+       await Bun.sleep(1);
+     }
+ 
+     return {
+-      version: "1",
++      version: "2",
+       map: record.info.config.gameMap,
+       mode: record.info.config.gameMode,
+       commit: record.gitCommit,
+       id: record.info.gameID,
+       startedAt: record.info.start,
+       finishedAt: record.info.end,
++      winner,
+       players: record.info.players.map((p) => {
+         return {
+           id: p.clientID,

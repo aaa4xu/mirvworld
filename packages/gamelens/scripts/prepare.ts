@@ -60,6 +60,7 @@ for (const version of versions) {
   }
   console.log('- Copying shared files...');
   await $`cp -r ${sharedRoot} ${gamelensPath}`.quiet();
+  await $`cd ${gamePath} && git add . && git commit -m "current gamelens state"`.quiet();
 }
 
 console.log('Done!');

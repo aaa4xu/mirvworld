@@ -1,6 +1,6 @@
 export interface LensStats {
   /* Event version */
-  version: "1";
+  version: '2';
   /* Match ID */
   id: string;
   /* Game commit on which the match was played */
@@ -15,8 +15,10 @@ export interface LensStats {
   finishedAt: number;
   /* Human players */
   players: LensStatsPlayer[];
-  /* Statistics for each game step */
-  turns: LensStatsTurn[];
+  /* Player ID -> stats for each game step */
+  turns: Record<string, LensStatsPlayerTurn>[];
+  /* Winner */
+  winner: [type: 'player' | 'team', id: string];
 }
 
 export interface LensStatsPlayer {
@@ -27,10 +29,11 @@ export interface LensStatsPlayer {
   /* Team */
   team: string | null;
   /* Coordinates where player spawned */
-  spawn?: [number, number];
+  spawn?: [x: number, y: number];
 }
 
-export interface LensStatsTurn {
-  /* Player ID -> number of tiles owned */
-  territory: Record<string, number>;
+export interface LensStatsPlayerTurn {
+  territory: number;
+  troops: number;
+  workers: number;
 }
