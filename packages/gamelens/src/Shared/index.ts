@@ -38,12 +38,12 @@ async function worker(signal: AbortSignal) {
   const queueName = env('GAMELENS_REDIS_IN', 'storage:bucketevents');
   const resultsBucket = env('GAMELENS_RESULTS_BUCKET', 'gamelens');
   const commit = env('GAMELENS_GIT_COMMIT');
+  const queueType = env('GAMELENS_QUEUE_TYPE', 'fifo');
 
-  const textDecoder = new TextDecoder();
   const playback: PlaybackEngine<unknown> = new ReplayPlaybackEngine('./resources/maps', commit);
 
   while (!signal.aborted) {
-    const task = await redis.lpop(queueName);
+    const task = queueType === 'fifo' ? await redis.lpop(queueName) : await redis.rpop(queueName);
     if (!task) {
       await Bun.sleep(250);
       continue;
