@@ -1,0 +1,220 @@
+diff --git a/src/ReplayPlaybackEngine.ts b/src/ReplayPlaybackEngine.ts
+new file mode 100644
+index 00000000..21d7daa0
+--- /dev/null
++++ b/src/ReplayPlaybackEngine.ts
+@@ -0,0 +1,214 @@
++import { MapData } from "frontend/src/lib/ReplayPlayer";
++import path from "path";
++import { GameRunner } from "./core/GameRunner";
++import { PseudoRandom } from "./core/PseudoRandom";
++import { GameEndInfo, GameRecord, GameStartInfo } from "./core/Schemas";
++import { decompressGameRecord, simpleHash } from "./core/Util";
++import { DefaultConfig } from "./core/configuration/DefaultConfig";
++import { prodConfig } from "./core/configuration/ProdConfig";
++import { Executor } from "./core/execution/ExecutionManager";
++import {
++  Cell,
++  GameMapType,
++  Nation,
++  PlayerInfo,
++  PlayerType,
++} from "./core/game/Game";
++import { createGame } from "./core/game/GameImpl";
++import { GameMap, GameMapImpl } from "./core/game/GameMap";
++import { MAP_FILE_NAMES } from "./core/game/TerrainMapFileLoader";
++import { NationMap } from "./core/game/TerrainMapLoader";
++import { LensStats, LensStatsTurn } from "./gamelens/LensStats";
++import { PlaybackEngine } from "./gamelens/PlaybackEngine";
++
++export class ReplayPlaybackEngine implements PlaybackEngine<GameRecord> {
++  public constructor(
++    private readonly mapsPath: string,
++    private readonly gitCommit: string,
++  ) {}
++
++  public async process(
++    replay: GameRecord,
++    signal: AbortSignal,
++  ): Promise<LensStats> {
++    if (!replay.gitCommit.startsWith(this.gitCommit)) {
++      throw new Error(
++        `Replay is not from the same commit as the game. Expected ${this.gitCommit}, got ${replay.gitCommit}`,
++      );
++    }
++
++    const record = decompressGameRecord(replay);
++    const runner = await this.createGameRunner(record.info);
++
++    const spawns = new Map<string, [number, number]>();
++    const turns: LensStatsTurn[] = [];
++
++    for (let i = 0; i < record.turns.length; i++) {
++      signal.throwIfAborted();
++      const turn = record.turns[i]!;
++
++      if (runner.game.inSpawnPhase()) {
++        for (const intent of turn.intents) {
++          if (intent.type !== "spawn") continue;
++          spawns.set(intent.clientID, [intent.x, intent.y]);
++        }
++      }
++
++      runner.addTurn(turn);
++      runner.executeNextTick();
++
++      const turnStats = runner.game
++        .allPlayers()
++        .filter((p) => p.type() === PlayerType.Human)
++        .reduce((acc, player) => {
++          const clientId = player.clientID();
++
++          if (clientId) {
++            acc[clientId] = player.numTilesOwned();
++          }
++
++          return acc;
++        }, {} as LensStatsTurn);
++      turns.push(turnStats);
++      await Bun.sleep(1);
++    }
++
++    return {
++      version: "1",
++      map: record.info.config.gameMap,
++      mode: record.info.config.gameMode,
++      commit: record.gitCommit,
++      id: record.info.gameID,
++      startedAt: record.info.start,
++      finishedAt: record.info.end,
++      players: record.info.players.map((p) => {
++        return {
++          id: p.clientID,
++          name: p.username,
++          team: runner.game.playerByClientID(p.clientID)?.team() ?? null,
++          spawn: spawns.get(p.clientID),
++        };
++      }),
++      turns,
++    };
++  }
++
++  private async createGameRunner(replay: GameEndInfo): Promise<GameRunner> {
++    const config = new DefaultConfig(prodConfig, replay.config, null, true);
++    const random = new PseudoRandom(simpleHash(replay.gameID));
++
++    const terrain = await this.loadTerrainMap(replay.config.gameMap);
++    const humans = this.createHumans(replay, random);
++    const nations = this.createNations(replay, random, terrain.nationMap);
++
++    const game = createGame(
++      humans,
++      nations,
++      terrain.gameMap,
++      terrain.miniGameMap,
++      config,
++    );
++
++    const gr = new GameRunner(
++      game,
++      new Executor(game, replay.gameID, "mirvworld-replay-client"),
++      () => {},
++    );
++    gr.init();
++    return gr;
++  }
++
++  private async loadTerrainMap(map: GameMapType) {
++    const mapFiles = await this.loadMapData(map);
++
++    const [gameMap, miniGameMap] = await Promise.all([
++      this.genTerrainFromBin(mapFiles.mapBin),
++      this.genTerrainFromBin(mapFiles.miniMapBin),
++    ]);
++
++    return {
++      nationMap: mapFiles.nationMap,
++      gameMap: gameMap,
++      miniGameMap: miniGameMap,
++    };
++  }
++
++  private async loadMapData(map: GameMapType): Promise<MapData> {
++    const fileName = MAP_FILE_NAMES[map];
++    if (!fileName) {
++      throw new Error(`No file name mapping found for map: ${map}`);
++    }
++
++    const [mapBin, miniMapBin, nationMap] = await Promise.all([
++      Bun.file(path.join(this.mapsPath, `${fileName}.bin`)).bytes(),
++      Bun.file(path.join(this.mapsPath, `${fileName}Mini.bin`)).bytes(),
++      Bun.file(path.join(this.mapsPath, `${fileName}.json`)).json(),
++    ]);
++
++    return {
++      mapBin,
++      miniMapBin,
++      nationMap,
++    };
++  }
++
++  private genTerrainFromBin(data: Uint8Array): GameMap {
++    const width = (data[1]! << 8) | data[0]!;
++    const height = (data[3]! << 8) | data[2]!;
++
++    if (data.length !== width * height + 4) {
++      throw new Error(
++        `Invalid data: buffer size ${data.length} incorrect for ${width}x${height} terrain plus 4 bytes for dimensions (${width * height + 4}).`,
++      );
++    }
++
++    // Store raw data in Uint8Array
++    const rawData = new Uint8Array(width * height);
++    let numLand = 0;
++
++    // Copy data starting after the header
++    for (let i = 0; i < width * height; i++) {
++      const packedByte = data[i + 4]!;
++      rawData[i] = packedByte;
++      if (packedByte & 0b10000000) numLand++;
++    }
++
++    return new GameMapImpl(width, height, rawData, numLand);
++  }
++
++  private createHumans(replay: GameStartInfo, random: PseudoRandom) {
++    return replay.players.map(
++      (p) =>
++        new PlayerInfo(
++          p.flag,
++          p.username,
++          PlayerType.Human,
++          p.clientID,
++          random.nextID(),
++        ),
++    );
++  }
++
++  private createNations(
++    replay: GameStartInfo,
++    random: PseudoRandom,
++    nationsMap: NationMap,
++  ) {
++    return replay.config.disableNPCs
++      ? []
++      : nationsMap.nations.map(
++          (n) =>
++            new Nation(
++              new Cell(n.coordinates[0], n.coordinates[1]),
++              n.strength,
++              new PlayerInfo(
++                n.flag || "",
++                n.name,
++                PlayerType.FakeHuman,
++                null,
++                random.nextID(),
++              ),
++            ),
++        );
++  }
++}
