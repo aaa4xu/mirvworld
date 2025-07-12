@@ -17,8 +17,8 @@ export interface LensStats {
   players: LensStatsPlayer[];
   /* Player ID -> stats for each game step */
   turns: Record<string, LensStatsPlayerTurn>[];
-  /* Winner */
-  winner: [type: 'player' | 'team', id: string];
+  /* Winner from replay info */
+  winner?: [type: 'player' | 'team', id: string];
 }
 
 export interface LensStatsPlayer {
