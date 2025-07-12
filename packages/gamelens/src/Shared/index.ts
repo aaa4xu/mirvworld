@@ -36,7 +36,7 @@ async function worker(signal: AbortSignal) {
   });
 
   const queueName = env('GAMELENS_REDIS_IN', 'storage:bucketevents');
-  const resultsName = env('GAMELENS_REDIS_OUT', 'gamelens:results');
+  const resultsBucket = env('GAMELENS_RESULTS_BUCKET', 'gamelens');
   const commit = env('GAMELENS_GIT_COMMIT');
 
   const textDecoder = new TextDecoder();
@@ -59,7 +59,7 @@ async function worker(signal: AbortSignal) {
           try {
             const gameRecord = await s3Client.file(name, { bucket }).json();
             const stats = await playback.process(gameRecord, signal);
-            await redis.rpush(resultsName, JSON.stringify(stats));
+            await s3Client.write(`${commit}/${stats.id}.json`, JSON.stringify(stats), { bucket: resultsBucket });
           } catch (e) {
             console.error(`Failed process ${bucket}/${name}`, e);
             await redis.rpush(queueName, task);
