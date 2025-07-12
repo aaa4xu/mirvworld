@@ -57,11 +57,7 @@ async function worker(signal: AbortSignal) {
           const name = decodeURIComponent(event.s3.object.key);
 
           try {
-            const compressed = await s3Client.file(name, { bucket }).bytes();
-            const decompressed = name.endsWith('.zst') ? await Bun.zstdDecompress(compressed) : compressed;
-            const json = textDecoder.decode(decompressed);
-            const gameRecord = JSON.parse(json);
-
+            const gameRecord = await s3Client.file(name, { bucket }).json();
             const stats = await playback.process(gameRecord, signal);
             await redis.rpush(resultsName, JSON.stringify(stats));
           } catch (e) {
