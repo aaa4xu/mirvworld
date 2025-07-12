@@ -9,9 +9,9 @@ RUN bun build ./packages/lurker/index.ts --compile --minify --sourcemap --byteco
 
 FROM debian:stable-slim
 WORKDIR /app
-VOLUME /app/storage
-ENV LURKER_STATE=/app/storage/state.json
+ENV LURKER_IMPORT_PATH=/app/storage/import.json
 ENV LURKER_S3_ENDPOINT=http://storage:9000
+ENV LURKER_REDIS_URL=redis://redis:6379
 
 COPY --from=build /usr/src/app/lurker /app/
 RUN chmod +x /app/lurker

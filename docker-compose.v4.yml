@@ -17,6 +17,9 @@ services:
       context: .
       dockerfile: packages/lurker/Dockerfile
     restart: unless-stopped
+    depends_on:
+      - redis
+      - storage
 
   redis:
     image: redis:8-alpine
