@@ -21,6 +21,7 @@ services:
       - cloudflare
       - default
     ports:
+      - 100.111.103.57:9000:9000
       - 100.111.103.57:9001:9001
 
   lurker:
