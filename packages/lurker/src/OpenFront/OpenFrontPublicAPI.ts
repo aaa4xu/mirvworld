@@ -2,6 +2,7 @@ import { OpenFrontClient } from './OpenFrontClient.ts';
 import { APIErrorResponseSchema } from './Schema/APIErrorResponse.ts';
 import { OpenFrontError } from './Errors/OpenFrontError.ts';
 import { PlayerStatsSchema } from './Schema/PlayerStats.ts';
+import { ArchivedGameRecordSchema } from './Schema/ArchivedGameResponse.ts';
 
 export class OpenFrontPublicAPI extends OpenFrontClient {
   public async player(id: string, signal?: AbortSignal) {
@@ -14,17 +15,13 @@ export class OpenFrontPublicAPI extends OpenFrontClient {
     return PlayerStatsSchema.parse(json);
   }
 
-  /**
-   * The server stores replays of different game versions, so the exact response format
-   * cannot be determined and may vary depending on the game version
-   */
-  public async game(id: string, signal?: AbortSignal): Promise<unknown> {
+  public async game(id: string, signal?: AbortSignal) {
     const response = await this.request(this.gameUrl(id), signal);
 
     await this.processError(response);
     this.validateContentType(response, 'application/json');
 
-    return response.json();
+    return ArchivedGameRecordSchema.parse(await response.json());
   }
 
   private playerUrl(id: string) {

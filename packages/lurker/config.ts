@@ -1,5 +1,6 @@
 export const config = {
-  endpoint: env('LURKER_ENDPOINT', 'https://openfront.io'),
+  serverEndpoint: env('LURKER_ENDPOINT', 'https://openfront.io'),
+  apiEndpoint: env('LURKER_API_ENDPOINT', 'https://api.openfront.io'),
   s3: {
     keyId: env('LURKER_S3_KEY_ID', 'minioadmin'),
     secret: env('LURKER_S3_SECRET', 'minioadmin'),
@@ -8,6 +9,7 @@ export const config = {
   },
   redis: env('LURKER_REDIS_URL', 'redis://localhost:6379'),
   lobbyInterval: parseInt(env('LURKER_LOBBY_INTERVAL', '6000'), 10),
+  importPath: env('LURKER_IMPORT_PATH', './import.json'),
 };
 
 function env(name: string, defaultValue?: string): string {

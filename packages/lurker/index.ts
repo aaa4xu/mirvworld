@@ -6,6 +6,9 @@ import { OpenFrontServerAPI } from './src/OpenFront/OpenFrontServerAPI.ts';
 import { S3Client } from 'bun';
 import { ReplayLurker } from './src/ReplayLurker.ts';
 import { ReplayStorage } from './src/ReplayStorage.ts';
+import { OpenFrontPublicAPI } from './src/OpenFront/OpenFrontPublicAPI.ts';
+import * as z from 'zod/v4';
+import { HistoryImporter } from './src/HistoryImporter.ts';
 
 (async () => {
   const s3 = new S3Client({
@@ -15,18 +18,34 @@ import { ReplayStorage } from './src/ReplayStorage.ts';
     endpoint: config.s3.endpoint,
   });
 
+  const server = new OpenFrontServerAPI(config.serverEndpoint);
+  const api = new OpenFrontPublicAPI(config.apiEndpoint);
+  const abortController = new AbortController();
+
   const redis = new RedisClient(config.redis);
   const queue = new DownloadQueue(redis);
-  const api = new OpenFrontServerAPI(config.endpoint);
   const storage = new ReplayStorage(s3);
-  const lobbiesLurker = new LobbiesLurker(api, queue, config.lobbyInterval);
-  const replayLurker = new ReplayLurker(api, storage, queue);
+  const lobbiesLurker = new LobbiesLurker(server, queue, config.lobbyInterval);
+  const replayLurker = new ReplayLurker(server, storage, queue);
+
+  Bun.file(config.importPath)
+    .exists()
+    .then(async (exists) => {
+      if (!exists) return;
+      const matches = z.array(z.string()).parse(await Bun.file(config.importPath).json());
+
+      console.log(`[Main] Importing ${matches.length} matches from history`);
+      const historyImporter = new HistoryImporter(api, storage);
+      await historyImporter.process(matches, abortController.signal);
+      console.log(`[Main] Import finished`);
+    })
+    .catch((err) => console.error(`[Main] Failed to start import: ${config.importPath}: ${err}`));
 
   async function dispose() {
     console.log(`[Main] Shutting down...`);
     lobbiesLurker.dispose();
     replayLurker.dispose();
-    process.exit(0);
+    abortController.abort();
   }
 
   process.on('SIGTERM', dispose);

@@ -1,16 +1,9 @@
-import { z } from 'zod';
-import { GameEndInfoSchema, GameRecordSchema, PlayerRecordSchema } from 'openfront-client/src/core/Schemas.ts';
+import { z } from 'zod/v4';
 
-export const ArchivedGamePlayerRecordSchema = PlayerRecordSchema.omit({
-  persistentID: true,
-});
+export const GitCommitSchema = z.string().regex(/^[0-9a-fA-F]{40}$/);
 
-export const ArchivedGameInfoSchema = GameEndInfoSchema.extend({
-  players: z.array(ArchivedGamePlayerRecordSchema),
-});
-
-export const ArchivedGameRecordSchema = GameRecordSchema.extend({
-  info: ArchivedGameInfoSchema,
+export const ArchivedGameRecordSchema = z.looseObject({
+  gitCommit: GitCommitSchema,
 });
 
 export type ArchivedGameRecord = z.infer<typeof ArchivedGameRecordSchema>;

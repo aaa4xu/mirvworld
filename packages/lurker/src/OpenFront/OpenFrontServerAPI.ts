@@ -1,4 +1,4 @@
-import { type ArchivedGameRecord, ArchivedGameResponseSchema } from './Schema/ArchivedGameResponse.ts';
+import { ArchivedGameResponseSchema, type ArchivedGameRecord } from './Schema/ArchivedGameResponse.ts';
 import { LobbiesResponse } from './Schema/LobbiesResponse.ts';
 import { OpenFrontClient } from './OpenFrontClient.ts';
 
