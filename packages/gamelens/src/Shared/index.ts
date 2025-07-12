@@ -65,13 +65,13 @@ async function worker(signal: AbortSignal) {
             const stats = await playback.process(gameRecord, signal);
             await redis.rpush(resultsName, JSON.stringify(stats));
           } catch (e) {
-            console.error(`Failed process ${bucket}/${name}`, e instanceof Error ? e.message : e);
+            console.error(`Failed process ${bucket}/${name}`, e);
             await redis.rpush(queueName, task);
           }
         }
       }
     } catch (e) {
-      console.error('Failed process task from queue', e instanceof Error ? e.message : e);
+      console.error('Failed process task from queue', e);
       await redis.rpush(queueName, task);
     }
 
