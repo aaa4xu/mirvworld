@@ -3,6 +3,8 @@ WORKDIR /usr/src/app
 RUN apt-get update && apt-get install -y git
 COPY . .
 
+RUN git config --global user.email gamelens@mirv.world && git config --global user.name gamelens
+
 ARG GAME_COMMIT
 RUN bun run packages/gamelens/scripts/prepare.ts ${GAME_COMMIT}
 
