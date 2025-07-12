@@ -1,17 +1,23 @@
 import { type ArchivedGameRecord } from './OpenFront/Schema/ArchivedGameResponse.ts';
-import { S3Client } from 'bun';
+import { Client } from 'minio';
 
 export class ReplayStorage {
-  public constructor(private readonly client: S3Client) {}
+  public constructor(
+    private readonly client: Client,
+    private readonly bucket: string,
+  ) {}
 
   public async save(id: string, replay: ArchivedGameRecord) {
     const json = JSON.stringify(replay, (key, value) => (typeof value === 'bigint' ? value.toString() : value));
-    await this.client.write(this.filename(replay.gitCommit, id), json, {
-      type: 'application/json',
+    const compressed = await Bun.zstdCompress(json, { level: 17 });
+
+    await this.client.putObject(this.bucket, this.filename(replay.gitCommit, id), compressed, compressed.length, {
+      'Content-Type': 'application/json',
+      'Content-Encoding': 'zstd',
     });
   }
 
   private filename(commit: string, id: string) {
-    return `${commit.slice(0, 7)}/${id}.json`;
+    return `${commit.slice(0, 7)}/${id}.json.zst`;
   }
 }

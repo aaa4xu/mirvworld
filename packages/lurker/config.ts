@@ -1,11 +1,21 @@
+import type { ClientOptions } from 'minio';
+
+const s3Url = new URL(env('LURKER_S3_ENDPOINT', 'http://localhost:9000'));
+const s3UseSSL = s3Url.protocol === 'https:';
+const s3Port = s3Url.port ? Number(s3Url.port) : s3UseSSL ? 443 : 80;
+
 export const config = {
   serverEndpoint: env('LURKER_ENDPOINT', 'https://openfront.io'),
   apiEndpoint: env('LURKER_API_ENDPOINT', 'https://api.openfront.io'),
   s3: {
-    keyId: env('LURKER_S3_KEY_ID', 'minioadmin'),
-    secret: env('LURKER_S3_SECRET', 'minioadmin'),
     bucket: env('LURKER_S3_BUCKET', 'replays'),
-    endpoint: env('LURKER_S3_ENDPOINT', 'http://localhost:9000'),
+    endpoint: {
+      endPoint: s3Url.hostname,
+      port: s3Port,
+      useSSL: s3UseSSL,
+      accessKey: env('LURKER_S3_KEY_ID', 'minioadmin'),
+      secretKey: env('LURKER_S3_SECRET', 'minioadmin'),
+    } satisfies ClientOptions,
   },
   redis: env('LURKER_REDIS_URL', 'redis://localhost:6379'),
   lobbyInterval: parseInt(env('LURKER_LOBBY_INTERVAL', '6000'), 10),

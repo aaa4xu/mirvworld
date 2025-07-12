@@ -3,20 +3,15 @@ import { config } from './config';
 import { DownloadQueue } from './src/DownloadQueue.ts';
 import { LobbiesLurker } from './src/LobbiesLurker.ts';
 import { OpenFrontServerAPI } from './src/OpenFront/OpenFrontServerAPI.ts';
-import { S3Client } from 'bun';
 import { ReplayLurker } from './src/ReplayLurker.ts';
 import { ReplayStorage } from './src/ReplayStorage.ts';
 import { OpenFrontPublicAPI } from './src/OpenFront/OpenFrontPublicAPI.ts';
 import * as z from 'zod/v4';
 import { HistoryImporter } from './src/HistoryImporter.ts';
+import { Client } from 'minio';
 
 (async () => {
-  const s3 = new S3Client({
-    accessKeyId: config.s3.keyId,
-    secretAccessKey: config.s3.secret,
-    bucket: config.s3.bucket,
-    endpoint: config.s3.endpoint,
-  });
+  const s3 = new Client(config.s3.endpoint);
 
   const server = new OpenFrontServerAPI(config.serverEndpoint);
   const api = new OpenFrontPublicAPI(config.apiEndpoint);
@@ -24,7 +19,7 @@ import { HistoryImporter } from './src/HistoryImporter.ts';
 
   const redis = new RedisClient(config.redis);
   const queue = new DownloadQueue(redis);
-  const storage = new ReplayStorage(s3);
+  const storage = new ReplayStorage(s3, config.s3.bucket);
   const lobbiesLurker = new LobbiesLurker(server, queue, config.lobbyInterval);
   const replayLurker = new ReplayLurker(server, storage, queue);
 
