@@ -20,7 +20,7 @@ import { Client } from 'minio';
   const redis = new RedisClient(config.redis);
   const queue = new DownloadQueue(redis);
   const storage = new ReplayStorage(s3, config.s3.bucket);
-  const lobbiesLurker = new LobbiesLurker(server, queue, config.lobbyInterval);
+  const lobbiesLurker = new LobbiesLurker(server, (id, startId) => queue.push(id, startId), config.lobbyInterval);
   const replayLurker = new ReplayLurker(server, storage, queue);
 
   Bun.file(config.importPath)

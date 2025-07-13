@@ -13,7 +13,7 @@ export class LobbiesLurker {
 
   public constructor(
     private readonly api: OpenFrontServerAPI,
-    private readonly queue: DownloadQueue,
+    private readonly listener: (id: string, time: number) => void,
     private readonly interval = 1_000,
   ) {
     console.log(`[LobbiesLurker] Starting with ${interval}ms interval`);
@@ -30,7 +30,7 @@ export class LobbiesLurker {
         if (this.lastTickLobbies.includes(lobby.gameID)) continue;
 
         console.log(`[LobbiesLurker] Detected lobby ${lobby.gameID}`);
-        await this.queue.push(lobby.gameID, baseTime + (lobby.msUntilStart ?? 0));
+        this.listener(lobby.gameID, baseTime + (lobby.msUntilStart ?? 0));
       }
 
       this.lastTickLobbies = lobbies.map((l) => l.gameID);
