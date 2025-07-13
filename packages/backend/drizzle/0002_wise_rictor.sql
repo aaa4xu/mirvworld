@@ -1,1 +1,0 @@
-CREATE INDEX `startedAt_index` ON `matches` (`startedAt`);

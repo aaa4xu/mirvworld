@@ -1,1 +1,0 @@
-<a href="/auth/discord">Login with Discord</a>
