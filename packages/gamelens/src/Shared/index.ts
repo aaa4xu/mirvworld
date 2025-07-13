@@ -62,7 +62,7 @@ async function worker(signal: AbortSignal) {
             await s3Client.write(`${commit}/${stats.id}.json`, JSON.stringify(stats), { bucket: resultsBucket });
           } catch (e) {
             console.error(`Failed process ${bucket}/${name}`, e);
-            await redis.rpush(queueName, task);
+            // await redis.rpush(queueName, task); // @TODO dead letter queue
           }
         }
       }
