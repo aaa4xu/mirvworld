@@ -1,5 +1,5 @@
 import type { OpenFrontServerAPI } from './OpenFront/OpenFrontServerAPI.ts';
-import { DownloadQueue } from './DownloadQueue.ts';
+import { GameId } from './OpenFront/GameId.ts';
 
 /**
  * LobbiesLurker monitors the public lobbies from a designated server API at specified intervals
@@ -13,7 +13,7 @@ export class LobbiesLurker {
 
   public constructor(
     private readonly api: OpenFrontServerAPI,
-    private readonly listener: (id: string, time: number) => void,
+    private readonly listener: (id: GameId, time: number) => void,
     private readonly interval = 1_000,
   ) {
     console.log(`[LobbiesLurker] Starting with ${interval}ms interval`);
@@ -30,7 +30,7 @@ export class LobbiesLurker {
         if (this.lastTickLobbies.includes(lobby.gameID)) continue;
 
         console.log(`[LobbiesLurker] Detected lobby ${lobby.gameID}`);
-        this.listener(lobby.gameID, baseTime + (lobby.msUntilStart ?? 0));
+        this.listener(new GameId(lobby.gameID), baseTime + (lobby.msUntilStart ?? 0));
       }
 
       this.lastTickLobbies = lobbies.map((l) => l.gameID);

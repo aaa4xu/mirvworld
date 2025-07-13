@@ -1,6 +1,7 @@
 import { ArchivedGameResponseSchema, type ArchivedGameRecord } from './Schema/ArchivedGameResponse.ts';
 import { LobbiesResponse } from './Schema/LobbiesResponse.ts';
 import { OpenFrontClient } from './OpenFrontClient.ts';
+import type { GameId } from './GameId.ts';
 
 /**
  * Client for interacting with the OpenFront server API
@@ -21,7 +22,7 @@ export class OpenFrontServerAPI extends OpenFrontClient {
     return result.lobbies;
   }
 
-  public async archivedGame(id: string, signal?: AbortSignal): Promise<ArchivedGameRecord | null> {
+  public async archivedGame(id: GameId, signal?: AbortSignal): Promise<ArchivedGameRecord | null> {
     const response = await this.request(this.replayUrl(id), signal);
 
     if (response.status === 404) {
@@ -44,8 +45,8 @@ export class OpenFrontServerAPI extends OpenFrontClient {
     return result.gameRecord;
   }
 
-  private replayUrl(id: string) {
-    return this.url(`/w0/api/archived_game/${id}`);
+  private replayUrl(id: GameId) {
+    return this.url(`/${id.workerId}/api/archived_game/${id}`);
   }
 
   private publicLobbiesUrl() {

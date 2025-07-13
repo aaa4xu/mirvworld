@@ -5,8 +5,6 @@ const s3UseSSL = s3Url.protocol === 'https:';
 const s3Port = s3Url.port ? Number(s3Url.port) : s3UseSSL ? 443 : 80;
 
 export const config = {
-  serverEndpoint: env('LURKER_ENDPOINT', 'https://openfront.io'),
-  apiEndpoint: env('LURKER_API_ENDPOINT', 'https://api.openfront.io'),
   s3: {
     bucket: env('LURKER_S3_BUCKET', 'replays'),
     endpoint: {
@@ -20,6 +18,11 @@ export const config = {
   redis: env('LURKER_REDIS_URL', 'redis://localhost:6379'),
   lobbyInterval: parseInt(env('LURKER_LOBBY_INTERVAL', '6000'), 10),
   importPath: env('LURKER_IMPORT_PATH', './import.json'),
+  openfront: {
+    workers: parseInt(env('LURKER_OPENFRONT_WORKERS', '20'), 10),
+    server: env('LURKER_OPENFRONT_SERVER_ENDPOINT', 'https://openfront.io'),
+    api: env('LURKER_OPENFRONT_API_ENDPOINT', 'https://api.openfront.io'),
+  },
 };
 
 function env(name: string, defaultValue?: string): string {
