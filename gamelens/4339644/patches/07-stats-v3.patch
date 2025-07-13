@@ -1,0 +1,36 @@
+diff --git a/src/ReplayPlaybackEngine.ts b/src/ReplayPlaybackEngine.ts
+index 1b5d5b68..534c27de 100644
+--- a/src/ReplayPlaybackEngine.ts
++++ b/src/ReplayPlaybackEngine.ts
+@@ -49,11 +49,20 @@ export class ReplayPlaybackEngine implements PlaybackEngine<GameRecord> {
+       signal.throwIfAborted();
+       const turn = record.turns[i]!;
+ 
+-      if (runner.game.inSpawnPhase()) {
+-        for (const intent of turn.intents) {
+-          if (intent.type !== "spawn") continue;
++      const builds = new Map<string, string[]>();
++
++      for (const intent of turn.intents) {
++        if (runner.game.inSpawnPhase() && intent.type === "spawn") {
+           spawns.set(intent.clientID, [intent.x, intent.y]);
+         }
++
++        if (intent.type === "build_unit") {
++          if (!builds.has(intent.clientID)) {
++            builds.set(intent.clientID, [intent.unit]);
++          } else {
++            builds.get(intent.clientID)!.push(intent.unit);
++          }
++        }
+       }
+ 
+       runner.addTurn(turn);
+@@ -71,6 +80,7 @@ export class ReplayPlaybackEngine implements PlaybackEngine<GameRecord> {
+                 territory: player.numTilesOwned(),
+                 workers: player.workers(),
+                 troops: player.troops(),
++                builds: builds.get(clientId) ?? [],
+               };
+             }
+ 

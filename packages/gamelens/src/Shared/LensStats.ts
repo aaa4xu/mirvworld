@@ -1,6 +1,6 @@
 export interface LensStats {
   /* Event version */
-  version: '2';
+  version: '3';
   /* Match ID */
   id: string;
   /* Game commit on which the match was played */
@@ -36,4 +36,5 @@ export interface LensStatsPlayerTurn {
   territory: number;
   troops: number;
   workers: number;
+  builds: string[];
 }

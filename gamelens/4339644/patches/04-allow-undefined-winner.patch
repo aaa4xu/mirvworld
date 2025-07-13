@@ -1,6 +1,3 @@
-diff --git a/04-allow-undefined-winner.patch b/04-allow-undefined-winner.patch
-new file mode 100644
-index 00000000..e69de29b
 diff --git a/src/ReplayPlaybackEngine.ts b/src/ReplayPlaybackEngine.ts
 index 0c38e697..1b5d5b68 100644
 --- a/src/ReplayPlaybackEngine.ts
