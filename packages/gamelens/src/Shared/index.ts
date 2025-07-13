@@ -30,13 +30,21 @@ if (cluster.isPrimary) {
 async function worker(signal: AbortSignal) {
   const redis = new RedisClient(env('GAMELENS_REDIS_URL', 'redis://localhost:6379'));
   const s3Client = new S3Client({
-    endpoint: env('GAMELENS_S3_ENDPOINT', 'http://localhost:9000'),
-    accessKeyId: env('GAMELENS_S3_KEY_ID', 'minioadmin'),
-    secretAccessKey: env('GAMELENS_S3_SECRET', 'minioadmin'),
+    endpoint: env('GAMELENS_SOURCE_ENDPOINT', env('GAMELENS_S3_ENDPOINT', 'http://localhost:9000')),
+    accessKeyId: env('GAMELENS_SOURCE_KEY_ID', env('GAMELENS_S3_KEY_ID', 'minioadmin')),
+    secretAccessKey: env('GAMELENS_SOURCE_SECRET', env('GAMELENS_S3_SECRET', 'minioadmin')),
   });
 
+  const targetS3Client = new S3Client({
+    endpoint: env('GAMELENS_RESULTS_ENDPOINT', env('GAMELENS_S3_ENDPOINT', 'http://localhost:9000')),
+    accessKeyId: env('GAMELENS_RESULTS_KEY_ID', env('GAMELENS_S3_KEY_ID', 'minioadmin')),
+    secretAccessKey: env('GAMELENS_RESULTS_SECRET', env('GAMELENS_S3_SECRET', 'minioadmin')),
+  });
+
+  const resultsBucket = env('GAMELENS_RESULTS_BUCKET', 'gamelens-v2');
+
   const queueName = env('GAMELENS_REDIS_IN', 'storage:bucketevents');
-  const resultsBucket = env('GAMELENS_RESULTS_BUCKET', 'gamelens');
+
   const commit = env('GAMELENS_GIT_COMMIT');
   const queueType = env('GAMELENS_QUEUE_TYPE', 'fifo');
 
@@ -59,7 +67,7 @@ async function worker(signal: AbortSignal) {
           try {
             const gameRecord = await s3Client.file(name, { bucket }).json();
             const stats = await playback.process(gameRecord, signal);
-            await s3Client.write(`${commit}/${stats.id}.json`, JSON.stringify(stats), { bucket: resultsBucket });
+            await targetS3Client.write(`${commit}/${stats.id}.json`, JSON.stringify(stats), { bucket: resultsBucket });
           } catch (e) {
             console.error(`Failed process ${bucket}/${name}`, e);
             // await redis.rpush(queueName, task); // @TODO dead letter queue
