@@ -1,0 +1,13 @@
+diff --git a/src/ReplayPlaybackEngine.ts b/src/ReplayPlaybackEngine.ts
+index 534c27de..9d576d23 100644
+--- a/src/ReplayPlaybackEngine.ts
++++ b/src/ReplayPlaybackEngine.ts
+@@ -93,7 +93,7 @@ export class ReplayPlaybackEngine implements PlaybackEngine<GameRecord> {
+     }
+ 
+     return {
+-      version: "2",
++      version: "3",
+       map: record.info.config.gameMap,
+       mode: record.info.config.gameMode,
+       commit: record.gitCommit,
