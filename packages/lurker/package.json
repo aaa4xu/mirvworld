@@ -10,7 +10,9 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "chalk": "^5.4.1",
     "minio": "^8.0.5",
+    "nanoid": "^5.1.5",
     "zod": "^3.25.75"
   }
 }

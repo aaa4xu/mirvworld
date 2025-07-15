@@ -1,5 +1,6 @@
 import type { OpenFrontServerAPI } from './OpenFront/OpenFrontServerAPI.ts';
 import { GameId } from './OpenFront/GameId.ts';
+import { type MatchInfo } from './OpenFront/Schema/MatchInfoSchema.ts';
 
 /**
  * LobbiesLurker monitors the public lobbies from a designated server API at specified intervals
@@ -9,11 +10,10 @@ import { GameId } from './OpenFront/GameId.ts';
 export class LobbiesLurker {
   private readonly abortController = new AbortController();
   private timerId: NodeJS.Timeout | null = null;
-  private lastTickLobbies: string[] = [];
 
   public constructor(
     private readonly api: OpenFrontServerAPI,
-    private readonly listener: (id: GameId, time: number) => void,
+    private readonly listener: (id: GameId, time: number, info: MatchInfo) => void,
     private readonly interval = 1_000,
   ) {
     console.log(`[LobbiesLurker] Starting with ${interval}ms interval`);
@@ -27,13 +27,8 @@ export class LobbiesLurker {
 
       const baseTime = Date.now();
       for (const lobby of lobbies) {
-        if (this.lastTickLobbies.includes(lobby.gameID)) continue;
-
-        console.log(`[LobbiesLurker] Detected lobby ${lobby.gameID}`);
-        this.listener(new GameId(lobby.gameID), baseTime + (lobby.msUntilStart ?? 0));
+        this.listener(new GameId(lobby.gameID), baseTime + (lobby.msUntilStart ?? 0), lobby);
       }
-
-      this.lastTickLobbies = lobbies.map((l) => l.gameID);
     } catch (err) {
       console.error(`[LobbiesLurker] Error fetching lobbies:`, err);
     } finally {

@@ -10,18 +10,15 @@ services:
       - MINIO_ROOT_USER=minioadmin
       - MINIO_ROOT_PASSWORD=minioadmin
 
-  lurker:
-    volumes:
-      - ./storage/docker/lurker:/app/storage
-    environment:
-      - LURKER_S3_KEY_ID=minioadmin
-      - LURKER_S3_SECRET=minioadmin
-
   redis:
     volumes:
       - ./storage/docker/redis:/data
     ports:
       - 6379:6379
+
+  lurker-worker:
+    environment:
+      - "DEBUG=mirvworld:lurker:*,-mirvworld:lurker:GameConnection:events"
 
   game-snapshot-v0-23-16:
     ports:

@@ -1,5 +1,5 @@
 export class OpenFrontClient {
-  protected readonly userAgent = 'MIRVWorldBot/0.4';
+  public static readonly UserAgent = 'MIRVWorldBot/0.5';
   protected readonly acceptEncoding = 'gzip, deflate, br, zstd';
 
   public constructor(protected readonly endpoint: string) {}
@@ -25,10 +25,11 @@ export class OpenFrontClient {
   protected request(url: URL, signal?: AbortSignal) {
     return fetch(url, {
       headers: {
-        'User-Agent': this.userAgent,
+        'User-Agent': OpenFrontClient.UserAgent,
         'Accept-Encoding': this.acceptEncoding,
       },
       signal: this.withTimeout(signal),
+      // verbose: true,
     });
   }
 }

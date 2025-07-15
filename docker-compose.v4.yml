@@ -11,11 +11,20 @@ services:
       - MINIO_NOTIFY_REDIS_FORMAT_PRIMARY=access
       - MINIO_NOTIFY_REDIS_QUEUE_DIR_PRIMARY=/opt/minio/events
 
-  lurker:
-    image: mirvworld/lurker
+  lurker-master:
+    image: mirvworld/lurker-master
     build:
       context: .
-      dockerfile: packages/lurker/Dockerfile
+      dockerfile: packages/lurker/master.Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - redis
+
+  lurker-worker:
+    image: mirvworld/lurker-worker
+    build:
+      context: .
+      dockerfile: packages/lurker/worker.Dockerfile
     restart: unless-stopped
     depends_on:
       - redis

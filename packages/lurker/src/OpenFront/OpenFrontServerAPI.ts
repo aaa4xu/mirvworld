@@ -61,6 +61,13 @@ export class OpenFrontServerAPI extends OpenFrontClient {
     return result.exists;
   }
 
+  public gameWebsocket(id: GameId) {
+    const url = new URL(this.endpoint);
+    url.pathname = `${id.workerId}`;
+    url.protocol = 'wss:';
+    return url;
+  }
+
   private replayUrl(id: GameId) {
     return this.url(`/${id.workerId}/api/archived_game/${id}`);
   }

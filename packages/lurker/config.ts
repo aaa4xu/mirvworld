@@ -17,7 +17,6 @@ export const config = {
   },
   redis: env('LURKER_REDIS_URL', 'redis://localhost:6379'),
   lobbyInterval: parseInt(env('LURKER_LOBBY_INTERVAL', '6000'), 10),
-  importPath: env('LURKER_IMPORT_PATH', './import.json'),
   openfront: {
     workers: parseInt(env('LURKER_OPENFRONT_WORKERS', '20'), 10),
     server: env('LURKER_OPENFRONT_SERVER_ENDPOINT', 'https://openfront.io'),

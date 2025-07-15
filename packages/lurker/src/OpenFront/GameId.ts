@@ -14,6 +14,10 @@ export class GameId {
     return this.id;
   }
 
+  public toJSON() {
+    return this.id.toString();
+  }
+
   private simpleHash(str: string) {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {

@@ -10,4 +10,9 @@ describe('GameId', () => {
     const id = new GameId('cMaLXZbG', 20);
     expect(id.workerId).toBe('w0');
   });
+
+  it('should serialize to string', () => {
+    const id = new GameId('cMaLXZbG', 20);
+    expect(JSON.stringify({ id })).toBe('{"id":"cMaLXZbG"}');
+  });
 });

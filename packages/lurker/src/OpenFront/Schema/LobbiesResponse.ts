@@ -1,6 +1,6 @@
 import { z } from 'zod/v4';
-import { MatchInfo } from './MatchInfo.ts';
+import { MatchInfoSchema } from './MatchInfoSchema.ts';
 
 export const LobbiesResponse = z.object({
-  lobbies: z.array(MatchInfo),
+  lobbies: z.array(MatchInfoSchema),
 });
