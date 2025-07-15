@@ -3,6 +3,7 @@ import { LobbiesResponse } from './Schema/LobbiesResponse.ts';
 import { OpenFrontClient } from './OpenFrontClient.ts';
 import type { GameId } from './GameId.ts';
 import { GameExistsResponseSchema } from './Schema/GameExistsResponseSchema.ts';
+import { GameInfoResponseSchema } from './Schema/GameInfo.ts';
 
 /**
  * Client for interacting with the OpenFront server API
@@ -61,11 +62,28 @@ export class OpenFrontServerAPI extends OpenFrontClient {
     return result.exists;
   }
 
+  public async game(id: GameId, signal?: AbortSignal) {
+    const response = await this.request(this.gameExistsUrl(id), signal);
+
+    if (!response.ok) {
+      throw new Error(`Http Status=${response.status}`);
+    }
+
+    this.validateContentType(response, 'application/json');
+
+    const json = await response.json();
+    return GameInfoResponseSchema.parse(json);
+  }
+
   public gameWebsocket(id: GameId) {
     const url = new URL(this.endpoint);
     url.pathname = `${id.workerId}`;
     url.protocol = 'wss:';
     return url;
+  }
+
+  private getUrl(id: GameId) {
+    return this.url(`/${id.workerId}/api/game/${id}`);
   }
 
   private replayUrl(id: GameId) {

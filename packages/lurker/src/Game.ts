@@ -64,8 +64,35 @@ export class Game {
 
       const onGameError = (e: unknown) => {
         if (e instanceof StaleGameError) {
-          console.warn(`[Game#${this.id}] 🚨 Game is in stale state, checking for replay...`);
-          tryToDownloadReplay();
+          console.warn(`[Game#${this.id}] Game is in stale state, checking list of clients...`);
+          this.server
+            .game(this.id, signal)
+            .then(
+              async (info) => {
+                if (info.clients.length > 1) {
+                  console.log(
+                    `[Game#${this.id}] There is still ${info.clients.length} clients in the game, waiting...`,
+                  );
+                  return;
+                }
+
+                console.warn(`[Game#${this.id}] I'm the only one left, disconnecting...`);
+                game.dispose();
+
+                for (let i = 0; i < 10; i++) {
+                  if (await tryToDownloadReplay()) {
+                    return;
+                  }
+                  await cancelableTimeout(10_000, signal);
+                }
+
+                throw new Error(`[Game#${this.id}] Don't have any idea whats wrong with this game`);
+              },
+              () => tryToDownloadReplay(),
+            )
+            .catch((err) => {
+              console.error(`[Game#${this.id}] Failed to check for replay of stale game:`, err);
+            });
         } else {
           game.dispose();
           cleanup();
@@ -96,14 +123,14 @@ export class Game {
         game.off('error', onGameError);
       }
 
-      const tryToDownloadReplay = async () => {
+      const tryToDownloadReplay = async (): Promise<boolean> => {
         await cancelableTimeout(5000, signal);
         try {
           const replay = await this.server.archivedGame(this.id, signal);
 
           if (!replay) {
             console.log(`[Game#${this.id}] ⏳ No replay found for now`);
-            return;
+            return false;
           }
 
           console.log(`[Game#${this.id}] 📦 Replay already exists, downloading...`);
@@ -113,7 +140,10 @@ export class Game {
           game.dispose();
           cleanup();
           resolve();
-        } catch (ignored) {}
+          return true;
+        } catch (ignored) {
+          return false;
+        }
       };
 
       connection.on('open', onConnectionOpen);
