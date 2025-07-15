@@ -1,0 +1,3 @@
+[submodule "packages/openfront/game"]
+	path = packages/openfront/game
+	url = https://github.com/openfrontio/OpenFrontIO
