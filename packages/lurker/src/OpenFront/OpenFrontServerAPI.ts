@@ -63,7 +63,7 @@ export class OpenFrontServerAPI extends OpenFrontClient {
   }
 
   public async game(id: GameId, signal?: AbortSignal) {
-    const response = await this.request(this.gameExistsUrl(id), signal);
+    const response = await this.request(this.gameUrl(id), signal);
 
     if (!response.ok) {
       throw new Error(`Http Status=${response.status}`);
@@ -82,7 +82,7 @@ export class OpenFrontServerAPI extends OpenFrontClient {
     return url;
   }
 
-  private getUrl(id: GameId) {
+  private gameUrl(id: GameId) {
     return this.url(`/${id.workerId}/api/game/${id}`);
   }
 
