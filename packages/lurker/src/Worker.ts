@@ -67,7 +67,7 @@ export class Worker {
       const inProgress = await game.isInProgress(ctrl.signal);
 
       if (!inProgress) {
-        console.log(`[Game#${gameId}] ⬇️  Game is not in progress, downloading replay...`);
+        console.log(`[Game#${gameId}] ⬇️  Game is already finished`);
         await game.download(this.storage, ctrl.signal);
       } else {
         await game.stream(this.gameStream, this.storage, ctrl.signal);
@@ -79,7 +79,11 @@ export class Worker {
       if (ctrl.signal.aborted) {
         console.warn(`[Game#${gameId}] ⚠️  Aborted due to shutdown`);
       } else {
-        console.error(`[Game#${gameId}] ❌ Error`, err);
+        if (err instanceof DOMException) {
+          console.error(`[Game#${gameId}] ❌ ${err.name}: ${err.message}`);
+        } else {
+          console.error(`[Game#${gameId}] ❌ Error`, err);
+        }
         // do NOT ack → message will be picked by another worker
       }
     } finally {
