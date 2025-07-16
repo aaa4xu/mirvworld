@@ -9,8 +9,8 @@ const server = new OpenFrontServerAPI(config.openfront.server);
 const redis = new RedisClient(config.redis);
 const q = new Queue(
   {
-    streamKey: 'lurker:v3:queue',
-    seenNamespace: 'lurker:v3:seen',
+    streamKey: 'lurker:queue',
+    seenNamespace: 'lurker:seen',
   },
   redis,
 );

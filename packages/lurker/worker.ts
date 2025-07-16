@@ -4,7 +4,7 @@ import { RedisClient } from 'bun';
 import { config } from './config.ts';
 import { Queue } from './src/Queue.ts';
 import { Worker } from './src/Worker.ts';
-import { GameStream } from './src/GameStream.ts';
+import { GameState } from './src/GameState.ts';
 import { ReplayStorage } from './src/ReplayStorage.ts';
 import { Client } from 'minio';
 import { OpenFrontServerAPIWithRateLimiter } from './src/OpenFrontServerAPIWithRateLimiter.ts';
@@ -43,12 +43,12 @@ if (cluster.isPrimary) {
 
   const q = new Queue(
     {
-      streamKey: 'lurker:v3:queue',
-      seenNamespace: 'lurker:v3:seen',
+      streamKey: 'lurker:queue',
+      seenNamespace: 'lurker:seen',
     },
     redis,
   );
-  const games = new GameStream('lurker:v3:games', redis);
+  const games = new GameState('lurker:games', redis);
   const worker = new Worker(q, storage, games, server);
 
   process.once('SIGINT', () => worker.dispose());

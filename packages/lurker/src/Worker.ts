@@ -1,6 +1,6 @@
 import { Game } from './Game.ts';
 import { ReplayStorage } from './ReplayStorage.ts';
-import { GameStream } from './GameStream.ts';
+import { GameState } from './GameState.ts';
 import type { Queue } from './Queue.ts';
 import { GameId } from './OpenFront/GameId.ts';
 import type { OpenFrontServerAPI } from './OpenFront/OpenFrontServerAPI.ts';
@@ -14,7 +14,7 @@ export class Worker {
   public constructor(
     private readonly queue: Queue,
     private readonly storage: ReplayStorage,
-    private readonly gameStream: GameStream,
+    private readonly gameStream: GameState,
     private readonly server: OpenFrontServerAPI,
     private readonly groupName = 'lurker-workers',
     private readonly maxTasks = 50,

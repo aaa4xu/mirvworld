@@ -3,7 +3,7 @@ import type { OpenFrontServerAPI } from './OpenFront/OpenFrontServerAPI.ts';
 import { GameConnection } from './GameConnection.ts';
 import { GameSession } from './GameSession.ts';
 import { ReplayStorage } from './ReplayStorage.ts';
-import { GameStream } from './GameStream.ts';
+import { GameState } from './GameState.ts';
 import { cancelableTimeout } from './Utils.ts';
 import { StaleGameError } from './Errors/StaleGameError.ts';
 
@@ -33,7 +33,7 @@ export class Game {
     await storage.save(this.id.toString(), replay);
   }
 
-  public async stream(gameStream: GameStream, storage: ReplayStorage, signal: AbortSignal) {
+  public async stream(gameState: GameState, storage: ReplayStorage, signal: AbortSignal) {
     const msUntilStart = this.startAt - Date.now() + 5_000; // 5 sec delay for game server to start
     if (msUntilStart > 0) {
       console.log(`[Game#${this.id}] 🕝 Game starts in ${Math.round(msUntilStart / 1000)}s`);
@@ -65,7 +65,10 @@ export class Game {
 
       const onStartEvent = (event: unknown) => {
         console.log(`[Game#${this.id}] 📺 Game started`);
-        gameStream.setExpire(this.id, this.startAt + Game.MaxDuration - Date.now());
+
+        Promise.all([gameState.setInfo(this.id, JSON.stringify(event)), gameState.removeTurns(this.id)]).then(() =>
+          gameState.setExpire(this.id, this.startAt + Game.MaxDuration - Date.now()),
+        );
       };
 
       const onGameError = (e: unknown) => {
@@ -110,7 +113,7 @@ export class Game {
       };
 
       const onTurnEvent = (event: unknown) => {
-        return gameStream.addTurn(this.id, JSON.stringify(event));
+        return gameState.addTurn(this.id, JSON.stringify(event));
       };
 
       function cleanup() {
@@ -135,7 +138,7 @@ export class Game {
           console.log(`[Game#${this.id}] 📦 Replay already exists, downloading...`);
           await storage.save(this.id.toString(), replay);
 
-          setTimeout(() => gameStream.remove(this.id), 1000);
+          setTimeout(() => gameState.remove(this.id), 1000);
           game.dispose();
           cleanup();
           resolve();
