@@ -9,7 +9,6 @@ export class GameStream {
 
   public setExpire(id: GameId | string, ms: number) {
     const seconds = Math.ceil(ms / 1000);
-    console.log('set expire', `${this.namespace}:${id}`, seconds);
     return this.redis.expire(`${this.namespace}:${id}`, seconds);
   }
 
