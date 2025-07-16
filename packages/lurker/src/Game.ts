@@ -70,9 +70,12 @@ export class Game {
             .then(
               async (info) => {
                 if (info.clients.length > 1) {
-                  console.log(
-                    `[Game#${this.id}] There is still ${info.clients.length} clients in the game, waiting...`,
-                  );
+                  console.log(`[Game#${this.id}] There is still ${info.clients.length} clients in the game`);
+
+                  if (await tryToDownloadReplay()) {
+                    game.dispose();
+                  }
+
                   return;
                 }
 
