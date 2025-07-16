@@ -123,22 +123,30 @@ export class GameSession extends EventEmitter {
           ...message.data,
           turns: [],
         });
+
         this.lastIntentAt = Date.now();
         for (const t of message.data.turns) {
           this.processTurn(t);
         }
         break;
       }
+
       case 'turn': {
         this.processTurn(message.data.turn);
         break;
       }
-      case 'winner':
+
+      case 'winner': {
         this.emit('winner', message.data);
         this.dispose();
         break;
+      }
 
-      case 'prestart':
+      case 'prestart': {
+        this.emit('prestart', message.data);
+        break;
+      }
+
       case 'ping':
       case 'desync':
         break;

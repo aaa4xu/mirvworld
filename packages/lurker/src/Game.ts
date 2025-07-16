@@ -8,6 +8,8 @@ import { cancelableTimeout } from './Utils.ts';
 import { StaleGameError } from './Errors/StaleGameError.ts';
 
 export class Game {
+  public static readonly MaxDuration = 3 * 60 * 60 * 1000; // Max match duration is 3h
+
   public constructor(
     public readonly id: GameId,
     public readonly startAt: number,
@@ -15,7 +17,7 @@ export class Game {
   ) {}
 
   public isInProgress(signal: AbortSignal) {
-    if (this.startAt + 3 * 60 * 60 * 1000 < Date.now()) return false; // Max match duration is 3h
+    if (this.startAt + Game.MaxDuration < Date.now()) return false;
     return this.server.gameExists(this.id, signal);
   }
 
@@ -57,9 +59,13 @@ export class Game {
       };
 
       const onWinnerEvent = (event: unknown) => {
-        onGameEvent('winner', event);
-        console.warn(`[Game#${this.id}] 🚨 We have a winner!`);
+        console.warn(`[Game#${this.id}] 🎉 We have a winner!`);
         tryToDownloadReplay();
+      };
+
+      const onStartEvent = (event: unknown) => {
+        console.log(`[Game#${this.id}] 📺 Game started`);
+        gameStream.setExpire(this.id, this.startAt + Game.MaxDuration - Date.now());
       };
 
       const onGameError = (e: unknown) => {
@@ -103,18 +109,8 @@ export class Game {
         }
       };
 
-      const onStartEvent = (event: unknown) => {
-        console.log(`[Game#${this.id}] 📺 Game started`);
-        onGameEvent('start', event).then(() =>
-          gameStream.setExpire(this.id, this.startAt + 3 * 60 * 60 * 1000 - Date.now()),
-        );
-      };
-
-      const onTurnEvent = (event: unknown) => onGameEvent('turn', event);
-
-      const onGameEvent = (type: string, event: unknown) => {
-        const json = JSON.stringify({ type, event });
-        return gameStream.push(this.id, json);
+      const onTurnEvent = (event: unknown) => {
+        return gameStream.addTurn(this.id, JSON.stringify(event));
       };
 
       function cleanup() {

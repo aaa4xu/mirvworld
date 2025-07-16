@@ -12,7 +12,7 @@ export class GameStream {
     return this.redis.expire(this.key(id), seconds);
   }
 
-  public push(id: GameId | string, event: string) {
+  public addTurn(id: GameId | string, event: string) {
     return this.redis.rpush(this.key(id), event);
   }
 
@@ -20,7 +20,7 @@ export class GameStream {
     return this.redis.del(this.key(id));
   }
 
-  public get(id: GameId | string): Promise<string[]> {
+  public turns(id: GameId | string): Promise<string[]> {
     return this.redis.send('LRANGE', [this.key(id), '0', '-1']);
   }
 
