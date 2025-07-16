@@ -4,6 +4,9 @@ import type { GameId } from './OpenFront/GameId.ts';
 import pushScript from './lua/push.lua' with { type: 'text' };
 import z from 'zod';
 import { RedisLuaScript } from './RedisLuaScript.ts';
+import debug from 'debug';
+
+const log = debug('mirvworld:lurker:Queue');
 
 export class Queue {
   private readonly options: Required<QueueOptions>;
@@ -43,6 +46,7 @@ export class Queue {
    * Returns true if lobby was new, false otherwise.
    */
   public async push(id: GameId, startAt: number, info?: Record<string, unknown>): Promise<boolean> {
+    log(`push ${id}`);
     return this.pushScript.exec(
       [`${this.options.seenNamespace}:${id}`, this.options.streamKey],
       [this.options.seenTTLms.toString(), id.toString(), startAt.toString(), JSON.stringify(info)],
@@ -133,6 +137,7 @@ export class Queue {
   }
 
   public ack(group: string, msgId: string): Promise<void> {
+    log(`ack ${group} ${msgId}`);
     return this.redis.send('XACK', [this.options.streamKey, group, msgId]);
   }
 
