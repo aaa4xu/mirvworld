@@ -20,7 +20,6 @@ export class Queue {
     private readonly redis: RedisClient,
   ) {
     this.options = {
-      blockMs: 3_000,
       stealIdleMs: 15_000,
       seenTTLms: 3 * 60 * 60 * 1000,
       ...options,
@@ -86,8 +85,6 @@ export class Queue {
       'GROUP',
       group,
       consumer,
-      'BLOCK',
-      this.options.blockMs.toString(),
       'COUNT',
       '1',
       'STREAMS',
@@ -156,8 +153,6 @@ export interface QueueOptions {
   seenNamespace: string;
   /* How long (ms) a deduplication flag lives. Default: 3 hours */
   seenTTLms?: number;
-  /* How long (ms) XREADGROUP will block waiting for a fresh message before we attempt a steal */
-  blockMs?: number;
   /**
    * A pending message is considered “stuck” and can be
    * claimed via XAUTOCLAIM after it has been idle
