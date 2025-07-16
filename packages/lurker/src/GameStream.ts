@@ -9,14 +9,22 @@ export class GameStream {
 
   public setExpire(id: GameId | string, ms: number) {
     const seconds = Math.ceil(ms / 1000);
-    return this.redis.expire(`${this.namespace}:${id}`, seconds);
+    return this.redis.expire(this.key(id), seconds);
   }
 
   public push(id: GameId | string, event: string) {
-    return this.redis.rpush(`${this.namespace}:${id}`, event);
+    return this.redis.rpush(this.key(id), event);
   }
 
   public remove(id: GameId | string) {
-    return this.redis.del(`${this.namespace}:${id}`);
+    return this.redis.del(this.key(id));
+  }
+
+  public get(id: GameId | string): Promise<string[]> {
+    return this.redis.send('LRANGE', [this.key(id), '0', '-1']);
+  }
+
+  private key(id: GameId | string) {
+    return `${this.namespace}:${id}`;
   }
 }
