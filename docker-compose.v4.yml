@@ -30,6 +30,15 @@ services:
       - redis
       - storage
 
+  frontend:
+    image: mirvworld/frontend
+    build:
+      context: .
+      dockerfile: packages/frontend/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - redis
+
   redis:
     image: redis:8-alpine
     restart: unless-stopped

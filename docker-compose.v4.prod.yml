@@ -36,6 +36,14 @@ services:
     env_file:
       - v4.env
 
+  frontend:
+    restart: always
+    env_file:
+      - v4.env
+    networks:
+      - cloudflare
+      - default
+
   redis:
     restart: always
     volumes:
