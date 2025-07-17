@@ -79,7 +79,10 @@ export class Worker {
       if (ctrl.signal.aborted) {
         console.warn(`[Game#${gameId}] ⚠️  Aborted due to shutdown`);
       } else {
-        if (err instanceof DOMException) {
+        if (err instanceof Error && err.message.includes('Http Status=403')) {
+          console.error(`[Worker#${this.consumerId}] ⛔️ Blocked by Cloudflare! Backing off for a long time...`);
+          await Bun.sleep(5 * 60 * 1000 + Math.random() * 60000);
+        } else if (err instanceof DOMException) {
           console.error(`[Game#${gameId}] ❌ ${err.name}: ${err.message}`);
         } else {
           console.error(`[Game#${gameId}] ❌ Error`, err);
