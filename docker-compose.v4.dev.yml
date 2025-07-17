@@ -20,6 +20,10 @@ services:
     environment:
       - "DEBUG=mirvworld:lurker:*,-mirvworld:lurker:GameConnection:events"
 
+  frontend:
+    ports:
+      - 4173:80
+
   game-snapshot-v0-23-16:
     ports:
       - 12316:80
