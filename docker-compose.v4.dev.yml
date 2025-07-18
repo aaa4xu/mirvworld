@@ -16,13 +16,17 @@ services:
     ports:
       - 6379:6379
 
-  lurker-worker:
-    environment:
-      - "DEBUG=mirvworld:lurker:*,-mirvworld:lurker:GameConnection:events"
-
   frontend:
     ports:
       - 4173:80
+
+  db:
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=mysecretpassword
+    volumes:
+      - ./storage/docker/mysql:/var/lib/mysql
 
   game-snapshot-v0-23-16:
     ports:

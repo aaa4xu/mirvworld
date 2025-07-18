@@ -24,17 +24,12 @@ services:
       - 100.111.103.57:9000:9000
       - 100.111.103.57:9001:9001
 
-  lurker-master:
+  lurker:
     restart: always
     env_file:
       - v4.env
     environment:
       - LURKER_LOBBY_INTERVAL=1000
-
-  lurker-worker:
-    restart: always
-    env_file:
-      - v4.env
 
   frontend:
     restart: always
@@ -56,10 +51,20 @@ services:
     networks:
       - cloudflare
 
+  db:
+    restart: always
+    volumes:
+      - mysql:/var/lib/mysql
+    env_file:
+      - v4.env
+    ports:
+      - 100.111.103.57:3306:3306
+
 volumes:
   storage:
   storage-events:
   redis:
+  mysql:
 
 networks:
   cloudflare:

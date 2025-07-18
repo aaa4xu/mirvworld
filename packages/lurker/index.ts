@@ -1,37 +1,59 @@
 import { LobbiesLurker } from './src/LobbiesLurker.ts';
 import { config } from './config.ts';
-import { OpenFrontServerAPI } from './src/OpenFront/OpenFrontServerAPI.ts';
-import { Queue } from './src/Queue.ts';
 import { RedisClient } from 'bun';
+import { LeakyBucket } from './src/LeakyBucket/LeakyBucket.ts';
+import { OpenFrontServerAPIWithLimiter } from './src/OpenFrontServerAPIWithLimiter.ts';
+import { OpenFrontPublicAPIWithLimiter } from './src/OpenFrontPublicAPIWithLimiter.ts';
+import { DownloadQueue } from './src/DownloadQueue/DownloadQueue.ts';
+import { ReplayLurker } from './src/ReplayLurker.ts';
+import { ReplayStorage } from './src/ReplayStorage.ts';
+import { Client } from 'minio';
 
 const abortController = new AbortController();
-const server = new OpenFrontServerAPI(config.openfront.server);
+process.on('SIGTERM', () => abortController.abort('SIGTERM'));
+process.on('SIGINT', () => abortController.abort('SIGINT'));
+
 const redis = new RedisClient(config.redis);
-const q = new Queue(
+const s3 = new Client(config.s3.endpoint);
+const storage = new ReplayStorage(s3, config.s3.bucket);
+
+const openfrontRateLimiter = new LeakyBucket({ bucketKey: 'openfront:global', capacity: 4, refillPerSec: 4 }, redis);
+
+const serverClient = new OpenFrontServerAPIWithLimiter(config.openfront.server, openfrontRateLimiter);
+const apiClient = new OpenFrontPublicAPIWithLimiter(
+  config.openfront.api,
+  new LeakyBucket({ bucketKey: 'openfront:api', capacity: 4, refillPerSec: 3 }, redis, openfrontRateLimiter),
+);
+const downloadQueue = new DownloadQueue(
   {
-    streamKey: 'lurker:queue',
-    seenNamespace: 'lurker:seen',
+    readyKey: 'lurker:queue',
+    firstDelay: 10 * 60 * 1000,
+    retryDelay: 5 * 60 * 1000,
+    entryKeyPrefix: 'lurker:entry:',
   },
   redis,
 );
+
+const lastTickLobbies = new Set<string>();
 const lobbiesLurker = new LobbiesLurker(
-  server,
-  (id, startAt, info) => {
-    q.push(id, startAt, info)
-      .then((added) => {
-        if (!added) return;
-        console.log(`[Lurker] Detected game ${id}`);
-      })
-      .catch((e) => console.error(`Failed to push ${id} to queue:`, e));
+  serverClient,
+  (lobbies) => {
+    for (const lobby of lobbies) {
+      if (!lastTickLobbies.has(lobby.gameID)) {
+        console.log(`[Lurker][${lobby.gameID}] 💡 New game detected`);
+      }
+
+      downloadQueue.push(lobby.gameID, Date.now(), lobby).catch((err) => {
+        console.error(`[Lurker] Failed to push ${lobby.gameID} to queue:`, err);
+      });
+    }
+
+    lastTickLobbies.clear();
+    lobbies.forEach((l) => lastTickLobbies.add(l.gameID));
   },
   config.lobbyInterval,
 );
+abortController.signal.addEventListener('abort', () => lobbiesLurker.dispose());
 
-async function dispose() {
-  console.log(`[Main] Shutting down...`);
-  lobbiesLurker.dispose();
-  abortController.abort('SIGTERM');
-}
-
-process.on('SIGTERM', dispose);
-process.on('SIGINT', dispose);
+const replaysLurker = new ReplayLurker(apiClient, storage, downloadQueue);
+abortController.signal.addEventListener('abort', () => replaysLurker.dispose());

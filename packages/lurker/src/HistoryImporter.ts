@@ -18,7 +18,6 @@ export class HistoryImporter {
         console.error(`[HistoryImporter] Error importing ${id}:`, err instanceof Error ? err.message : err);
       }
       if (signal?.aborted) return;
-      await Bun.sleep(startAt + 500 - Date.now());
     }
   }
 }

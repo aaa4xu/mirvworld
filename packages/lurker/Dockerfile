@@ -5,14 +5,14 @@ RUN bun install
 
 # build into binary
 # @see https://bun.sh/docs/bundler/executables
-RUN bun build ./packages/lurker/worker.ts --compile --minify --sourcemap --bytecode --outfile lurker-worker
+RUN bun build ./packages/lurker/index.ts --compile --minify --sourcemap --bytecode --outfile lurker
 
 FROM debian:stable-slim
 WORKDIR /app
 ENV LURKER_S3_ENDPOINT=http://storage:9000
 ENV LURKER_REDIS_URL=redis://redis:6379
 
-COPY --from=build /usr/src/app/lurker-worker /app/
-RUN chmod +x /app/lurker-worker
+COPY --from=build /usr/src/app/lurker /app/
+RUN chmod +x /app/lurker
 
-ENTRYPOINT ["/app/lurker-worker"]
+ENTRYPOINT ["/app/lurker"]

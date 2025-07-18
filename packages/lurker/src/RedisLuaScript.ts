@@ -1,55 +1,78 @@
 import type { RedisClient } from 'bun';
-import z from 'zod';
+import z from 'zod/v4';
 
-export class RedisLuaScript<
-  KeysSchema extends z.ZodTypeAny,
-  ArgsSchema extends z.ZodTypeAny,
-  ResultSchema extends z.ZodTypeAny,
-  Result = z.infer<ResultSchema>,
-> {
-  private sha: Promise<string> | null = null;
+/**
+ * A type‑safe wrapper around a Lua script stored in Redis.
+ *
+ * The class takes care of:
+ *  - validating the `keys` and `args` arrays at runtime using Zod
+ *  - loading the script into Redis on first use and caching its SHA‑1 hash
+ *  - transparently retrying the call when Redis answers `NOSCRIPT`
+ *  - parsing the raw Redis reply through a caller‑supplied Zod schema so that
+ *    the returned value is fully type‑checked
+ */
+export class RedisLuaScript<ResultSchema extends z.ZodTypeAny> {
+  private scriptId: Promise<string> | null = null;
+  private readonly keysSchema: z.ZodArray<z.ZodString>;
+  private readonly argsSchema: z.ZodArray<z.ZodString>;
 
-  public constructor(
-    private readonly options: {
-      redis: RedisClient;
-      source: {};
-      keysSchema: ZodTuple<ZodString[], null>;
-      argsSchema: ZodTuple<ZodString[], null>;
-      resultSchema: ZodEffects<ZodUnion<[ZodLiteral<'0'>, ZodLiteral<'1'>]>, boolean>;
-    },
-  ) {}
+  public constructor(private readonly options: RedisLuaScriptOptions<ResultSchema>) {
+    this.keysSchema = z.array(z.string()).length(this.options.keys);
+    this.argsSchema = z.array(z.string()).length(this.options.args);
+  }
 
-  public async exec(
-    keys: z.infer<KeysSchema> extends never ? string[] : z.infer<KeysSchema>,
-    args: z.infer<ArgsSchema> extends never ? (string | number | boolean)[] : z.infer<ArgsSchema>,
-  ): Promise<Result> {
-    const ks = (this.options.keysSchema ?? z.array(z.string())).parse(keys);
-    const as = (this.options.argsSchema ?? z.array(z.any())).parse(args);
+  public async execute(keys: string[], args: string[]): Promise<z.infer<ResultSchema>> {
+    keys = this.keysSchema.parse(keys);
+    args = this.argsSchema.parse(args);
 
     try {
-      return await this.execute(ks, as);
+      // Attempt to execute the script using its cached SHA1 hash
+      return await this.loadAndExecute(keys, args);
     } catch (err) {
       if (err instanceof Error && err.message.includes('NOSCRIPT')) {
-        // скрипт вымылся — сброс кеша и retry
-        this.sha = null;
-        return this.exec(ks, as);
+        // If Redis reports the script is not loaded, clear the cached ID and retry
+        this.scriptId = null;
+        return this.loadAndExecute(keys, args);
       }
-
+      // Re-throw any other errors.
       throw err;
     }
   }
 
-  private async execute(keys: string[], args: (string | number | boolean)[]): Promise<Result> {
-    const sha = await this.load();
-    const raw = await this.options.redis.send('EVALSHA', [sha, keys.length.toString(), ...keys, ...args.map(String)]);
-    const parsed = this.options.resultSchema.parse(raw);
-    return parsed as Result;
+  /**
+   * Loads the script if necessary and executes it using EVALSHA.
+   * This is the internal execution logic without the retry mechanism.
+   */
+  private async loadAndExecute(keys: string[], args: string[]): Promise<z.infer<ResultSchema>> {
+    const scriptId = await this.getScriptId();
+    const result = await this.options.redis.send('EVALSHA', [scriptId, keys.length.toString(), ...keys, ...args]);
+    return this.options.schema.parse(result);
   }
 
-  private load(): Promise<string> {
-    if (!this.sha) {
-      this.sha = this.options.redis.send('SCRIPT', ['LOAD', this.options.source]);
+  /**
+   * Gets the SHA1 hash of the script, loading it into Redis if it hasn't been loaded yet.
+   * This method caches the promise for loading the script to prevent multiple SCRIPT LOAD
+   * commands from being sent simultaneously
+   */
+  private getScriptId(): Promise<string> {
+    if (!this.scriptId) {
+      this.scriptId = this.options.redis.send('SCRIPT', ['LOAD', this.options.source]).then(
+        (id) => id,
+        (err) => {
+          this.scriptId = null;
+          throw err;
+        },
+      );
     }
-    return this.sha;
+
+    return this.scriptId;
   }
+}
+
+export interface RedisLuaScriptOptions<ResultSchema extends z.ZodTypeAny> {
+  redis: RedisClient;
+  source: string;
+  keys: number;
+  args: number;
+  schema: ResultSchema;
 }

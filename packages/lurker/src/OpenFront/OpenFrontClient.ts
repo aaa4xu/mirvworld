@@ -1,5 +1,5 @@
 export class OpenFrontClient {
-  public static readonly UserAgent = 'MIRVWorldBot/0.5';
+  public static readonly UserAgent = 'MIRVWorldBot/0.6';
   protected readonly acceptEncoding = 'gzip, deflate, br, zstd';
 
   public constructor(protected readonly endpoint: string) {}
@@ -29,7 +29,7 @@ export class OpenFrontClient {
         'Accept-Encoding': this.acceptEncoding,
       },
       signal: this.withTimeout(signal),
-      // verbose: true,
+      verbose: !!process.env['HTTP_CLIENT_VERBOSE'],
     });
   }
 }

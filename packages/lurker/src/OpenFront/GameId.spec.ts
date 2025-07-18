@@ -1,8 +1,9 @@
 import { GameId } from './GameId.ts';
+import { describe, expect, it } from 'bun:test';
 
 describe('GameId', () => {
   it('should convert to string using toString method', () => {
-    const id = new GameId('cMaLXZbG');
+    const id = new GameId('cMaLXZbG', 20);
     expect(id.toString()).toBe('cMaLXZbG');
   });
 

@@ -18,6 +18,10 @@ export class OpenFrontPublicAPI extends OpenFrontClient {
   public async game(id: string, signal?: AbortSignal) {
     const response = await this.request(this.gameUrl(id), signal);
 
+    if (response.status === 404) {
+      return null;
+    }
+
     await this.processError(response);
     this.validateContentType(response, 'application/json');
 

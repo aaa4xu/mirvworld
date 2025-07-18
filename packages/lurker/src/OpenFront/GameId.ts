@@ -1,11 +1,9 @@
-import { config } from '../../config.ts';
-
 export class GameId {
   public workerId: string;
 
   public constructor(
     public readonly id: string,
-    workers = config.openfront.workers,
+    workers: number,
   ) {
     this.workerId = `w${this.simpleHash(id) % workers}`;
   }

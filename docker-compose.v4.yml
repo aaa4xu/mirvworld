@@ -11,20 +11,11 @@ services:
       - MINIO_NOTIFY_REDIS_FORMAT_PRIMARY=access
       - MINIO_NOTIFY_REDIS_QUEUE_DIR_PRIMARY=/opt/minio/events
 
-  lurker-master:
-    image: mirvworld/lurker-master
+  lurker:
+    image: mirvworld/lurker
     build:
       context: .
-      dockerfile: packages/lurker/master.Dockerfile
-    restart: unless-stopped
-    depends_on:
-      - redis
-
-  lurker-worker:
-    image: mirvworld/lurker-worker
-    build:
-      context: .
-      dockerfile: packages/lurker/worker.Dockerfile
+      dockerfile: packages/lurker/Dockerfile
     restart: unless-stopped
     depends_on:
       - redis
@@ -43,6 +34,12 @@ services:
     image: redis:8-alpine
     restart: unless-stopped
     command: redis-server --save 60 1 --loglevel warning
+
+  db:
+    image: mysql
+    restart: unless-stopped
+    environment:
+      - MYSQL_DATABASE=local
 
   game-snapshot-v0-23-16:
     image: mirvworld/game-snapshot:v0.23.16
