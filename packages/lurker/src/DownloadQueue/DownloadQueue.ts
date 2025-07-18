@@ -3,7 +3,7 @@ import popTaskScript from './PopTask.lua' with { type: 'text' };
 import { RedisClient } from 'bun';
 import { RedisLuaScript } from '../RedisLuaScript.ts';
 import { DownloadQueueResultSchema } from './Schema.ts';
-import type { MatchInfo } from '../OpenFront/Schema/MatchInfoSchema.ts';
+import { type MatchInfo, MatchInfoSchema } from '../OpenFront/Schema/MatchInfoSchema.ts';
 
 export class DownloadQueue {
   private readonly script: RedisLuaScript<typeof DownloadQueueResultSchema>;
@@ -67,6 +67,10 @@ export class DownloadQueue {
 
   public async removeWithError(id: string, reason: string) {
     return Promise.all([this.redis.hmset(this.options.deadLetterKey, [id, reason]), this.remove(id)]);
+  }
+
+  public async startedAt(id: string) {
+    return parseInt((await this.redis.hmget(this.key(id), ['startedAt']))[0] ?? '0', 10);
   }
 
   private key(id: string) {

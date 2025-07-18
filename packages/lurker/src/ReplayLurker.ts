@@ -38,7 +38,12 @@ export class ReplayLurker {
 
       const gameRecord = await this.client.game(id, this.abortController.signal);
       if (!gameRecord) {
-        console.log(`[ReplayLurker][${id}] 💤 Replay for game is not ready yet`);
+        if ((await this.queue.startedAt(id)) + (3 * 60 + 5) * 60 * 1000 < Date.now()) {
+          console.error(`[ReplayLurker][${id}] 🙈 Replay for game is not ready after 3 hours, removing from queue`);
+          await this.queue.removeWithError(id, 'Replay is not ready after 3 hours');
+        } else {
+          console.log(`[ReplayLurker][${id}] 💤 Replay for game is not ready yet`);
+        }
         return;
       }
 
