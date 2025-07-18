@@ -30,6 +30,7 @@ const downloadQueue = new DownloadQueue(
     firstDelay: 10 * 60 * 1000,
     retryDelay: 5 * 60 * 1000,
     entryKeyPrefix: 'lurker:entry:',
+    deadLetterKey: 'lurker:deadletter',
   },
   redis,
 );

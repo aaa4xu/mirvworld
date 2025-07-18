@@ -65,6 +65,10 @@ export class DownloadQueue {
     return Promise.all([this.redis.send('DEL', [entryKey]), this.redis.send('ZREM', [this.options.readyKey, id])]);
   }
 
+  public async removeWithError(id: string, reason: string) {
+    return Promise.all([this.redis.hmset(this.options.deadLetterKey, [id, reason]), this.remove(id)]);
+  }
+
   private key(id: string) {
     return `${this.options.entryKeyPrefix}${id}`;
   }
@@ -75,4 +79,5 @@ export interface DownloadQueueOptions {
   retryDelay: number;
   entryKeyPrefix: string;
   readyKey: string;
+  deadLetterKey: string;
 }

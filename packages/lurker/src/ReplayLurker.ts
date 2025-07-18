@@ -3,6 +3,7 @@ import type { DownloadQueue } from './DownloadQueue/DownloadQueue.ts';
 import type { ReplayStorage } from './ReplayStorage.ts';
 import type { OpenFrontPublicAPI } from './OpenFront/OpenFrontPublicAPI.ts';
 import { cancelableTimeout } from './Utils.ts';
+import { OpenFrontError } from './OpenFront/Errors/OpenFrontError.ts';
 
 export class ReplayLurker {
   private readonly abortController = new AbortController();
@@ -18,9 +19,21 @@ export class ReplayLurker {
   private async tick() {
     this.abortController.signal.throwIfAborted();
 
+    let id: string | null = null;
     try {
-      const id = await this.queue.pop();
-      if (!id) return;
+      id = await this.queue.pop();
+    } catch (e) {
+      console.error(`[ReplayLurker] Failed to get id from queue:`, e);
+    }
+
+    if (!id) {
+      cancelableTimeout(1000, this.abortController.signal)
+        .then(() => this.tick())
+        .catch(() => null);
+      return;
+    }
+
+    try {
       console.log(`[ReplayLurker][${id}] 🕓 Checking replay for game`);
 
       const gameRecord = await this.client.game(id, this.abortController.signal);
@@ -33,7 +46,12 @@ export class ReplayLurker {
       await this.queue.remove(id);
       console.log(`[ReplayLurker][${id}] ✅ Replay for game saved to storage`);
     } catch (err) {
-      console.error(`[ReplayLurker] 💥 Failed to check replay:`, err);
+      if (err instanceof OpenFrontError && err.message.startsWith('✖')) {
+        console.error(`[ReplayLurker][${id}] 💥 Replay is invalid: ${err.message.slice(2)}`);
+        await this.queue.removeWithError(id, err.message);
+      } else {
+        console.error(`[ReplayLurker][${id}] 💥 Failed to check replay:`, err);
+      }
     } finally {
       if (!this.abortController.signal.aborted) {
         cancelableTimeout(100, this.abortController.signal)
