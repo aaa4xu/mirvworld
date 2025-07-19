@@ -1,4 +1,4 @@
-import type { Game, Player, TerraNullius } from 'openfront/game/src/core/game/Game';
+import { type Game, type Player, PlayerType, type TerraNullius } from 'openfront/game/src/core/game/Game';
 import type { Stats as GameStats } from 'openfront/game/src/core/game/Stats';
 import type { NukeType, OtherUnitType } from 'openfront/game/src/core/StatsSchemas';
 import { type GamelensEvent } from './Events.ts';
@@ -273,10 +273,10 @@ export class Stats implements GameStats {
       (acc, p) => {
         const clientId = p.clientID();
         if (!clientId) return acc;
-        acc[clientId] = { id: p.smallID(), name: p.displayName() };
+        acc[clientId] = { id: p.smallID(), name: p.displayName(), type: p.type() };
         return acc;
       },
-      {} as Record<string, { id: number; name: string }>,
+      {} as Record<string, { id: number; name: string; type: string }>,
     );
 
     this.events.push({
