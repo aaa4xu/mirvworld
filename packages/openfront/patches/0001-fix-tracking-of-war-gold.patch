@@ -1,0 +1,24 @@
+From 0d5e1432364847028f1873b386f87c26a1fc623b Mon Sep 17 00:00:00 2001
+From: aaa4xu <aaa4xu@gmail.com>
+Date: Sat, 19 Jul 2025 16:26:42 +0700
+Subject: [PATCH] Log war gold transaction during attack execution
+
+---
+ src/core/execution/AttackExecution.ts | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/core/execution/AttackExecution.ts b/src/core/execution/AttackExecution.ts
+index 5038c28a..136cdfa6 100644
+--- a/src/core/execution/AttackExecution.ts
++++ b/src/core/execution/AttackExecution.ts
+@@ -340,6 +340,7 @@ export class AttackExecution implements Execution {
+       this._owner.id(),
+       gold,
+     );
++    this.mg.stats().goldWar(this._owner, this.target, gold);
+     this.target.removeGold(gold);
+     this._owner.addGold(gold);
+ 
+-- 
+2.39.5 (Apple Git-154)
+

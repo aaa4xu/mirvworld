@@ -1,0 +1,33 @@
+From 30192968808d05094e1dc5e7dd62fed9dc99f260 Mon Sep 17 00:00:00 2001
+From: aaa4xu <aaa4xu@gmail.com>
+Date: Sat, 19 Jul 2025 17:13:54 +0700
+Subject: [PATCH] Update trade ship execution to log stats for trades and
+ captures
+
+---
+ src/core/execution/TradeShipExecution.ts | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/core/execution/TradeShipExecution.ts b/src/core/execution/TradeShipExecution.ts
+index 482fb47d..c1a332f7 100644
+--- a/src/core/execution/TradeShipExecution.ts
++++ b/src/core/execution/TradeShipExecution.ts
+@@ -148,6 +148,7 @@ export class TradeShipExecution implements Execution {
+         this.tradeShip!.owner().id(),
+         gold,
+       );
++      this.mg.stats().boatCapturedTrade(this.tradeShip!.owner(), this.origOwner, gold);
+     } else {
+       this.srcPort.owner().addGold(gold);
+       this._dstPort.owner().addGold(gold, this._dstPort.tile());
+@@ -163,6 +164,7 @@ export class TradeShipExecution implements Execution {
+         this.srcPort.owner().id(),
+         gold,
+       );
++      this.mg.stats().boatArriveTrade(this.srcPort.owner(), this._dstPort.owner(), gold);
+     }
+     return;
+   }
+-- 
+2.39.5 (Apple Git-154)
+
