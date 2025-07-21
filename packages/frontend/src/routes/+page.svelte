@@ -1,34 +1,36 @@
 <script lang="ts">
-	import Game from '$lib/components/Game.svelte';
-	import type { PageServerData } from './$types';
+  import Game from '$lib/components/Game.svelte';
+  import type { PageServerData } from './$types';
 
-	let { data }: { data: PageServerData } = $props();
+  let { data }: { data: PageServerData } = $props();
 </script>
 
 <div class="games">
-	<h1>Matches</h1>
+  <h1>Matches</h1>
 
-	<div class="list">
+  <pre>{JSON.stringify(data.match, null, 2)}</pre>
+
+  <!--<div class="list">
 		{#each data.games as game (game.id)}
 			<Game {game} />
 		{/each}
-	</div>
+	</div>-->
 </div>
 
 <style>
-	.games {
-		display: flex;
-		flex-direction: column;
-		flex-wrap: wrap;
-		gap: 1rem;
-		padding: 0 1rem;
-	}
+  .games {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 0 1rem;
+  }
 
-	.list {
-		display: flex;
-		flex-direction: row;
-		flex-wrap: wrap;
-		gap: 1rem;
-		justify-content: center;
-	}
+  .list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+  }
 </style>
