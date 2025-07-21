@@ -47,4 +47,8 @@ if (cluster.isPrimary) {
   const eventsStorage = new GamelensEventsStorage(new MinioStorage(config.s3.bucket, new Client(config.s3.endpoint)));
 
   new GameLensStatsWorker(config.mapsPath, redis, replayStorage, eventsStorage);
+  abort.signal.addEventListener('abort', () => {
+    console.log(`[Worker#${process.pid}] Aborting...`);
+    process.exit(1);
+  });
 }

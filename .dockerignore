@@ -5,8 +5,6 @@ README.md
 .env
 .env.production.local
 .gitignore
-.gitmodules
-.git
 .dockerignore
 /gamelens/.master
 /gamelens/*/src
