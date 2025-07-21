@@ -2,7 +2,7 @@ import { OpenFrontClient } from './OpenFrontClient.ts';
 import { APIErrorResponseSchema } from './Schema/APIErrorResponse.ts';
 import { OpenFrontError } from './Errors/OpenFrontError.ts';
 import { PlayerStatsSchema } from './Schema/PlayerStats.ts';
-import { ArchivedGameRecordSchema } from './Schema/ArchivedGameResponse.ts';
+import { GenericReplaySchema } from 'openfront/src/Schema.ts';
 
 export class OpenFrontPublicAPI extends OpenFrontClient {
   public async player(id: string, signal?: AbortSignal) {
@@ -25,7 +25,7 @@ export class OpenFrontPublicAPI extends OpenFrontClient {
     await this.processError(response);
     this.validateContentType(response, 'application/json');
 
-    return ArchivedGameRecordSchema.parse(await response.json());
+    return GenericReplaySchema.parse(await response.json());
   }
 
   private playerUrl(id: string) {

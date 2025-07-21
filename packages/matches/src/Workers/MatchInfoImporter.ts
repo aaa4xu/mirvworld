@@ -3,10 +3,9 @@ import { type TaskMessage, TaskWorker } from '../TaskWorker.ts';
 import { MySql2Database } from 'drizzle-orm/mysql2/driver';
 import { MinioPutEventSchema } from '../Schema/MinioPutEvent.ts';
 import type { Readable } from 'node:stream';
-import { GenericReplaySchema } from '../Schema/GenericReplay.ts';
 import type { Client } from 'minio';
 import z from 'zod/v4';
-import { GameRecordSchema } from 'openfront/src/Schema.ts';
+import { GameRecordSchema, GenericReplaySchema } from 'openfront/src/Schema.ts';
 import { matches, matchPlayers } from '../db/schema.ts';
 import { eq } from 'drizzle-orm';
 

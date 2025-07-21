@@ -1,16 +1,11 @@
-import { z } from 'zod/v4';
+import z from 'zod/v4';
+import { GenericReplaySchema } from 'openfront/src/Schema.ts';
 
-export const GitCommitSchema = z.string().regex(/^[0-9a-fA-F]{40}$/);
-
-export const ArchivedGameRecordSchema = z.looseObject({
-  gitCommit: GitCommitSchema,
-});
-
-export type ArchivedGameRecord = z.infer<typeof ArchivedGameRecordSchema>;
+export type ArchivedGameRecord = z.infer<typeof GenericReplaySchema>;
 
 export const ArchivedGameSuccessResponseSchema = z.object({
   success: z.literal(true),
-  gameRecord: ArchivedGameRecordSchema,
+  gameRecord: GenericReplaySchema,
 });
 
 export const ArchivedGameErrorResponseSchema = z.object({
