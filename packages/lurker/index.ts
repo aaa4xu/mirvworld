@@ -16,7 +16,7 @@ process.on('SIGINT', () => abortController.abort('SIGINT'));
 
 const redis = new RedisClient(config.redis);
 const s3 = new Client(config.s3.endpoint);
-const storage = new CompressedStorage(new MinioStorage(config.s3.bucket, s3), 22);
+const storage = new MinioStorage(config.s3.bucket, s3);
 const replayStorage = new ReplayStorage(storage);
 
 const openfrontRateLimiter = new LeakyBucket({ bucketKey: 'openfront:global', capacity: 4, refillPerSec: 4 }, redis);
