@@ -9,7 +9,7 @@ RUN bun build ./packages/lurker/index.ts --compile --minify --sourcemap --byteco
 
 FROM debian:stable-slim
 WORKDIR /app
-ENV LURKER_S3_ENDPOINT=http://storage:9000
+ENV LURKER_S3_URL=http://minioadmin:minioadmin@storage:9000
 ENV LURKER_REDIS_URL=redis://redis:6379
 
 COPY --from=build /usr/src/app/lurker /app/
