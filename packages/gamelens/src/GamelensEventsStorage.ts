@@ -6,7 +6,11 @@ export class GamelensEventsStorage {
   private readonly storage: JSONStorage<typeof GamelensEventsSchema>;
 
   public constructor(storage: Storage, compressionLevel = 22) {
-    this.storage = new JSONStorage(new CompressedStorage(storage, compressionLevel), GamelensEventsSchema);
+    this.storage = new JSONStorage(
+      new CompressedStorage(storage, compressionLevel),
+      GamelensEventsSchema,
+      (k: string, v: any) => (typeof v === 'bigint' ? v.toString() : v),
+    );
   }
 
   public async save(gitCommit: string, id: string, replay: GamelensEvents) {
