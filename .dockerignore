@@ -1,11 +1,12 @@
 .idea
 node_modules
-docker-compose*.yml
+docker-compose*
 README.md
 .env
 .env.production.local
 .gitignore
 .gitmodules
+.git
 .dockerignore
 /gamelens/.master
 /gamelens/*/src
