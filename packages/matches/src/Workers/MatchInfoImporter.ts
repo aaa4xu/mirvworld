@@ -10,7 +10,6 @@ import type { ReplayStorage } from 'lurker/src/ReplayStorage.ts';
 
 export class MatchInfoImporter {
   private readonly worker: TaskWorker;
-  private readonly versions = ['cef2a853dc31b7a29961dbb454681bf28c7ecf9d'];
 
   public constructor(
     redis: RedisClient,
@@ -38,10 +37,6 @@ export class MatchInfoImporter {
         }
 
         const genericReplay = await this.replays.read(decodeURIComponent(event.s3.object.key));
-
-        if (!this.versions.includes(genericReplay.gitCommit)) {
-          throw new Error(`Unsupported replay version ${genericReplay.gitCommit.substring(0, 7)}`);
-        }
 
         const replay = GameRecordSchema.parse(genericReplay);
         await this.import(replay);
