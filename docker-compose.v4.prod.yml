@@ -25,6 +25,7 @@ services:
       - 100.111.103.57:9001:9001
 
   lurker:
+    image: ghcr.io/aaa4xu/mirvworld/lurker
     restart: always
     env_file:
       - v4.env

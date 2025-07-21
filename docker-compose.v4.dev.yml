@@ -31,3 +31,8 @@ services:
   game-snapshot-v0-23-16:
     ports:
       - 12316:80
+
+  lurker:
+    build:
+      context: .
+      dockerfile: packages/lurker/Dockerfile

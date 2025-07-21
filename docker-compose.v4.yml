@@ -13,9 +13,6 @@ services:
 
   lurker:
     image: mirvworld/lurker
-    build:
-      context: .
-      dockerfile: packages/lurker/Dockerfile
     restart: unless-stopped
     depends_on:
       - redis
