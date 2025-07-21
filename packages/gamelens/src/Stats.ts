@@ -11,7 +11,6 @@ export class Stats implements GameStats {
   private captureNewOwner: number | null = null;
   private destroyer: number | null = null;
   private dead = new Set<number>();
-  private spawns: Record<string, [x: number, y: number]> = {};
   private goldFromWorkers = new Map<number, bigint>();
 
   public getEvents() {
