@@ -1,6 +1,6 @@
 import type { ClientOptions } from 'minio';
 
-const s3Url = new URL(env('LURKER_S3_ENDPOINT', 'http://localhost:9000'));
+const s3Url = new URL(env('LURKER_S3_URL', 'http://minioadmin:minioadmin@localhost:9000'));
 const s3UseSSL = s3Url.protocol === 'https:';
 const s3Port = s3Url.port ? Number(s3Url.port) : s3UseSSL ? 443 : 80;
 
@@ -11,8 +11,8 @@ export const config = {
       endPoint: s3Url.hostname,
       port: s3Port,
       useSSL: s3UseSSL,
-      accessKey: env('LURKER_S3_KEY_ID', 'minioadmin'),
-      secretKey: env('LURKER_S3_SECRET', 'minioadmin'),
+      accessKey: s3Url.username,
+      secretKey: s3Url.password,
     } satisfies ClientOptions,
   },
   redis: env('LURKER_REDIS_URL', 'redis://localhost:6379'),
