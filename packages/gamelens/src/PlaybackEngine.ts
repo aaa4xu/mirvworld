@@ -29,6 +29,7 @@ export class PlaybackEngine {
       runner.addTurn(turn);
       runner.executeNextTick();
       stats.endTurn(runner.game);
+      await Bun.sleep(0); // To let event loop do things
     }
 
     stats.endGame(runner.game);
