@@ -1,4 +1,4 @@
-FROM oven/bun:1 AS build
+FROM oven/bun:1-alpine AS build
 WORKDIR /usr/src/app
 COPY . .
 RUN bun install
@@ -7,7 +7,9 @@ RUN bun install
 # @see https://bun.sh/docs/bundler/executables
 RUN bun build ./packages/lurker/index.ts --compile --minify --sourcemap --bytecode --outfile lurker
 
-FROM debian:stable-slim
+FROM alpine:3
+RUN apk add --no-cache libstdc++ libgcc
+
 WORKDIR /app
 ENV LURKER_S3_URL=http://minioadmin:minioadmin@storage:9000
 ENV LURKER_REDIS_URL=redis://redis:6379
