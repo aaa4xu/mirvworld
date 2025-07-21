@@ -2,8 +2,6 @@ import { publicProcedure, router } from './trpc';
 import z from 'zod/v4';
 import { matches, matchPlayers } from '../db/schema.ts';
 import { eq } from 'drizzle-orm';
-import { CompressedFile } from '../CompressedFile.ts';
-import { GamelensEventSchema } from 'gamelens/src/Events.ts';
 import { Match } from '../Match.ts';
 import { GameLensStats } from '../GameLensStats.ts';
 
@@ -23,10 +21,8 @@ export const appRouter = router({
       if (!info) return null;
 
       const players = await ctx.db.select().from(matchPlayers).where(eq(matchPlayers.matchId, info.id));
-      const file = ctx.s3.getObject('gamelens-v4', `${info.version.slice(0, 7)}/${info.gameId}.json.zst`);
-      const json = await CompressedFile.json(file).catch(() => []);
-      const events = z.array(GamelensEventSchema).parse(json);
 
+      const events: any[] = [];
       return new Match(info, players, events.length > 0 ? new GameLensStats(events) : undefined).toJSON();
     }),
   },

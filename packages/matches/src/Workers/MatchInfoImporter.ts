@@ -2,20 +2,20 @@ import { RedisClient } from 'bun';
 import { type TaskMessage, TaskWorker } from '../TaskWorker.ts';
 import { MySql2Database } from 'drizzle-orm/mysql2/driver';
 import { MinioPutEventSchema } from '../Schema/MinioPutEvent.ts';
-import type { Readable } from 'node:stream';
-import type { Client } from 'minio';
 import z from 'zod/v4';
-import { GameRecordSchema, GenericReplaySchema } from 'openfront/src/Schema.ts';
+import { GameRecordSchema } from 'openfront/src/Schema.ts';
 import { matches, matchPlayers } from '../db/schema.ts';
 import { eq } from 'drizzle-orm';
+import type { ReplayStorage } from 'lurker/src/ReplayStorage.ts';
 
 export class MatchInfoImporter {
   private readonly worker: TaskWorker;
+  private readonly versions = ['cef2a853dc31b7a29961dbb454681bf28c7ecf9d'];
 
   public constructor(
     redis: RedisClient,
     private readonly db: MySql2Database,
-    private readonly s3: Client,
+    private readonly replays: ReplayStorage,
   ) {
     this.worker = new TaskWorker(redis, {
       consumer: `matches-processor-${process.pid}`,
@@ -37,11 +37,10 @@ export class MatchInfoImporter {
           throw new Error(`Unknown event ${event.eventName}`);
         }
 
-        const stream = this.s3.getObject(event.s3.bucket.name, decodeURIComponent(event.s3.object.key));
-        const genericReplay = await this.readReplay(stream);
+        const genericReplay = await this.replays.read(decodeURIComponent(event.s3.object.key));
 
-        if (genericReplay.gitCommit !== 'cef2a853dc31b7a29961dbb454681bf28c7ecf9d') {
-          throw new Error(`Unknown commit ${genericReplay.gitCommit}`);
+        if (!this.versions.includes(genericReplay.gitCommit)) {
+          throw new Error(`Unsupported replay version ${genericReplay.gitCommit.substring(0, 7)}`);
         }
 
         const replay = GameRecordSchema.parse(genericReplay);
@@ -80,23 +79,6 @@ export class MatchInfoImporter {
       if (playersRows.length) {
         await tx.insert(matchPlayers).values(playersRows).execute();
       }
-    });
-  }
-
-  private async readReplay(stream: Promise<Readable>) {
-    const compressed = await this.read(await stream);
-    const decompressed = await Bun.zstdDecompress(compressed);
-    const json = JSON.parse(decompressed.toString());
-    return GenericReplaySchema.parse(json);
-  }
-
-  private async read(stream: Readable) {
-    const chunks: Buffer[] = [];
-
-    return new Promise<Buffer>((resolve, reject) => {
-      stream.on('data', (chunk) => chunks.push(chunk));
-      stream.on('end', () => resolve(Buffer.concat(chunks)));
-      stream.on('error', reject);
     });
   }
 }

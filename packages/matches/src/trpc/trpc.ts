@@ -1,13 +1,11 @@
 import { initTRPC } from '@trpc/server';
 import type { CreateHTTPContextOptions } from '@trpc/server/adapters/standalone';
-import type { Client } from 'minio';
 import type { MySql2Database } from 'drizzle-orm/mysql2/driver';
 import superjson from 'superjson';
 
-export const createContext = (s3: Client, db: MySql2Database) => {
+export const createContext = (db: MySql2Database) => {
   return async (opts: CreateHTTPContextOptions) => {
     return {
-      s3,
       db,
     };
   };
