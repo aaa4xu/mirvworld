@@ -145,16 +145,42 @@ export class Stats implements GameStats {
   public bombIntercept(player: Player, type: NukeType, count: number | bigint): void {}
 
   public bombLand(player: Player, target: Player | TerraNullius, type: NukeType): void {
-    this.events.push({
-      type: 'bomb.landed',
-      turn: this.turn,
-      player: player.smallID(),
-      target: target.smallID(),
-      nukeType: type,
-    });
+    if (target.isPlayer()) {
+      this.events.push({
+        type: 'bomb.landed.player',
+        turn: this.turn,
+        player: player.smallID(),
+        target: target.smallID(),
+        nukeType: type,
+      });
+    } else {
+      this.events.push({
+        type: 'bomb.landed.terra',
+        turn: this.turn,
+        player: player.smallID(),
+        nukeType: type,
+      });
+    }
   }
 
-  public bombLaunch(player: Player, target: Player | TerraNullius, type: NukeType): void {}
+  public bombLaunch(player: Player, target: Player | TerraNullius, type: NukeType): void {
+    if (target.isPlayer()) {
+      this.events.push({
+        type: 'bomb.launched.player',
+        turn: this.turn,
+        player: player.smallID(),
+        target: target.smallID(),
+        nukeType: type,
+      });
+    } else {
+      this.events.push({
+        type: 'bomb.launched.terra',
+        turn: this.turn,
+        player: player.smallID(),
+        nukeType: type,
+      });
+    }
+  }
 
   public goldWar(player: Player, captured: Player, gold: number | bigint): void {
     // v0.24.0: Трекает только убийства через аннексии, запатчил чтобы трекало и обычные убийства

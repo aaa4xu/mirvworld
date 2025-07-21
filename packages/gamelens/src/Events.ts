@@ -64,10 +64,24 @@ export const GamelensDeathEventSchema = GamelensTurnEventSchema.extend({
   type: z.literal('death'),
 });
 
-export const GamelensBombLandedEventSchema = GamelensTurnEventSchema.extend({
-  type: z.literal('bomb.landed'),
-  target: z.number(),
+export const GamelensBombLandedTerraEventSchema = GamelensTurnEventSchema.extend({
+  type: z.literal('bomb.landed.terra'),
   nukeType: z.string(),
+});
+
+export const GamelensBombLandedPlayerEventSchema = GamelensBombLandedTerraEventSchema.extend({
+  type: z.literal('bomb.landed.player'),
+  target: z.number(),
+});
+
+export const GamelensBombLaunchedIntoTerraEventSchema = GamelensTurnEventSchema.extend({
+  type: z.literal('bomb.launched.terra'),
+  nukeType: z.string(),
+});
+
+export const GamelensBombLaunchedIntoPlayerEventSchema = GamelensBombLaunchedIntoTerraEventSchema.extend({
+  type: z.literal('bomb.launched.player'),
+  target: z.number(),
 });
 
 export const GamelensSpawnEventSchema = GamelensTurnEventSchema.extend({
@@ -106,7 +120,8 @@ export const GamelensEventSchema = z.discriminatedUnion('type', [
   GamelensUnitDestroyedEventSchema,
   GamelensTradeDestroyedEventSchema,
   GamelensKillEventSchema,
-  GamelensBombLandedEventSchema,
+  GamelensBombLandedPlayerEventSchema,
+  GamelensBombLandedTerraEventSchema,
   GamelensDeathEventSchema,
   GamelensSpawnEventSchema,
   GamelensTradeArrivedEventSchema,
@@ -114,6 +129,8 @@ export const GamelensEventSchema = z.discriminatedUnion('type', [
   GamelensTilesEventSchema,
   GamelensGoldFromWorkersEventSchema,
   GamelensPlayersMappingEventSchema,
+  GamelensBombLaunchedIntoPlayerEventSchema,
+  GamelensBombLaunchedIntoTerraEventSchema,
 ]);
 
 export const GamelensEventsSchema = z.array(GamelensEventSchema);
