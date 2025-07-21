@@ -298,10 +298,10 @@ export class Stats implements GameStats {
       (acc, p) => {
         const clientId = p.clientID();
         if (!clientId) return acc;
-        acc[clientId] = { id: p.smallID(), name: p.displayName(), type: p.type() };
+        acc[clientId] = { id: p.smallID(), name: p.displayName(), type: p.type(), team: p.team() };
         return acc;
       },
-      {} as Record<string, { id: number; name: string; type: string }>,
+      {} as Record<string, { id: number; name: string; type: string; team: string | null }>,
     );
 
     this.events.push({

@@ -105,7 +105,10 @@ export const GamelensGoldFromWorkersEventSchema = z.object({
 export const GamelensPlayersMappingEventSchema = z.object({
   type: z.literal('players.mapping'),
   turn: z.number(),
-  players: z.record(z.string(), z.object({ id: z.number(), name: z.string(), type: z.string() })),
+  players: z.record(
+    z.string(),
+    z.object({ id: z.number(), name: z.string(), type: z.string(), team: z.string().nullable() }),
+  ),
 });
 
 export const GamelensAttackEventSchema = z.discriminatedUnion('type', [
