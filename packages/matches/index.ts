@@ -9,10 +9,17 @@ import { drizzle } from 'drizzle-orm/mysql2';
 import * as schema from './src/db/schema.ts';
 import { GameRecordSchema } from 'openfront/src/Schema.ts';
 import { matches, matchPlayers } from './src/db/schema.ts';
-import { eq } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
 import { Streamify } from './src/Streamify/Streamify.ts';
 import { TaskWorker } from './src/TaskWorker.ts';
 import { MatchInfoImporter } from './src/Workers/MatchInfoImporter.ts';
+import { Match } from './src/Match.ts';
+import z from 'zod/v4';
+import { GamelensEventSchema } from 'gamelens/src/Events.ts';
+import { GameLensStats } from './src/GameLensStats.ts';
+import { appRouter } from './src/trpc/router.ts';
+import { createHTTPServer } from '@trpc/server/adapters/standalone';
+import { createContext } from './src/trpc/trpc.ts';
 
 const abort = new AbortController();
 process.on('SIGTERM', () => abort.abort('SIGTERM'));
@@ -27,6 +34,49 @@ abort.signal.addEventListener('abort', () => streamify.dispose());
 streamify.start();
 
 new MatchInfoImporter(redis, db, s3);
+
+const server = createHTTPServer({
+  router: appRouter,
+  createContext: createContext(s3, db),
+});
+
+server.listen(3600);
+
+/*Bun.serve({
+  port: 3500,
+  async fetch(req) {
+    const info = (await db.select().from(matches).orderBy(desc(matches.id)).limit(1)).at(0)!;
+    const players = await db.select().from(matchPlayers).where(eq(matchPlayers.matchId, info.id));
+
+    console.log(`${info.version.slice(0, 7)}/${info.gameId}.json.szt`);
+    const file = s3.getObject('gamelens-v4', `${info.version.slice(0, 7)}/${info.gameId}.json.zst`);
+    const json = await readCompressedFile(file).catch(() => []);
+    const events = z.array(GamelensEventSchema).parse(json);
+
+    const match = new Match(info, players, events.length > 0 ? new GameLensStats(events) : undefined);
+
+    const response = JSON.stringify(match, (key, value) => {
+      if (typeof value === 'bigint') {
+        return value.toString();
+      }
+
+      if (value instanceof Map) {
+        return Object.fromEntries(value);
+      }
+
+      if (value instanceof Set) {
+        return Array.from(value);
+      }
+
+      return value;
+    });
+    return new Response(response, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  },
+});*/
 
 /*
 
@@ -156,13 +206,17 @@ while (!abort.signal.aborted) {
   }
 
   break;
+}*/
+
+async function getReplay(stream: Promise<Readable>) {
+  const json = await readCompressedFile(stream);
+  return GenericReplaySchema.parse(json);
 }
 
-async function readReplay(stream: Promise<Readable>) {
+async function readCompressedFile(stream: Promise<Readable>) {
   const compressed = await read(await stream);
   const decompressed = await Bun.zstdDecompress(compressed);
-  const json = JSON.parse(decompressed.toString());
-  return GenericReplaySchema.parse(json);
+  return JSON.parse(decompressed.toString());
 }
 
 function read(stream: Readable) {
@@ -174,4 +228,3 @@ function read(stream: Readable) {
     stream.on('error', reject);
   });
 }
-*/

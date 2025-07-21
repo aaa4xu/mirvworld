@@ -27,7 +27,6 @@ export class Streamify {
     while (!this.stop) {
       try {
         const r = await this.script.execute([this.from, this.to], [this.batch.toString()]);
-        console.log(r);
       } catch (err) {
         console.error(`[Streamify][${this.from}/${this.to}] Error:`, err instanceof Error ? err.message : err);
       }

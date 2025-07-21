@@ -14,7 +14,7 @@ export class MatchInfoImporter {
   private readonly worker: TaskWorker;
 
   public constructor(
-    private readonly redis: RedisClient,
+    redis: RedisClient,
     private readonly db: MySql2Database,
     private readonly s3: Client,
   ) {
@@ -35,16 +35,14 @@ export class MatchInfoImporter {
     for (const task of tasks) {
       for (const event of task.Event) {
         if (event.eventName !== 's3:ObjectCreated:Put') {
-          console.warn(`Unknown event ${event.eventName}`);
-          continue;
+          throw new Error(`Unknown event ${event.eventName}`);
         }
 
         const stream = this.s3.getObject(event.s3.bucket.name, decodeURIComponent(event.s3.object.key));
         const genericReplay = await this.readReplay(stream);
 
         if (genericReplay.gitCommit !== 'cef2a853dc31b7a29961dbb454681bf28c7ecf9d') {
-          console.warn(`Unknown commit ${genericReplay.gitCommit}`);
-          continue;
+          throw new Error(`Unknown commit ${genericReplay.gitCommit}`);
         }
 
         const replay = GameRecordSchema.parse(genericReplay);
