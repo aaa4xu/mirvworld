@@ -1,14 +1,26 @@
 import { ArchivedGameResponseSchema, type ArchivedGameRecord } from './Schema/ArchivedGameResponse.ts';
 import { LobbiesResponse } from './Schema/LobbiesResponse.ts';
 import { OpenFrontClient } from './OpenFrontClient.ts';
-import type { GameId } from './GameId.ts';
+import { GameId } from './GameId.ts';
 import { GameExistsResponseSchema } from './Schema/GameExistsResponseSchema.ts';
 import { GameInfoResponseSchema } from './Schema/GameInfo.ts';
+import { URL } from 'node:url';
 
 /**
  * Client for interacting with the OpenFront server API
  */
 export class OpenFrontServerAPI extends OpenFrontClient {
+  public constructor(
+    endpoint: string,
+    public readonly workers: number,
+  ) {
+    super(endpoint);
+  }
+
+  public gameId(id: string) {
+    return new GameId(id, this.workers);
+  }
+
   public async publicLobbies(signal?: AbortSignal) {
     const response = await this.request(this.publicLobbiesUrl(), signal);
 

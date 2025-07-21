@@ -21,7 +21,11 @@ const replayStorage = new ReplayStorage(storage);
 
 const openfrontRateLimiter = new LeakyBucket({ bucketKey: 'openfront:global', capacity: 4, refillPerSec: 4 }, redis);
 
-const serverClient = new OpenFrontServerAPIWithLimiter(config.openfront.server, openfrontRateLimiter);
+const serverClient = new OpenFrontServerAPIWithLimiter(
+  config.openfront.server,
+  config.openfront.workers,
+  openfrontRateLimiter,
+);
 const apiClient = new OpenFrontPublicAPIWithLimiter(
   config.openfront.api,
   new LeakyBucket({ bucketKey: 'openfront:api', capacity: 4, refillPerSec: 3 }, redis, openfrontRateLimiter),
@@ -58,5 +62,5 @@ const lobbiesLurker = new LobbiesLurker(
 );
 abortController.signal.addEventListener('abort', () => lobbiesLurker.dispose());
 
-const replaysLurker = new ReplayLurker(apiClient, replayStorage, downloadQueue);
+const replaysLurker = new ReplayLurker(apiClient, serverClient, replayStorage, downloadQueue);
 abortController.signal.addEventListener('abort', () => replaysLurker.dispose());
