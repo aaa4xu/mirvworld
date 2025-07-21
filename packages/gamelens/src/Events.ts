@@ -1,5 +1,11 @@
 import z from 'zod/v4';
 
+export const BigIntStringSchema = z.preprocess((val) => {
+  if (typeof val === 'string' && /^\d+$/.test(val)) return BigInt(val);
+  if (typeof val === 'bigint') return val;
+  return val;
+}, z.bigint());
+
 export const GamelensTurnEventSchema = z.object({
   type: z.string(),
   turn: z.number(),
@@ -8,7 +14,7 @@ export const GamelensTurnEventSchema = z.object({
 
 export const GamelensTerraAttackEventSchema = GamelensTurnEventSchema.extend({
   type: z.literal('attack.terra'),
-  troops: z.bigint(),
+  troops: BigIntStringSchema,
 });
 
 export const GamelensPlayerAttackEventSchema = GamelensTerraAttackEventSchema.extend({
@@ -39,19 +45,19 @@ export const GamelensTradeDestroyedEventSchema = GamelensTurnEventSchema.extend(
 export const GamelensTradeArrivedEventSchema = GamelensTurnEventSchema.extend({
   type: z.literal('trade.arrived'),
   owner: z.number(),
-  gold: z.bigint(),
+  gold: BigIntStringSchema,
 });
 
 export const GamelensCapturedTradeArrivedEventSchema = GamelensTurnEventSchema.extend({
   type: z.literal('trade.captured'),
   owner: z.number(),
-  gold: z.bigint(),
+  gold: BigIntStringSchema,
 });
 
 export const GamelensKillEventSchema = GamelensTurnEventSchema.extend({
   type: z.literal('kill'),
   target: z.number(),
-  gold: z.bigint(),
+  gold: BigIntStringSchema,
 });
 
 export const GamelensDeathEventSchema = GamelensTurnEventSchema.extend({
@@ -73,13 +79,13 @@ export const GamelensSpawnEventSchema = GamelensTurnEventSchema.extend({
 export const GamelensTilesEventSchema = z.object({
   type: z.literal('tiles'),
   turn: z.number(),
-  players: z.record(z.number(), z.number()),
+  players: z.record(z.string(), z.number()),
 });
 
 export const GamelensGoldFromWorkersEventSchema = z.object({
   type: z.literal('gold.workers'),
   turn: z.number(),
-  players: z.record(z.number(), z.bigint()),
+  players: z.record(z.string(), BigIntStringSchema),
 });
 
 export const GamelensPlayersMappingEventSchema = z.object({
