@@ -2,7 +2,8 @@ name: Lurker
 
 on:
   push:
-    branches: main
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -37,3 +38,4 @@ jobs:
           push: true
           file: packages/lurker/Dockerfile
           tags: ghcr.io/${{ github.repository }}/lurker:latest
+          platforms: linux/amd64,linux/arm64
