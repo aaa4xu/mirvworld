@@ -41,8 +41,8 @@ export class Stats implements GameStats {
           type: 'spawn',
           turn: this.turn,
           player: player.smallID(),
-          x: intent.x,
-          y: intent.y,
+          x: game.x(intent.tile),
+          y: game.y(intent.tile),
         });
       }
     }
