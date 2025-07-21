@@ -1,12 +1,11 @@
 import { RedisClient } from 'bun';
-import type { Client } from 'minio';
 import { TaskWorker, type TaskMessage } from 'matches/src/TaskWorker.ts';
 import { MinioPutEventSchema } from 'matches/src/Schema/MinioPutEvent.ts';
 import { GameRecordSchema } from 'openfront/src/Schema.ts';
-import type { Readable } from 'node:stream';
-import { GenericReplaySchema } from 'matches/src/Schema/GenericReplay.ts';
 import { PlaybackEngine } from './PlaybackEngine.ts';
 import type { GameRecord } from 'openfront/game/src/core/Schemas.ts';
+import type { ReplayStorage } from 'lurker/src/ReplayStorage.ts';
+import type { GamelensEventsStorage } from './GamelensEventsStorage.ts';
 
 export class GameLensStatsWorker {
   private readonly worker: TaskWorker;
@@ -14,9 +13,9 @@ export class GameLensStatsWorker {
 
   public constructor(
     mapsPath: string,
-    private readonly bucket: string,
     redis: RedisClient,
-    private readonly s3: Client,
+    private readonly replayStorage: ReplayStorage,
+    private readonly eventsStorage: GamelensEventsStorage,
   ) {
     this.worker = new TaskWorker(redis, {
       streamKey: 'matches:processing',
@@ -40,52 +39,17 @@ export class GameLensStatsWorker {
           continue;
         }
 
-        const stream = this.s3.getObject(event.s3.bucket.name, decodeURIComponent(event.s3.object.key));
-        const genericReplay = await this.readReplay(stream);
-
-        if (genericReplay.gitCommit !== 'cef2a853dc31b7a29961dbb454681bf28c7ecf9d') {
-          console.warn(`Unknown commit ${genericReplay.gitCommit}`);
-          continue;
-        }
+        const genericReplay = await this.replayStorage.read(decodeURIComponent(event.s3.object.key));
 
         const replay = GameRecordSchema.parse(genericReplay);
         const stats = await this.playback.process(replay as GameRecord);
 
-        const json = JSON.stringify(stats, (key, value) => (typeof value === 'bigint' ? value.toString() : value));
-        const compressed = await Bun.zstdCompress(json, { level: 22 });
-
-        await this.s3.putObject(
-          this.bucket,
-          this.filename(replay.gitCommit, replay.info.gameID),
-          compressed,
-          compressed.length,
-          {
-            'Content-Type': 'application/json',
-            'Content-Encoding': 'zstd',
-          },
-        );
+        await this.eventsStorage.save(replay.gitCommit, replay.info.gameID, stats);
       }
     }
   };
 
-  private async readReplay(stream: Promise<Readable>) {
-    const compressed = await this.read(await stream);
-    const decompressed = await Bun.zstdDecompress(compressed);
-    const json = JSON.parse(decompressed.toString());
-    return GenericReplaySchema.parse(json);
-  }
-
-  private async read(stream: Readable) {
-    const chunks: Buffer[] = [];
-
-    return new Promise<Buffer>((resolve, reject) => {
-      stream.on('data', (chunk) => chunks.push(chunk));
-      stream.on('end', () => resolve(Buffer.concat(chunks)));
-      stream.on('error', reject);
-    });
-  }
-
   private filename(commit: string, id: string) {
-    return `${commit.slice(0, 7)}/${id}.json.zst`;
+    return `${commit.slice(0, 7)}/${id}.json`;
   }
 }

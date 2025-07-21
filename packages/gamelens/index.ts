@@ -1,18 +1,12 @@
-import { PlaybackEngine } from './src/PlaybackEngine.ts';
 import os from 'node:os';
 import cluster from 'node:cluster';
 import { RedisClient } from 'bun';
 import { config } from './config.ts';
 import { Client } from 'minio';
 import { GameLensStatsWorker } from './src/GameLensStatsWorker.ts';
-
-// const filename = 'ihq5E8kV.json';
-//
-// const record = await Bun.file(filename).json();
-// const playback = new PlaybackEngine('./../openfront/game/resources/maps');
-//
-// await playback.process(record);
-// console.log('Done!');
+import { ReplayStorage } from 'lurker/src/ReplayStorage.ts';
+import { MinioStorage } from 'compressed-storage';
+import { GamelensEventsStorage } from './src/GamelensEventsStorage.ts';
 
 if (cluster.isPrimary) {
   const threads = os.availableParallelism();
@@ -45,6 +39,12 @@ if (cluster.isPrimary) {
   process.on('SIGINT', () => abort.abort('SIGINT'));
 
   const redis = new RedisClient(config.redis);
-  const s3 = new Client(config.s3.endpoint);
-  new GameLensStatsWorker(config.mapsPath, config.s3.bucket, redis, s3);
+
+  const replayStorage = new ReplayStorage(
+    new MinioStorage(config.replays.s3.bucket, new Client(config.replays.s3.endpoint)),
+  );
+
+  const eventsStorage = new GamelensEventsStorage(new MinioStorage(config.s3.bucket, new Client(config.s3.endpoint)));
+
+  new GameLensStatsWorker(config.mapsPath, redis, replayStorage, eventsStorage);
 }
