@@ -12,6 +12,10 @@ export class HistoryImporter {
       const startAt = Date.now();
       try {
         const replay = await this.client.game(id, signal);
+        if (!replay) {
+          throw new Error(`Game ${id} not found`);
+        }
+
         await this.storage.save(id, replay);
         console.log(`[HistoryImporter] Imported ${id} in ${Date.now() - startAt}ms`);
       } catch (err) {
