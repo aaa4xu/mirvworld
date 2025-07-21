@@ -20,6 +20,10 @@ export class CompressedStorage implements Storage {
   }
 
   private filename(filename: string) {
-    return `${filename}.zst`;
+    if (filename.endsWith('.zst')) {
+      return filename;
+    } else {
+      return `${filename}.zst`;
+    }
   }
 }
