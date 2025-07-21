@@ -18,7 +18,7 @@ export class ReplayStorage {
     return this.storage.read(filename);
   }
 
-  private filename(commit: string, id: string) {
+  public filename(commit: string, id: string) {
     return `${commit.slice(0, 7)}/${id}.json`;
   }
 }
