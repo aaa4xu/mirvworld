@@ -1,23 +1,23 @@
-import { type ArchivedGameRecord } from './OpenFront/Schema/ArchivedGameResponse.ts';
-import { Client } from 'minio';
+import { type ArchivedGameRecord, ArchivedGameRecordSchema } from './OpenFront/Schema/ArchivedGameResponse.ts';
+import { JSONStorage } from 'compressed-storage/src/JSONStorage.ts';
+import type { Storage } from 'compressed-storage';
 
 export class ReplayStorage {
-  public constructor(
-    private readonly client: Client,
-    private readonly bucket: string,
-  ) {}
+  private readonly storage: JSONStorage<typeof ArchivedGameRecordSchema>;
+
+  public constructor(storage: Storage) {
+    this.storage = new JSONStorage(storage, ArchivedGameRecordSchema);
+  }
 
   public async save(id: string, replay: ArchivedGameRecord) {
-    const json = JSON.stringify(replay, (key, value) => (typeof value === 'bigint' ? value.toString() : value));
-    const compressed = await Bun.zstdCompress(json, { level: 17 });
+    await this.storage.write(this.filename(replay.gitCommit, id), replay);
+  }
 
-    await this.client.putObject(this.bucket, this.filename(replay.gitCommit, id), compressed, compressed.length, {
-      'Content-Type': 'application/json',
-      'Content-Encoding': 'zstd',
-    });
+  public async read(filename: string) {
+    return this.storage.read(filename);
   }
 
   private filename(commit: string, id: string) {
-    return `${commit.slice(0, 7)}/${id}.json.zst`;
+    return `${commit.slice(0, 7)}/${id}.json`;
   }
 }

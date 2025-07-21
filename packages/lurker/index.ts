@@ -8,6 +8,7 @@ import { DownloadQueue } from './src/DownloadQueue/DownloadQueue.ts';
 import { ReplayLurker } from './src/ReplayLurker.ts';
 import { ReplayStorage } from './src/ReplayStorage.ts';
 import { Client } from 'minio';
+import { CompressedStorage, MinioStorage } from 'compressed-storage';
 
 const abortController = new AbortController();
 process.on('SIGTERM', () => abortController.abort('SIGTERM'));
@@ -15,7 +16,8 @@ process.on('SIGINT', () => abortController.abort('SIGINT'));
 
 const redis = new RedisClient(config.redis);
 const s3 = new Client(config.s3.endpoint);
-const storage = new ReplayStorage(s3, config.s3.bucket);
+const storage = new CompressedStorage(new MinioStorage(config.s3.bucket, s3), 22);
+const replayStorage = new ReplayStorage(storage);
 
 const openfrontRateLimiter = new LeakyBucket({ bucketKey: 'openfront:global', capacity: 4, refillPerSec: 4 }, redis);
 
@@ -56,5 +58,5 @@ const lobbiesLurker = new LobbiesLurker(
 );
 abortController.signal.addEventListener('abort', () => lobbiesLurker.dispose());
 
-const replaysLurker = new ReplayLurker(apiClient, storage, downloadQueue);
+const replaysLurker = new ReplayLurker(apiClient, replayStorage, downloadQueue);
 abortController.signal.addEventListener('abort', () => replaysLurker.dispose());
