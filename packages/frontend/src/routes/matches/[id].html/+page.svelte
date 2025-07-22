@@ -11,10 +11,21 @@
 
   const winner = $derived(data.match.players.find((p) => p.clientId === data.match.winner)?.name ?? '(unknown)');
   const duration = $derived(data.match.finishedAt.getTime() - data.match.startedAt.getTime());
+  const padDate = (time: number) => time.toString().padStart(2, '0');
+  const formatDate = (date: Date) =>
+    `${padDate(date.getUTCHours())}:${padDate(date.getUTCMinutes())} ${padDate(date.getDate())}.${padDate(date.getUTCMonth() + 1)}.${date.getUTCFullYear()} (UTC)`;
 </script>
 
 <svelte:head>
   <title>{data.match.gameId} - Match results - MIRV.World</title>
+  <meta property="og:title" content="Winner: {winner}" />
+  <meta
+    property="og:description"
+    content="{data.match.players.length}/{data.match.maxPlayers} {data.match.mode} on {data.match.map} - Match {data
+      .match.gameId}, {formatDate(data.match.startedAt)}"
+  />
+  <meta property="og:image" content="/openfront/maps/{data.match.map.split(' ').join('')}Thumb.webp" />
+  <meta name="twitter:card" content="summary_large_image" />
 </svelte:head>
 
 <GameResultsHeader
@@ -31,7 +42,7 @@
 
 {#if !data.match.stats}
   <GameNotParsedNotification />
-  <GameResultsNoStatsPlayersTable players={data.match.players} {duration} />
+  <!--  <GameResultsNoStatsPlayersTable players={data.match.players} {duration} />-->
 {:else}
   <GameResultsWithStatsPlayersTable stats={data.match.stats} {duration} />
 {/if}
