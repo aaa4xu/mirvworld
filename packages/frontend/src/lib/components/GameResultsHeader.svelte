@@ -37,12 +37,15 @@
       <a href="https://openfront.io/#join={gameId}" target="_blank">View replay</a>
     </div>
 
-    <h2 class="winner"><Crown /> {winner}</h2>
+    <h2 class="winner">
+      <Crown />
+      {winner}
+    </h2>
 
     <div class="details">
       <div>
         <h5>Mode</h5>
-        <p>{mode === 'ffa' ? 'Free For All' : mode}</p>
+        <p>{mode === 'ffa' ? 'Free For All' : 'Teams'}</p>
       </div>
 
       <div>

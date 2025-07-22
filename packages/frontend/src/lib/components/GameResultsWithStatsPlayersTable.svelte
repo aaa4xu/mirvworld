@@ -4,17 +4,23 @@
   import GoldCoinIcon from '$lib/icons/GoldCoinIcon.svelte';
 
   const {
-    stats,
+    players,
     duration,
+    team,
   }: {
-    stats: NonNullable<NonNullable<Awaited<ReturnType<(typeof trpc)['matches']['getByGameId']['query']>>>['stats']>;
+    players: Array<
+      NonNullable<
+        NonNullable<Awaited<ReturnType<(typeof trpc)['matches']['getByGameId']['query']>>>['stats']
+      >['players'][string]
+    >;
     duration: number;
+    team?: string;
   } = $props();
 
   const durationOfMatch = BigInt(Math.round(duration / 1000 / 60));
   const total = (v: Record<any, bigint>) => Object.values(v).reduce((acc, v) => acc + v, 0n);
   const formatK = (v: bigint) => (Number(v) / 1000).toFixed(1) + 'k';
-  const players = Object.entries(stats.players).sort(([idl, l], [idr, r]) => {
+  const sortedPlayers = players.sort((l, r) => {
     if (l.killed < 0 && r.killed >= 0) return -1;
     if (l.killed >= 0 && r.killed < 0) return 1;
 
@@ -28,6 +34,7 @@
 
 <section>
   <div class="content">
+    {#if team}<h2>{team}</h2>{/if}
     <table>
       <thead>
         <tr>
@@ -43,7 +50,7 @@
       </thead>
 
       <tbody>
-        {#each players as [id, player], index (id)}
+        {#each sortedPlayers as player, index (index)}
           {@const alive =
             player.killed < 0
               ? durationOfMatch
