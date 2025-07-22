@@ -17,6 +17,9 @@ services:
       - 6379:6379
 
   frontend:
+    build:
+      context: .
+      dockerfile: packages/frontend/Dockerfile
     ports:
       - 4173:80
 

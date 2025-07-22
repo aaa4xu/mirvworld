@@ -33,6 +33,7 @@ services:
       - LURKER_LOBBY_INTERVAL=1000
 
   frontend:
+    image: ghcr.io/aaa4xu/mirvworld/frontend
     restart: always
     env_file:
       - v4.env
