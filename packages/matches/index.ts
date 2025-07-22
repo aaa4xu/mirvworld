@@ -10,12 +10,15 @@ import { createContext } from './src/trpc/trpc.ts';
 import { ReplayStorage } from 'lurker/src/ReplayStorage.ts';
 import { MinioStorage } from 'compressed-storage';
 import { GamelensEventsStorage } from 'gamelens/src/GamelensEventsStorage.ts';
+import { migrate } from 'drizzle-orm/mysql2/migrator';
 
 const abort = new AbortController();
 process.on('SIGTERM', () => abort.abort('SIGTERM'));
 process.on('SIGINT', () => abort.abort('SIGINT'));
 
 const db = drizzle(config.db);
+await migrate(db, { migrationsFolder: './drizzle' });
+
 const redis = new RedisClient(config.redis);
 const replaysS3 = new Client(config.replays.s3.endpoint);
 const replayStorage = new ReplayStorage(new MinioStorage(config.replays.s3.bucket, replaysS3));

@@ -17,6 +17,7 @@ ENV MATCHES_HTTP_PORT=80
 ENV MATCHES_REDIS_URL=redis://redis:6379
 
 COPY --from=build /usr/src/app/matches /app/
+COPY ./packages/matches/drizzle ./
 RUN chmod +x /app/matches
 
 EXPOSE 80
