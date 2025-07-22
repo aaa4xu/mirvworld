@@ -24,9 +24,13 @@ export class Streamify {
   }
 
   public async start() {
+    console.log(`[Streamify][${this.from}/${this.to}] Starting`);
     while (!this.stop) {
       try {
         const r = await this.script.execute([this.from, this.to], [this.batch.toString()]);
+        if (r.length > 0) {
+          console.log(`[Streamify][${this.from}/${this.to}] Moved ${r.length} items`);
+        }
       } catch (err) {
         console.error(`[Streamify][${this.from}/${this.to}] Error:`, err instanceof Error ? err.message : err);
       }
@@ -36,6 +40,7 @@ export class Streamify {
   }
 
   dispose() {
+    console.log(`[Streamify][${this.from}/${this.to}] Disposing`);
     this.stop = true;
   }
 }
