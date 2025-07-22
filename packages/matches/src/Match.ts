@@ -1,5 +1,5 @@
 import { type matches, matchPlayers } from './db/schema.ts';
-import type { GameLensStats } from './GameLensStats.ts';
+import type { GameLensStats } from './GameLensStats/GameLensStats.ts';
 
 export class Match {
   public constructor(

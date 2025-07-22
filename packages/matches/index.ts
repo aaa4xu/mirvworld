@@ -1,5 +1,5 @@
 import { RedisClient } from 'bun';
-import { config, env } from './config.ts';
+import { config } from './config.ts';
 import { Client } from 'minio';
 import { drizzle } from 'drizzle-orm/mysql2';
 import { Streamify } from './src/Streamify/Streamify.ts';
@@ -9,15 +9,19 @@ import { createHTTPServer } from '@trpc/server/adapters/standalone';
 import { createContext } from './src/trpc/trpc.ts';
 import { ReplayStorage } from 'lurker/src/ReplayStorage.ts';
 import { MinioStorage } from 'compressed-storage';
+import { GamelensEventsStorage } from 'gamelens/src/GamelensEventsStorage.ts';
 
 const abort = new AbortController();
 process.on('SIGTERM', () => abort.abort('SIGTERM'));
 process.on('SIGINT', () => abort.abort('SIGINT'));
 
-const db = drizzle(env('DATABASE_URL'));
+const db = drizzle(config.db);
 const redis = new RedisClient(config.redis);
 const replaysS3 = new Client(config.replays.s3.endpoint);
 const replayStorage = new ReplayStorage(new MinioStorage(config.replays.s3.bucket, replaysS3));
+const eventsStorage = new GamelensEventsStorage(
+  new MinioStorage(config.gamelens.s3.bucket, new Client(config.gamelens.s3.endpoint)),
+);
 
 const streamify = new Streamify(redis, 'storage:bucketevents', 'matches:processing');
 abort.signal.addEventListener('abort', () => streamify.dispose());
@@ -27,7 +31,7 @@ new MatchInfoImporter(redis, db, replayStorage);
 
 const server = createHTTPServer({
   router: appRouter,
-  createContext: createContext(db),
+  createContext: createContext(db, eventsStorage),
 });
 
 server.listen(config.http.port);

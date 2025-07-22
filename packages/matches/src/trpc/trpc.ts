@@ -2,11 +2,13 @@ import { initTRPC } from '@trpc/server';
 import type { CreateHTTPContextOptions } from '@trpc/server/adapters/standalone';
 import type { MySql2Database } from 'drizzle-orm/mysql2/driver';
 import superjson from 'superjson';
+import { GamelensEventsStorage } from 'gamelens/src/GamelensEventsStorage.ts';
 
-export const createContext = (db: MySql2Database) => {
+export const createContext = (db: MySql2Database, eventsStorage: GamelensEventsStorage) => {
   return async (opts: CreateHTTPContextOptions) => {
     return {
       db,
+      eventsStorage,
     };
   };
 };
