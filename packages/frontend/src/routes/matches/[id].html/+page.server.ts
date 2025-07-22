@@ -1,5 +1,4 @@
 import type { PageServerLoad } from './$types';
-import { getListOfLiveGames } from '$lib/server/livegames';
 import { trpc } from '$lib/server/trpc';
 import { error } from '@sveltejs/kit';
 
