@@ -18,4 +18,5 @@ export const config = {
     port: parseInt(env('MATCHES_HTTP_PORT', '3600'), 10),
   },
   db: env('DATABASE_URL'),
+  readOnly: env('MATCHES_READ_ONLY', '0') === '1',
 };

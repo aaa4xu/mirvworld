@@ -23,11 +23,12 @@ const eventsStorage = new GamelensEventsStorage(
   new MinioStorage(config.gamelens.s3.bucket, new Client(config.gamelens.s3.endpoint)),
 );
 
-const streamify = new Streamify(redis, 'storage:bucketevents', 'matches:processing');
-abort.signal.addEventListener('abort', () => streamify.dispose());
-streamify.start();
-
-new MatchInfoImporter(redis, db, replayStorage);
+if (!config.readOnly) {
+  const streamify = new Streamify(redis, 'storage:bucketevents', 'matches:processing');
+  abort.signal.addEventListener('abort', () => streamify.dispose());
+  streamify.start();
+  new MatchInfoImporter(redis, db, replayStorage);
+}
 
 const server = createHTTPServer({
   router: appRouter,
