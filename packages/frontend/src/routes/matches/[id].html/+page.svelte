@@ -20,9 +20,6 @@
     }, new Map<string, Array<GameLensPlayerStats>>());
   });
 
-  console.log(data.match.winner);
-  const winner = $derived(data.match.winner?.split(',').at(0) ?? 'unknown');
-
   const duration = $derived(data.match.finishedAt.getTime() - data.match.startedAt.getTime());
   const padDate = (time: number) => time.toString().padStart(2, '0');
   const formatDate = (date: Date) =>
@@ -37,6 +34,20 @@
       return bt - at;
     }),
   );
+
+  let winner = $derived.by(() => {
+    const winners = data.match.winner?.split(',');
+
+    if (winners && winners.length > 1) {
+      return winners[0];
+    }
+
+    if (winners && winners.length === 1) {
+      return data.match.players.find((player) => player.clientId === winners[0])?.name ?? 'unknown';
+    }
+
+    return 'unknown';
+  });
 </script>
 
 <svelte:head>
