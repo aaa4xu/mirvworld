@@ -52,6 +52,14 @@ services:
     networks:
       - cloudflare
 
+  matches:
+    image: ghcr.io/aaa4xu/mirvworld/matches
+    restart: always
+    env_file:
+      - v4.env
+    ports:
+      - 100.111.103.57:3700:80
+
   db:
     restart: always
     volumes:

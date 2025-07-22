@@ -13,7 +13,7 @@ RUN apk add --no-cache libstdc++ libgcc
 WORKDIR /app
 ENV MATCHES_REPLAYS_S3_URL=http://minioadmin:minioadmin@storage:9000
 ENV MATCHES_GAMELENS_S3_URL=http://minioadmin:minioadmin@storage:9000
-ENV MATCHES_HTTP_PORT=http://minioadmin:minioadmin@storage:80
+ENV MATCHES_HTTP_PORT=80
 ENV LURKER_REDIS_URL=redis://redis:6379
 
 COPY --from=build /usr/src/app/matches /app/

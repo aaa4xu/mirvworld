@@ -26,6 +26,7 @@ services:
     restart: unless-stopped
     depends_on:
       - redis
+      - matches
 
   redis:
     image: redis:8-alpine
@@ -39,6 +40,10 @@ services:
       - MYSQL_DATABASE=local
 
   gamelens:
+    image: mirvworld/gamelens
+    restart: unless-stopped
+
+  matches:
     image: mirvworld/gamelens
     restart: unless-stopped
 
