@@ -32,6 +32,14 @@ services:
     ports:
       - 12316:80
 
+  gamelens:
+    build:
+      context: .
+      dockerfile: packages/gamelens/Dockerfile
+    depends_on:
+      - redis
+      - storage
+
   lurker:
     build:
       context: .

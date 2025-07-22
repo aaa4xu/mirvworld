@@ -1,0 +1,6 @@
+services:
+  gamelens:
+    image: ghcr.io/aaa4xu/mirvworld/gamelens
+    restart: always
+    env_file:
+      - worker.env

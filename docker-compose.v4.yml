@@ -38,6 +38,10 @@ services:
     environment:
       - MYSQL_DATABASE=local
 
+  gamelens:
+    image: mirvworld/gamelens
+    restart: unless-stopped
+
   game-snapshot-v0-23-16:
     image: mirvworld/game-snapshot:v0.23.16
     build:
