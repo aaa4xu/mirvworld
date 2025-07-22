@@ -17,6 +17,6 @@ export const config = {
   http: {
     port: parseInt(env('MATCHES_HTTP_PORT', '3600'), 10),
   },
-  db: env('DATABASE_URL'),
+  db: env('DATABASE_URL', 'mysql://root:mysecretpassword@localhost:3306/local'),
   readOnly: env('MATCHES_READ_ONLY', '0') === '1',
 };
