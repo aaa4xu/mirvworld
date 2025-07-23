@@ -33,8 +33,8 @@ const apiClient = new OpenFrontPublicAPIWithLimiter(
 const downloadQueue = new DownloadQueue(
   {
     readyKey: 'lurker:queue',
-    firstDelay: 10 * 60 * 1000,
-    retryDelay: 5 * 60 * 1000,
+    firstDelay: 15 * 60 * 1000,
+    retryDelay: 3 * 60 * 1000,
     entryKeyPrefix: 'lurker:entry:',
     deadLetterKey: 'lurker:deadletter',
   },
