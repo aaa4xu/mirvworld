@@ -25,5 +25,8 @@
     "openfront-client",
     "protobufjs",
     "sharp"
-  ]
+  ],
+  "patchedDependencies": {
+    "@nx-tools/nx-container@6.8.0": "patches/@nx-tools%2Fnx-container@6.8.0.patch"
+  }
 }

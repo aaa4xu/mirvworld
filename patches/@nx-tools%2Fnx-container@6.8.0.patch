@@ -1,0 +1,13 @@
+diff --git a/dist/plugins/nodes.js b/dist/plugins/nodes.js
+index db0e43c3fd1996e77c4a5da5d3ade202e3f7f3d4..9e750e501df9366ca25aa43124bd0e87f63e7fa9 100644
+--- a/dist/plugins/nodes.js
++++ b/dist/plugins/nodes.js
+@@ -33,7 +33,7 @@ async function createNodesInternal(configFilePath, options, context) {
+     const normalized = normalizeOptions(options);
+     const projectRoot = (0, path_1.dirname)(configFilePath);
+     // Do not create a project if package.json and project.json isn't there.
+-    const isProject = (0, node_fs_1.existsSync)((0, path_1.join)(projectRoot, 'project.json')) || (0, node_fs_1.existsSync)((0, path_1.join)(projectRoot, 'package.json'));
++    const isProject = (0, node_fs_1.existsSync)((0, path_1.join)(projectRoot, 'project.json'));
+     if (!isProject) {
+         return {};
+     }
