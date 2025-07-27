@@ -47,6 +47,10 @@ services:
     restart: unless-stopped
     environment:
       - MATCHES_REDIS_URL=redis://redis:6379
+    depends_on:
+      - redis
+      - storage
+      - mysql
 
   game-snapshot-v0-23-16:
     image: mirvworld/game-snapshot:v0.23.16
