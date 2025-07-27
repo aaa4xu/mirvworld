@@ -18,7 +18,10 @@
   },
   "private": true,
   "trustedDependencies": [
+    "core-js-pure",
     "esbuild",
+    "frontend",
+    "nx",
     "openfront-client",
     "protobufjs",
     "sharp"
