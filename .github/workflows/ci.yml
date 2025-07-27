@@ -44,4 +44,4 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build docker images
-        run: INPUT_GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} bunx nx affected --base=$NX_BASE --head=$NX_HEAD --target=container --parallel=2
+        run: INPUT_GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} INPUT_PUSH=true bunx nx affected --base=$NX_BASE --head=$NX_HEAD --target=container --parallel=2

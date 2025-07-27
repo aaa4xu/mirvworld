@@ -40,14 +40,11 @@
       "container": {
         "executor": "@nx-tools/nx-container:build",
         "options": {
-          "push": true,
-          "file": "docker/app.Dockerfile",
-          "build-args": [
-            "PACKAGE_NAME=lurker"
-          ],
           "tags": [
             "ghcr.io/aaa4xu/mirvworld/lurker:latest"
-          ]
+          ],
+          "cache-from": ["type=gha"],
+          "cache-to": ["type=gha,mode=max"]
         }
       }
     }
