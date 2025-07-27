@@ -8,9 +8,10 @@
     "packages/*"
   ],
   "devDependencies": {
+    "@nx-tools/nx-container": "^6.8.0",
     "@types/bun": "latest",
-    "prettier": "^3.6.2",
-    "nx": "21.3.7"
+    "nx": "21.3.7",
+    "prettier": "^3.6.2"
   },
   "peerDependencies": {
     "typescript": "^5"

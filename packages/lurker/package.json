@@ -12,7 +12,6 @@
   },
   "scripts": {
     "build": "bun build --target=bun --sourcemap=external --outdir=dist index.ts",
-    "build:docker": "docker build -t mirvworld/lurker -f ../../docker/app.Dockerfile --build-arg PACKAGE_NAME=lurker --progress=plain ../..",
     "test": "bun test",
     "lint": "prettier --check ."
   },
@@ -37,6 +36,19 @@
       },
       "lint": {
         "cache": true
+      },
+      "container": {
+        "executor": "@nx-tools/nx-container:build",
+        "options": {
+          "push": true,
+          "file": "docker/app.Dockerfile",
+          "build-args": [
+            "PACKAGE_NAME=lurker"
+          ],
+          "tags": [
+            "aaa4xu/mirvworld/lurker:latest"
+          ]
+        }
       }
     }
   }
