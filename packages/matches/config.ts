@@ -9,7 +9,7 @@ export const config = {
   },
   gamelens: {
     s3: {
-      bucket: env('MATCHES_GAMELENS_S3_BUCKET', 'gamelens-v4'),
+      bucket: env('MATCHES_GAMELENS_S3_BUCKET', 'gamelens'),
       endpoint: createMinioClientOptions(env('MATCHES_GAMELENS_S3_URL', 'http://minioadmin:minioadmin@localhost:9000')),
     },
   },

@@ -8,7 +8,7 @@ export const config = {
     },
   },
   s3: {
-    bucket: env('GAMELENS_S3_BUCKET', 'gamelens-v4'),
+    bucket: env('GAMELENS_S3_BUCKET', 'gamelens'),
     endpoint: createMinioClientOptions(env('GAMELENS_S3_URL', 'http://minioadmin:minioadmin@localhost:9000')),
   },
   redis: env('GAMELENS_REDIS_URL', 'redis://localhost:6379'),
