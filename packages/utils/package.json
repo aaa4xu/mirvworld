@@ -2,6 +2,10 @@
   "name": "utils",
   "module": "index.ts",
   "type": "module",
+  "scripts": {
+    "test": "bun test",
+    "lint": "prettier --check ."
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },
