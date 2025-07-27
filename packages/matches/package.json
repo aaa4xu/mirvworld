@@ -5,7 +5,9 @@
   "private": true,
   "scripts": {
     "db:push": "bunx drizzle-kit push",
-    "db:studio": "bunx drizzle-kit studio"
+    "db:studio": "bunx drizzle-kit studio",
+    "build": "bun build --target=bun --sourcemap=external --outdir=dist index.ts",
+    "lint": "prettier --check ."
   },
   "devDependencies": {
     "@types/bun": "latest",
@@ -23,5 +25,30 @@
     "openfront": "workspace:*",
     "lurker": "workspace:*",
     "compressed-storage": "workspace:*"
+  },
+  "nx": {
+    "projectType": "application",
+    "targets": {
+      "build": {
+        "cache": true
+      },
+      "lint": {
+        "cache": true
+      },
+      "container": {
+        "executor": "@nx-tools/nx-container:build",
+        "options": {
+          "tags": [
+            "ghcr.io/aaa4xu/mirvworld/matches:latest"
+          ],
+          "cache-from": [
+            "type=gha"
+          ],
+          "cache-to": [
+            "type=gha,mode=max"
+          ]
+        }
+      }
+    }
   }
 }
