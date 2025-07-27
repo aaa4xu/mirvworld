@@ -1,6 +1,7 @@
 {
   "name": "lurker",
   "module": "index.ts",
+  "description": "Lurker is a lightweight, self‑contained service that monitors OpenFront.io public game lobbies, downloads their replays once they finish, and archives them to an S3‑compatible object store",
   "type": "module",
   "private": true,
   "devDependencies": {
@@ -8,6 +9,12 @@
   },
   "peerDependencies": {
     "typescript": "^5"
+  },
+  "scripts": {
+    "build": "bun build --target=bun --sourcemap=external --outdir=dist index.ts",
+    "build:docker": "docker build -t mirvworld/lurker -f ../../docker/app.Dockerfile --build-arg PACKAGE_NAME=lurker --progress=plain ../..",
+    "test": "bun test",
+    "lint": "prettier --check ."
   },
   "dependencies": {
     "chalk": "^5.4.1",
@@ -18,5 +25,19 @@
     "compressed-storage": "workspace:*",
     "utils": "workspace:*",
     "openfront": "workspace:*"
+  },
+  "nx": {
+    "projectType": "application",
+    "targets": {
+      "test": {
+        "cache": true
+      },
+      "build": {
+        "cache": true
+      },
+      "lint": {
+        "cache": true
+      }
+    }
   }
 }
