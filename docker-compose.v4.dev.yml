@@ -23,7 +23,7 @@ services:
     ports:
       - 4173:80
 
-  db:
+  mysql:
     ports:
       - 3306:3306
     environment:

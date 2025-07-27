@@ -11,18 +11,34 @@ services:
   storage:
     restart: always
     volumes:
-      - storage:/data
+      - storage-data:/data
       - storage-events:/opt/minio/events
     env_file:
       - v4.env
-    environment:
-      - MINIO_COMPRESSION_ENABLE=on
+    depends_on:
+      - redis
     networks:
       - cloudflare
       - default
     ports:
-      - 100.111.103.57:9000:9000
-      - 100.111.103.57:9001:9001
+      - 100.115.138.95:9000:9000
+      - 100.115.138.95:9001:9001
+
+  redis:
+    restart: always
+    volumes:
+      - redis:/data
+    ports:
+      - 100.115.138.95:6379:6379
+
+  mysql:
+    restart: always
+    volumes:
+      - mysql:/var/lib/mysql
+    env_file:
+      - v4.env
+    ports:
+      - 100.115.138.95:3306:3306
 
   lurker:
     image: ghcr.io/aaa4xu/mirvworld/lurker
@@ -31,6 +47,10 @@ services:
       - v4.env
     environment:
       - LURKER_LOBBY_INTERVAL=1000
+    dns:
+      - 100.100.100.100
+    dns_search:
+      - elf-chameleon.ts.net
 
   frontend:
     image: ghcr.io/aaa4xu/mirvworld/frontend
@@ -40,13 +60,6 @@ services:
     networks:
       - cloudflare
       - default
-
-  redis:
-    restart: always
-    volumes:
-      - redis:/data
-    ports:
-      - 100.111.103.57:6379:6379
 
   game-snapshot-v0-23-16:
     restart: always
@@ -61,17 +74,8 @@ services:
     ports:
       - 100.111.103.57:3700:80
 
-  db:
-    restart: always
-    volumes:
-      - mysql:/var/lib/mysql
-    env_file:
-      - v4.env
-    ports:
-      - 100.111.103.57:3306:3306
-
 volumes:
-  storage:
+  storage-data:
   storage-events:
   redis:
   mysql:
