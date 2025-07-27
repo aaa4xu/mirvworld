@@ -3,7 +3,6 @@ WORKDIR /app
 COPY . .
 RUN bun install
 
-ARG PACKAGE_NAME
 RUN cd packages/lurker && bun run build
 
 FROM oven/bun:1-alpine
