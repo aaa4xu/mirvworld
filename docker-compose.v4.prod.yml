@@ -74,6 +74,18 @@ services:
     ports:
       - 100.115.138.95:3700:80
 
+  gamelens:
+    image: ghcr.io/aaa4xu/mirvworld/gamelens
+    restart: always
+    environment:
+      - GAMELENS_REDIS_URL=redis://redis:6379
+    env_file:
+      - v4.env
+    depends_on:
+      - redis
+      - storage
+    cpus: 24
+
 volumes:
   storage-data:
   storage-events:
