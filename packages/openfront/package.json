@@ -4,8 +4,7 @@
   "type": "module",
   "private": true,
   "devDependencies": {
-    "@types/bun": "latest",
-    "@types/debug": "^4.1.12"
+    "@types/bun": "latest"
   },
   "peerDependencies": {
     "typescript": "^5"
@@ -13,7 +12,6 @@
   "dependencies": {
     "colord": "^2.9.3",
     "colorjs.io": "^0.5.2",
-    "debug": "^4.4.1",
     "dompurify": "^3.1.7",
     "fastpriorityqueue": "^0.7.5",
     "jose": "^6.0.12",
