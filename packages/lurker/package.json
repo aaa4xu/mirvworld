@@ -46,7 +46,7 @@
             "PACKAGE_NAME=lurker"
           ],
           "tags": [
-            "aaa4xu/mirvworld/lurker:latest"
+            "ghcr.io/aaa4xu/mirvworld/lurker:latest"
           ]
         }
       }
