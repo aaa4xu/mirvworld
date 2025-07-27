@@ -1,6 +1,10 @@
 {
   "name": "gamelens",
   "module": "index.ts",
+  "scripts": {
+    "build": "bun build --target=bun --sourcemap=external --outdir=dist index.ts",
+    "lint": "prettier --check ."
+  },
   "dependencies": {
     "openfront": "workspace:*",
     "utils": "workspace:*",
@@ -15,5 +19,30 @@
     "typescript": "^5"
   },
   "private": true,
-  "type": "module"
+  "type": "module",
+  "nx": {
+    "projectType": "application",
+    "targets": {
+      "build": {
+        "cache": true
+      },
+      "lint": {
+        "cache": true
+      },
+      "container": {
+        "executor": "@nx-tools/nx-container:build",
+        "options": {
+          "tags": [
+            "ghcr.io/aaa4xu/mirvworld/gamelens:latest"
+          ],
+          "cache-from": [
+            "type=gha"
+          ],
+          "cache-to": [
+            "type=gha,mode=max"
+          ]
+        }
+      }
+    }
+  }
 }
