@@ -15,6 +15,7 @@
     "colorjs.io": "^0.5.2",
     "debug": "^4.4.1",
     "dompurify": "^3.1.7",
+    "fastpriorityqueue": "^0.7.5",
     "jose": "^6.0.12",
     "obscenity": "^0.4.4",
     "twemoji": "^14.0.2"

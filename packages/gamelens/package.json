@@ -1,15 +1,19 @@
 {
   "name": "gamelens",
   "module": "index.ts",
-  "type": "module",
-  "private": true,
+  "dependencies": {
+    "openfront": "workspace:*",
+    "utils": "workspace:*",
+    "lurker": "workspace:*",
+    "compressed-storage": "workspace:*",
+    "matches": "workspace:*"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
-  "dependencies": {
-    "fastpriorityqueue": "^0.7.5"
-  }
+  "private": true,
+  "type": "module"
 }
