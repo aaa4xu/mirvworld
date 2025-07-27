@@ -21,6 +21,7 @@
     "superjson": "^2.2.2",
     "gamelens": "workspace:*",
     "openfront": "workspace:*",
-    "lurker": "workspace:*"
+    "lurker": "workspace:*",
+    "compressed-storage": "workspace:*"
   }
 }
