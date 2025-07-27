@@ -61,11 +61,6 @@ services:
       - cloudflare
       - default
 
-  game-snapshot-v0-23-16:
-    restart: always
-    networks:
-      - cloudflare
-
   matches:
     image: ghcr.io/aaa4xu/mirvworld/matches
     restart: always
