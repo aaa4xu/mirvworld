@@ -43,11 +43,14 @@
           "tags": [
             "ghcr.io/aaa4xu/mirvworld/lurker:latest"
           ],
-          "cache-from": ["type=gha"],
-          "cache-to": ["type=gha,mode=max"]
+          "cache-from": [
+            "type=gha"
+          ],
+          "cache-to": [
+            "type=gha,mode=max"
+          ]
         }
       }
     }
   }
 }
-
