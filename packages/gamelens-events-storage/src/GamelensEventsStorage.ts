@@ -4,8 +4,8 @@ import { type GamelensEvents, GamelensEventsSchema } from './GamelensEvents.ts';
 export class GamelensEventsStorage {
   private readonly storage: JSONStorage<GamelensEvents>;
 
-  public constructor(storage: Storage, compressionLevel = 22) {
-    // Дженерик тут потому что без него ts плюется "Type instantiation is excessively deep and possibly infinite". Когда там уже релиз ts-rs?
+  public constructor(storage: Storage, compressionLevel = 17) {
+    // @ts-ignore "Type instantiation is excessively deep and possibly infinite". Когда там уже релиз ts-rs?
     this.storage = new JSONStorage<GamelensEvents>(
       new CompressedStorage(storage, compressionLevel),
       GamelensEventsSchema,
