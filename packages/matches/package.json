@@ -23,8 +23,9 @@
     "superjson": "^2.2.2",
     "gamelens": "workspace:*",
     "openfront": "workspace:*",
-    "lurker": "workspace:*",
-    "compressed-storage": "workspace:*"
+    "compressed-storage": "workspace:*",
+    "redis-script": "workspace:*",
+    "replay-storage": "workspace:*"
   },
   "nx": {
     "projectType": "application",

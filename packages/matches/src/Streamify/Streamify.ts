@@ -1,8 +1,8 @@
 // @ts-ignore - lua script
 import moveToStreamScript from './MoveToStream.lua' with { type: 'text' };
-import { RedisLuaScript } from 'lurker/src/RedisLuaScript.ts';
 import { MoveToStreamResultSchema } from './Schema.ts';
 import { RedisClient } from 'bun';
+import { RedisLuaScript } from 'redis-script';
 
 export class Streamify {
   private readonly script: RedisLuaScript<typeof MoveToStreamResultSchema>;

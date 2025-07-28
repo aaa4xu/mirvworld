@@ -6,7 +6,7 @@ import z from 'zod/v4';
 import { GameRecordSchema } from 'openfront/src/Schema.ts';
 import { matches, matchPlayers } from '../db/schema.ts';
 import { eq } from 'drizzle-orm';
-import type { ReplayStorage } from 'lurker/src/ReplayStorage.ts';
+import type { ReplayStorage } from 'replay-storage';
 
 export class MatchInfoImporter {
   private readonly worker: TaskWorker;

@@ -6,9 +6,9 @@ import { OpenFrontServerAPIWithLimiter } from './src/OpenFrontServerAPIWithLimit
 import { OpenFrontPublicAPIWithLimiter } from './src/OpenFrontPublicAPIWithLimiter.ts';
 import { DownloadQueue } from './src/DownloadQueue/DownloadQueue.ts';
 import { ReplayLurker } from './src/ReplayLurker.ts';
-import { ReplayStorage } from './src/ReplayStorage.ts';
 import { Client } from 'minio';
-import { CompressedStorage, MinioStorage } from 'compressed-storage';
+import { MinioStorage } from 'compressed-storage';
+import { ReplayStorage } from 'replay-storage';
 
 const abortController = new AbortController();
 process.on('SIGTERM', () => abortController.abort('SIGTERM'));

@@ -4,8 +4,8 @@ import { MinioPutEventSchema } from 'matches/src/Schema/MinioPutEvent.ts';
 import { GameRecordSchema } from 'openfront/src/Schema.ts';
 import { PlaybackEngine } from './PlaybackEngine.ts';
 import type { GameRecord } from 'openfront/game/src/core/Schemas.ts';
-import type { ReplayStorage } from 'lurker/src/ReplayStorage.ts';
 import type { GamelensEventsStorage } from './GamelensEventsStorage.ts';
+import { ReplayStorage } from 'replay-storage';
 
 export class GameLensStatsWorker {
   private readonly worker: TaskWorker;

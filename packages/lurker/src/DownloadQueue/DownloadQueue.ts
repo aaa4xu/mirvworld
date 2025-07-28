@@ -1,9 +1,9 @@
 // @ts-ignore - lua script
 import popTaskScript from './PopTask.lua' with { type: 'text' };
 import { RedisClient } from 'bun';
-import { RedisLuaScript } from '../RedisLuaScript.ts';
 import { DownloadQueueResultSchema } from './Schema.ts';
 import { type MatchInfo, MatchInfoSchema } from '../OpenFront/Schema/MatchInfoSchema.ts';
+import { RedisLuaScript } from 'redis-script';
 
 export class DownloadQueue {
   private readonly script: RedisLuaScript<typeof DownloadQueueResultSchema>;

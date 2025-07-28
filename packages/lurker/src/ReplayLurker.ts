@@ -1,9 +1,9 @@
 import type { DownloadQueue } from './DownloadQueue/DownloadQueue.ts';
-import type { ReplayStorage } from './ReplayStorage.ts';
 import type { OpenFrontPublicAPI } from './OpenFront/OpenFrontPublicAPI.ts';
 import { cancelableTimeout } from './Utils.ts';
 import { OpenFrontError } from './OpenFront/Errors/OpenFrontError.ts';
 import type { OpenFrontServerAPI } from './OpenFront/OpenFrontServerAPI.ts';
+import type { ReplayStorage } from 'replay-storage';
 
 export class ReplayLurker {
   private readonly abortController = new AbortController();

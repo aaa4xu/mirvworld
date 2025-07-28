@@ -23,7 +23,8 @@
     "zod": "^3.25.75",
     "compressed-storage": "workspace:*",
     "utils": "workspace:*",
-    "openfront": "workspace:*"
+    "openfront": "workspace:*",
+    "redis-script": "workspace:*"
   },
   "nx": {
     "projectType": "application",
