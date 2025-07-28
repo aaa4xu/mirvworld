@@ -9,7 +9,6 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "compressed-storage": "workspace:*",
     "zod": "^3.25.75"
   }
 }

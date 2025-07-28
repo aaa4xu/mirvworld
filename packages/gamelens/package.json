@@ -5,13 +5,7 @@
     "build": "bun build --target=bun --sourcemap=external --outdir=dist index.ts",
     "lint": "prettier --check ."
   },
-  "dependencies": {
-    "openfront": "workspace:*",
-    "utils": "workspace:*",
-    "replay-storage": "workspace:*",
-    "compressed-storage": "workspace:*",
-    "gamelens-events-storage": "workspace:*",
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/bun": "latest"
   },

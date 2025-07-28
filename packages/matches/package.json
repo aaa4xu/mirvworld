@@ -20,13 +20,7 @@
     "@trpc/server": "^11.4.3",
     "drizzle-orm": "^0.44.3",
     "mysql2": "^3.14.2",
-    "superjson": "^2.2.2",
-    "openfront": "workspace:*",
-    "compressed-storage": "workspace:*",
-    "gamelens-events-storage": "workspace:*",
-    "redis-script": "workspace:*",
-    "replay-storage": "workspace:*",
-    "utils": "workspace:*"
+    "superjson": "^2.2.2"
   },
   "nx": {
     "projectType": "application",

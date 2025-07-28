@@ -8,7 +8,5 @@
   "peerDependencies": {
     "typescript": "^5"
   },
-  "dependencies": {
-    "compressed-storage": "workspace:*"
-  }
+  "dependencies": {}
 }
