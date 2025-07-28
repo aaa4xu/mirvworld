@@ -22,3 +22,5 @@ export const GitCommitSchema = z.string().regex(/^[0-9a-fA-F]{40}$/);
 export const GenericReplaySchema = z.looseObject({
   gitCommit: GitCommitSchema,
 });
+
+export type GenericReplay = z.infer<typeof GenericReplaySchema>;

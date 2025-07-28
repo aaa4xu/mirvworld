@@ -1,13 +1,16 @@
 import { JSONStorage } from 'compressed-storage/src/JSONStorage.ts';
 import { CompressedStorage, type Storage } from 'compressed-storage';
-import { GenericReplaySchema } from 'openfront/src/Schema.ts';
+import { type GenericReplay, GenericReplaySchema } from 'openfront/src/Schema.ts';
 import z from 'zod/v4';
 
 export class ReplayStorage {
-  private readonly storage: JSONStorage<typeof GenericReplaySchema>;
+  private readonly storage: JSONStorage<GenericReplay>;
 
   public constructor(storage: Storage, compressionLevel = 22) {
-    this.storage = new JSONStorage(new CompressedStorage(storage, compressionLevel), GenericReplaySchema);
+    this.storage = new JSONStorage<GenericReplay>(
+      new CompressedStorage(storage, compressionLevel),
+      GenericReplaySchema,
+    );
   }
 
   public async save(id: string, replay: z.infer<typeof GenericReplaySchema>) {
