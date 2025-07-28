@@ -1,7 +1,7 @@
 import { RedisClient } from 'bun';
-import { type TaskMessage, TaskWorker } from '../TaskWorker.ts';
+import { type TaskMessage, TaskWorker } from 'utils';
 import { MySql2Database } from 'drizzle-orm/mysql2/driver';
-import { MinioPutEventSchema } from '../Schema/MinioPutEvent.ts';
+import { MinioPutEventSchema } from 'utils';
 import z from 'zod/v4';
 import { GameRecordSchema } from 'openfront/src/Schema.ts';
 import { matches, matchPlayers } from '../db/schema.ts';

@@ -21,11 +21,12 @@
     "drizzle-orm": "^0.44.3",
     "mysql2": "^3.14.2",
     "superjson": "^2.2.2",
-    "gamelens": "workspace:*",
     "openfront": "workspace:*",
     "compressed-storage": "workspace:*",
+    "gamelens-events-storage": "workspace:*",
     "redis-script": "workspace:*",
-    "replay-storage": "workspace:*"
+    "replay-storage": "workspace:*",
+    "utils": "workspace:*"
   },
   "nx": {
     "projectType": "application",

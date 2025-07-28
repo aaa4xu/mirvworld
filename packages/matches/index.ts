@@ -8,9 +8,9 @@ import { appRouter } from './src/trpc/router.ts';
 import { createHTTPServer } from '@trpc/server/adapters/standalone';
 import { createContext } from './src/trpc/trpc.ts';
 import { MinioStorage } from 'compressed-storage';
-import { GamelensEventsStorage } from 'gamelens/src/GamelensEventsStorage.ts';
 import { migrate } from 'drizzle-orm/mysql2/migrator';
 import { ReplayStorage } from 'replay-storage';
+import { GamelensEventsStorage } from 'gamelens-events-storage';
 
 const abort = new AbortController();
 process.on('SIGTERM', () => abort.abort('SIGTERM'));

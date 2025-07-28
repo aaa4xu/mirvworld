@@ -5,8 +5,8 @@ import { config } from './config.ts';
 import { Client } from 'minio';
 import { GameLensStatsWorker } from './src/GameLensStatsWorker.ts';
 import { MinioStorage } from 'compressed-storage';
-import { GamelensEventsStorage } from './src/GamelensEventsStorage.ts';
 import { ReplayStorage } from 'replay-storage';
+import { GamelensEventsStorage } from 'gamelens-events-storage';
 
 if (cluster.isPrimary) {
   const threads = os.availableParallelism();

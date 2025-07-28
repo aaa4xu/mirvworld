@@ -1,10 +1,12 @@
 import { MinioStorage } from 'compressed-storage';
-import { config } from 'gamelens/config.ts';
+import { config } from './config.ts';
 import { Client } from 'minio';
-import { GamelensEventsStorage } from 'gamelens/src/GamelensEventsStorage.ts';
 import { GameLensStats } from './src/GameLensStats/GameLensStats.ts';
+import { GamelensEventsStorage } from 'gamelens-events-storage';
 
-const eventsStorage = new GamelensEventsStorage(new MinioStorage(config.s3.bucket, new Client(config.s3.endpoint)));
+const eventsStorage = new GamelensEventsStorage(
+  new MinioStorage(config.gamelens.s3.bucket, new Client(config.gamelens.s3.endpoint)),
+);
 
 const events = await eventsStorage.read('98420cc/0Dyn1blV.json');
 const stats = new GameLensStats(events);

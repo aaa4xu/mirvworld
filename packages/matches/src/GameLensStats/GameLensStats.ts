@@ -1,5 +1,5 @@
-import type { GamelensEvent } from 'gamelens/src/Events.ts';
 import { PlayerStats } from './PlayerStats';
+import type { GamelensEvent } from 'gamelens-events-storage';
 
 export class GameLensStats {
   public readonly players = new Map<number, PlayerStats>();

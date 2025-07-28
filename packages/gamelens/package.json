@@ -10,7 +10,7 @@
     "utils": "workspace:*",
     "replay-storage": "workspace:*",
     "compressed-storage": "workspace:*",
-    "matches": "workspace:*"
+    "gamelens-events-storage": "workspace:*",
   },
   "devDependencies": {
     "@types/bun": "latest"

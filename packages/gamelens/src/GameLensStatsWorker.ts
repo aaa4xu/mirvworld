@@ -1,11 +1,11 @@
 import { RedisClient } from 'bun';
-import { TaskWorker, type TaskMessage } from 'matches/src/TaskWorker.ts';
-import { MinioPutEventSchema } from 'matches/src/Schema/MinioPutEvent.ts';
+import { TaskWorker, type TaskMessage } from 'utils';
+import { MinioPutEventSchema } from 'utils';
 import { GameRecordSchema } from 'openfront/src/Schema.ts';
 import { PlaybackEngine } from './PlaybackEngine.ts';
 import type { GameRecord } from 'openfront/game/src/core/Schemas.ts';
-import type { GamelensEventsStorage } from './GamelensEventsStorage.ts';
 import { ReplayStorage } from 'replay-storage';
+import { GamelensEventsStorage } from 'gamelens-events-storage';
 
 export class GameLensStatsWorker {
   private readonly worker: TaskWorker;

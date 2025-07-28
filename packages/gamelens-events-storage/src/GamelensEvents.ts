@@ -111,13 +111,9 @@ export const GamelensPlayersMappingEventSchema = z.object({
   ),
 });
 
-export const GamelensAttackEventSchema = z.discriminatedUnion('type', [
+export const GamelensEventSchema = z.discriminatedUnion('type', [
   GamelensTerraAttackEventSchema,
   GamelensPlayerAttackEventSchema,
-]);
-
-export const GamelensEventSchema = z.discriminatedUnion('type', [
-  GamelensAttackEventSchema,
   GamelensUnitBuildEventSchema,
   GamelensUnitCapturedEventSchema,
   GamelensUnitDestroyedEventSchema,
@@ -140,4 +136,3 @@ export const GamelensEventsSchema = z.array(GamelensEventSchema);
 export type GamelensEvents = z.infer<typeof GamelensEventsSchema>;
 
 export type GamelensEvent = z.infer<typeof GamelensEventSchema>;
-export type GamelensAttackEvent = z.infer<typeof GamelensAttackEventSchema>;
