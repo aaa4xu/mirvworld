@@ -1,15 +1,25 @@
 <script lang="ts">
-  import type { PageServerData } from './$types';
+  import type { PageProps } from './$types';
+  import { enhance } from '$app/forms';
 
-  let { data }: { data: PageServerData } = $props();
+  let { data, form }: PageProps = $props();
+  const matches = $derived(form ? form.results : data.matches);
 </script>
 
 <section>
   <div class="latest">
     <h1>Latest matches</h1>
 
+    <form method="POST" action="?/search" use:enhance>
+      <label>
+        Search by player
+        <input name="player" type="text" required />
+      </label>
+      <button>Search</button>
+    </form>
+
     <ul>
-      {#each data.matches as match (match.id)}
+      {#each matches as match (match.gameId)}
         <li>
           <a href="/matches/{match.gameId}.html"
             ><span class="gameid">{match.gameId}</span> - {match.mode} @ {match.map}</a
@@ -18,6 +28,10 @@
       {/each}
     </ul>
   </div>
+
+  <pre>
+    {JSON.stringify(form, null, 2)}
+  </pre>
 </section>
 
 <style>

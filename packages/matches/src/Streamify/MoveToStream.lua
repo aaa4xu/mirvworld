@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 --[[
   Atomically moves up to ARGV[1] items from the tail of the list KEYS[1]
   to the stream KEYS[2] where each item is stored under the field "data".

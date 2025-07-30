@@ -3,8 +3,9 @@ import type { CreateHTTPContextOptions } from '@trpc/server/adapters/standalone'
 import type { MySql2Database } from 'drizzle-orm/mysql2/driver';
 import type { GamelensEventsStorage } from 'gamelens-events-storage';
 import superjson from 'superjson';
+import * as schema from '../db/schema.ts';
 
-export const createContext = (db: MySql2Database, eventsStorage: GamelensEventsStorage) => {
+export const createContext = (db: MySql2Database<typeof schema>, eventsStorage: GamelensEventsStorage) => {
   return async (opts: CreateHTTPContextOptions) => {
     return {
       db,

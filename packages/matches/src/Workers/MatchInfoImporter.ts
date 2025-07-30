@@ -7,13 +7,14 @@ import { GameRecordSchema } from 'openfront/src/Schema.ts';
 import { matches, matchPlayers } from '../db/schema.ts';
 import { eq } from 'drizzle-orm';
 import type { ReplayStorage } from 'replay-storage';
+import * as schema from '../db/schema.ts';
 
 export class MatchInfoImporter {
   private readonly worker: TaskWorker;
 
   public constructor(
     redis: RedisClient,
-    private readonly db: MySql2Database,
+    private readonly db: MySql2Database<typeof schema>,
     private readonly replays: ReplayStorage,
   ) {
     this.worker = new TaskWorker(redis, {

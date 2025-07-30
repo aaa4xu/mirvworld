@@ -1,7 +1,7 @@
 import { publicProcedure, router } from './trpc';
 import z from 'zod/v4';
 import { matches, matchPlayers } from '../db/schema.ts';
-import { desc, eq } from 'drizzle-orm';
+import { desc, eq, getTableColumns } from 'drizzle-orm';
 import { GameLensStats } from '../GameLensStats/GameLensStats.ts';
 
 export const appRouter = router({
@@ -28,6 +28,16 @@ export const appRouter = router({
         })),
         stats: events ? new GameLensStats(events).toJSON() : null,
       };
+    }),
+
+    searchByPlayerName: publicProcedure.input(z.string()).query(async ({ ctx, input: playerName }) => {
+      return ctx.db
+        .selectDistinct({ ...getTableColumns(matches) })
+        .from(matches)
+        .innerJoin(matchPlayers, eq(matchPlayers.matchId, matches.id))
+        .where(eq(matchPlayers.name, playerName))
+        .orderBy(desc(matches.startedAt))
+        .limit(20);
     }),
   },
 });

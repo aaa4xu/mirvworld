@@ -11,12 +11,17 @@ import { MinioStorage } from 'compressed-storage';
 import { migrate } from 'drizzle-orm/mysql2/migrator';
 import { ReplayStorage } from 'replay-storage';
 import { GamelensEventsStorage } from 'gamelens-events-storage';
+import * as schema from './src/db/schema.ts';
 
 const abort = new AbortController();
 process.on('SIGTERM', () => abort.abort('SIGTERM'));
-process.on('SIGINT', () => abort.abort('SIGINT'));
+process.on('SIGINT', () => abort.abort(''));
 
-const db = drizzle(config.db);
+const db = drizzle(config.db, {
+  mode: 'default',
+  schema,
+});
+
 migrate(db, { migrationsFolder: './drizzle' }).then(() => {
   const redis = new RedisClient(config.redis);
   const replaysS3 = new Client(config.replays.s3.endpoint);
