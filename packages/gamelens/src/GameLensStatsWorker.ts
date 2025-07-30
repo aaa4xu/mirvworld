@@ -13,15 +13,16 @@ export class GameLensStatsWorker {
 
   public constructor(
     mapsPath: string,
+    private readonly version: string,
     redis: RedisClient,
     private readonly replayStorage: ReplayStorage,
     private readonly eventsStorage: GamelensEventsStorage,
   ) {
     this.worker = new TaskWorker(redis, {
       streamKey: 'matches:processing',
-      group: 'gamelens-v4',
+      group: `gamelens-${version}`,
       deadLetterKey: 'gamelens:deadletter',
-      consumer: `gamelens-v4-${process.pid}`,
+      consumer: `gamelens-${version}-${process.pid}`,
     });
 
     this.playback = new PlaybackEngine(mapsPath);
@@ -36,6 +37,11 @@ export class GameLensStatsWorker {
       for (const event of task.Event) {
         if (event.eventName !== 's3:ObjectCreated:Put') {
           console.warn(`Unknown event ${event.eventName}`);
+          continue;
+        }
+
+        if (!event.s3.object.key.startsWith(this.version)) {
+          // Replay from different game version
           continue;
         }
 

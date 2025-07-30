@@ -1,6 +1,6 @@
 import os from 'node:os';
 import cluster from 'node:cluster';
-import { RedisClient } from 'bun';
+import { $, RedisClient } from 'bun';
 import { config } from './config.ts';
 import { Client } from 'minio';
 import { GameLensStatsWorker } from './src/GameLensStatsWorker.ts';
@@ -32,7 +32,14 @@ if (cluster.isPrimary) {
     cluster.disconnect();
   });
 } else {
-  console.log(`[Worker#${process.pid}] Starting...`);
+  let gameCommit: string;
+  if (await Bun.file('game-commit.txt').exists()) {
+    gameCommit = await Bun.file('game-commit.txt').text();
+  } else {
+    gameCommit = await $`cd ../openfront/game && git rev-parse --short HEAD`.text();
+  }
+
+  console.log(`[Worker#${gameCommit}-${process.pid}] Starting...`);
 
   const abort = new AbortController();
   process.on('SIGTERM', () => abort.abort('SIGTERM'));
@@ -46,7 +53,7 @@ if (cluster.isPrimary) {
 
   const eventsStorage = new GamelensEventsStorage(new MinioStorage(config.s3.bucket, new Client(config.s3.endpoint)));
 
-  new GameLensStatsWorker(config.mapsPath, redis, replayStorage, eventsStorage);
+  new GameLensStatsWorker(config.mapsPath, gameCommit, redis, replayStorage, eventsStorage);
   abort.signal.addEventListener('abort', () => {
     console.log(`[Worker#${process.pid}] Aborting...`);
     process.exit(1);
