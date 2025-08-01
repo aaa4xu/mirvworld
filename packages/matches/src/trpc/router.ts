@@ -39,6 +39,20 @@ export const appRouter = router({
         .orderBy(desc(matches.startedAt))
         .limit(20);
     }),
+
+    importById: publicProcedure.input(z.string().length(8)).mutation(async ({ ctx, input: id }) => {
+      try {
+        const replay = await ctx.api.game(id, AbortSignal.timeout(5000));
+        if (!replay) {
+          throw new Error('Replay is not found');
+        }
+
+        await ctx.storage.save(id, replay);
+      } catch (err) {
+        console.error(`Failed to download replay:`, err instanceof Error ? err.message : err);
+        throw new Error('Failed to download replay');
+      }
+    }),
   },
 });
 

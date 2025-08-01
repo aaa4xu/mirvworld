@@ -48,7 +48,7 @@ migrate(db, { migrationsFolder: './drizzle' }).then(() => {
 
   const server = createHTTPServer({
     router: appRouter,
-    createContext: createContext(db, eventsStorage),
+    createContext: createContext(db, eventsStorage, api, replayStorage),
   });
 
   server.listen(config.http.port);

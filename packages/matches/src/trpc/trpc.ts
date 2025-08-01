@@ -4,12 +4,21 @@ import type { MySql2Database } from 'drizzle-orm/mysql2/driver';
 import type { GamelensEventsStorage } from 'gamelens-events-storage';
 import superjson from 'superjson';
 import * as schema from '../db/schema.ts';
+import type { OpenFrontPublicAPI } from 'lurker/src/OpenFront/OpenFrontPublicAPI.ts';
+import type { ReplayStorage } from 'replay-storage';
 
-export const createContext = (db: MySql2Database<typeof schema>, eventsStorage: GamelensEventsStorage) => {
+export const createContext = (
+  db: MySql2Database<typeof schema>,
+  eventsStorage: GamelensEventsStorage,
+  api: OpenFrontPublicAPI,
+  storage: ReplayStorage,
+) => {
   return async (opts: CreateHTTPContextOptions) => {
     return {
       db,
       eventsStorage,
+      api,
+      storage,
     };
   };
 };
