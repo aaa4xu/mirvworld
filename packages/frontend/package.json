@@ -54,5 +54,24 @@
     "superjson": "^2.2.2",
     "twemoji": "^14.0.2",
     "zod": "^3.25.75"
+  },
+  "nx": {
+    "projectType": "application",
+    "targets": {
+      "container": {
+        "executor": "@nx-tools/nx-container:build",
+        "options": {
+          "tags": [
+            "ghcr.io/aaa4xu/mirvworld/frontend:latest"
+          ],
+          "cache-from": [
+            "type=gha"
+          ],
+          "cache-to": [
+            "type=gha,mode=max"
+          ]
+        }
+      }
+    }
   }
 }
