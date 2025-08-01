@@ -1,9 +1,10 @@
 <script lang="ts">
   import type { PageProps } from './$types';
   import { enhance } from '$app/forms';
+  import ImportMatchByLobbyIdForm from '$lib/components/ImportMatchByLobbyIdForm.svelte';
 
   let { data, form }: PageProps = $props();
-  const matches = $derived(form ? form.results : data.matches);
+  const matches = $derived(form && form.results ? form.results : data.matches);
 </script>
 
 <section>
@@ -32,6 +33,11 @@
   <pre>
     {JSON.stringify(form, null, 2)}
   </pre>
+</section>
+
+<section>
+  <h2>Import private match</h2>
+  <ImportMatchByLobbyIdForm action="?/importMatch" error={form?.importError} />
 </section>
 
 <style>
