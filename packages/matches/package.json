@@ -4,8 +4,9 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "db:push": "bunx drizzle-kit push",
+    "db:push": "bunx --bun drizzle-kit push",
     "db:studio": "bunx drizzle-kit studio",
+    "db:generate": "bunx --bun drizzle-kit generate",
     "build": "bun build --target=bun --sourcemap=external --outdir=dist index.ts",
     "lint": "prettier --check ."
   },

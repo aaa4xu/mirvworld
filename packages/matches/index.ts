@@ -1,4 +1,4 @@
-import { RedisClient } from 'bun';
+import { redis, RedisClient } from 'bun';
 import { config } from './config.ts';
 import { Client } from 'minio';
 import { drizzle } from 'drizzle-orm/mysql2';
@@ -12,6 +12,10 @@ import { migrate } from 'drizzle-orm/mysql2/migrator';
 import { ReplayStorage } from 'replay-storage';
 import { GamelensEventsStorage } from 'gamelens-events-storage';
 import * as schema from './src/db/schema.ts';
+import { PlayerMatchesImporter } from './src/Workers/PlayerMatchesImporter.ts';
+
+import { OpenFrontPublicAPIWithLimiter } from 'lurker/src/OpenFrontPublicAPIWithLimiter.ts';
+import { LeakyBucket } from 'lurker/src/LeakyBucket/LeakyBucket.ts';
 
 const abort = new AbortController();
 process.on('SIGTERM', () => abort.abort('SIGTERM'));
@@ -21,6 +25,10 @@ const db = drizzle(config.db, {
   mode: 'default',
   schema,
 });
+
+const openfrontRateLimiter = new LeakyBucket({ bucketKey: 'openfront:global', capacity: 4, refillPerSec: 4 }, redis);
+
+const api = new OpenFrontPublicAPIWithLimiter(config.openfront.api, openfrontRateLimiter);
 
 migrate(db, { migrationsFolder: './drizzle' }).then(() => {
   const redis = new RedisClient(config.redis);
@@ -35,6 +43,7 @@ migrate(db, { migrationsFolder: './drizzle' }).then(() => {
     abort.signal.addEventListener('abort', () => streamify.dispose());
     streamify.start();
     new MatchInfoImporter(redis, db, replayStorage);
+    new PlayerMatchesImporter(db, api);
   }
 
   const server = createHTTPServer({

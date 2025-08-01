@@ -1,4 +1,5 @@
-import { createMinioClientOptions, env } from 'utils';
+import { env } from 'utils/src/env';
+import { createMinioClientOptions } from 'utils/src/createMinioClientOptions';
 
 export const config = {
   replays: {
@@ -12,6 +13,9 @@ export const config = {
       bucket: env('MATCHES_GAMELENS_S3_BUCKET', 'gamelens'),
       endpoint: createMinioClientOptions(env('MATCHES_GAMELENS_S3_URL', 'http://minioadmin:minioadmin@localhost:9000')),
     },
+  },
+  openfront: {
+    api: env('MATCHES_OPENFRONT_API_ENDPOINT', 'https://api.openfront.io'),
   },
   redis: env('MATCHES_REDIS_URL', 'redis://localhost:6379'),
   http: {
