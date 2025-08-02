@@ -29,6 +29,7 @@ export interface WorkerOptions {
   heartbeatIntervalMs?: number;
   /** How long to sleep when no work is found (ms) */
   idleSleepMs?: number;
+  startFromBeginingOfQueue?: boolean;
 }
 
 const log = debug('mirvworld:matches:task-worker');
@@ -70,6 +71,7 @@ export class TaskWorker {
   private readonly stealIdleMs: number;
   private readonly heartbeatIntervalMs: number;
   private readonly idleSleepMs: number;
+  private readonly startFromBeginingOfQueue: boolean;
 
   public constructor(redis: RedisClient, opts: WorkerOptions) {
     this.redis = redis;
@@ -80,6 +82,7 @@ export class TaskWorker {
     this.stealIdleMs = opts.stealIdleMs ?? 15_000;
     this.heartbeatIntervalMs = opts.heartbeatIntervalMs ?? 5_000;
     this.idleSleepMs = opts.idleSleepMs ?? 1_000;
+    this.startFromBeginingOfQueue = opts.startFromBeginingOfQueue ?? false;
   }
 
   /**
@@ -87,7 +90,13 @@ export class TaskWorker {
    */
   public async ensureGroup(): Promise<void> {
     try {
-      await this.redis.send('XGROUP', ['CREATE', this.streamKey, this.group, '$', 'MKSTREAM']);
+      await this.redis.send('XGROUP', [
+        'CREATE',
+        this.streamKey,
+        this.group,
+        this.startFromBeginingOfQueue ? '0-0' : '$',
+        'MKSTREAM',
+      ]);
     } catch (err) {
       // BUSYGROUP → already exists, ignore
       if (!(err instanceof Error) || !err.message.includes('BUSYGROUP')) {

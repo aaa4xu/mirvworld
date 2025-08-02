@@ -23,6 +23,7 @@ export class GameLensStatsWorker {
       group: `gamelens-${version}`,
       deadLetterKey: 'gamelens:deadletter',
       consumer: `gamelens-${version}-${process.pid}`,
+      startFromBeginingOfQueue: true,
     });
 
     this.playback = new PlaybackEngine(mapsPath);
