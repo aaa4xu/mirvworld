@@ -38,6 +38,7 @@ if (cluster.isPrimary) {
   } else {
     gameCommit = await $`cd ../openfront/game && git rev-parse --short HEAD`.text();
   }
+  gameCommit = gameCommit.trim().substring(0, 7);
 
   console.log(`[Worker#${gameCommit}-${process.pid}] Starting...`);
 
