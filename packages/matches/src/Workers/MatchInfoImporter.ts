@@ -58,7 +58,7 @@ export class MatchInfoImporter {
           version: replay.gitCommit,
           players: replay.info.players.length,
           maxPlayers: replay.info.config.maxPlayers ?? 0,
-          winner: replay.info.winner?.slice(1).join(','),
+          winner: replay.info.winner?.[1],
           startedAt: new Date(replay.info.start),
           finishedAt: new Date(replay.info.end),
         })
