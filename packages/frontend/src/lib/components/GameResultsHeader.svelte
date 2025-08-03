@@ -10,7 +10,6 @@
     date,
     players,
     maxPlayers,
-    id,
   }: {
     winner: string;
     gameId: string;
@@ -20,7 +19,6 @@
     date: Date;
     players: number;
     maxPlayers: number;
-    id: string;
   } = $props();
 
   const durationH = Math.floor(duration / 3600 / 1000);

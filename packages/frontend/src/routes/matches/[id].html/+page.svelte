@@ -38,12 +38,12 @@
   let winner = $derived.by(() => {
     const winners = data.match.winner?.split(',');
 
-    if (winners && winners.length > 1) {
-      return winners[0];
+    if (winners && data.match.mode === 'ffa') {
+      return data.match.players.find((player) => player.clientId === winners[0])?.name ?? 'unknown';
     }
 
-    if (winners && winners.length === 1) {
-      return data.match.players.find((player) => player.clientId === winners[0])?.name ?? 'unknown';
+    if (winners && winners.length > 0 && data.match.mode === 'team') {
+      return winners[0];
     }
 
     return 'unknown';
@@ -71,7 +71,6 @@
   {winner}
   players={data.match.players.length}
   maxPlayers={data.match.maxPlayers}
-  id={data.match.gameId}
 />
 
 {#if !data.match.stats}

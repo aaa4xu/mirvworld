@@ -18,7 +18,7 @@
   } = $props();
 
   const durationOfMatch = BigInt(Math.round(duration / 1000 / 60));
-  const total = (v: Record<any, bigint>) => Object.values(v).reduce((acc, v) => acc + v, 0n);
+  const total = (v: Record<string, bigint>) => Object.values(v).reduce((acc, v) => acc + v, 0n);
   const formatK = (v: bigint) => (Number(v) / 1000).toFixed(1) + 'k';
   const sortedPlayers = players.sort((l, r) => {
     if (l.killed < 0 && r.killed >= 0) return -1;
@@ -46,6 +46,7 @@
           <th><span><TroopIconWhite /> Received/min</span></th>
           <th><span><GoldCoinIcon /> Gold/min</span></th>
           <th>Max tiles</th>
+          <th>Survived time</th>
         </tr>
       </thead>
 
@@ -74,6 +75,9 @@
               )}</td
             >
             <td>{(Math.max(0, ...Object.values(player.tiles)) * 100).toFixed(2)}%</td>
+            <td
+              >{#if player.killed >= 0}{Math.round(player.killed / 10)}s{:else}-{/if}</td
+            >
           </tr>
         {/each}
       </tbody>
