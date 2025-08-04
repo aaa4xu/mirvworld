@@ -26,10 +26,12 @@ const serverClient = new OpenFrontServerAPIWithLimiter(
   config.openfront.workers,
   openfrontRateLimiter,
 );
+
 const apiClient = new OpenFrontPublicAPIWithLimiter(
   config.openfront.api,
   new LeakyBucket({ bucketKey: 'openfront:api', capacity: 4, refillPerSec: 3 }, redis, openfrontRateLimiter),
 );
+
 const downloadQueue = new DownloadQueue(
   {
     readyKey: 'lurker:queue',
@@ -63,4 +65,4 @@ const lobbiesLurker = new LobbiesLurker(
 abortController.signal.addEventListener('abort', () => lobbiesLurker.dispose());
 
 const replaysLurker = new ReplayLurker(apiClient, serverClient, replayStorage, downloadQueue);
-abortController.signal.addEventListener('abort', () => replaysLurker.dispose());
+abortController.signal.addEventListener('abort', () => replaysLurker.dispose(), { once: true });
