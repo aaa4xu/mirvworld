@@ -34,6 +34,8 @@ export class LobbiesLurker {
         this.exponentialBackoffFactor++;
       } else if (err instanceof DOMException && err.name === 'AbortError') {
         console.warn(`[LobbiesLurker] Fetching lobbies aborted`);
+      } else if (err instanceof Error && err.name === 'TimeoutError') {
+        console.error(`[LobbiesLurker] Error fetching lobbies:`, err.name);
       } else {
         console.error(`[LobbiesLurker] Error fetching lobbies:`, err);
       }
