@@ -47,6 +47,7 @@
   "dependencies": {
     "@sveltejs/kit": "^2.24.0",
     "@trpc/client": "^11.4.3",
+    "canvas": "^3.1.2",
     "dompurify": "^3.2.6",
     "drizzle-orm": "^0.40.0",
     "ioredis": "^5.6.1",

@@ -25,6 +25,7 @@
   "private": true,
   "trustedDependencies": [
     "@swc/core",
+    "canvas",
     "core-js-pure",
     "esbuild",
     "frontend",

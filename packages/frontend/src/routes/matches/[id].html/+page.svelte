@@ -84,7 +84,7 @@
     content="{data.match.players.length}/{data.match.maxPlayers} {data.match.mode} on {data.match.map} - Match {data
       .match.gameId}, {formatDate(data.match.startedAt)}"
   />
-  <meta property="og:image" content="/openfront/maps/{data.match.map.split(' ').join('')}Thumb.webp" />
+  <meta property="og:image" content="/matches/{data.match.gameId}.jpg" />
   <meta name="twitter:card" content="summary_large_image" />
 </svelte:head>
 
