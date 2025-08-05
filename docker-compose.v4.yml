@@ -37,7 +37,6 @@ services:
     image: mirvworld/frontend
     restart: unless-stopped
     depends_on:
-      - redis
       - matches
 
   redis:
@@ -57,7 +56,7 @@ services:
     depends_on:
       - redis
       - storage
-      - mysql
+      - mongodb
 
   mongodb:
     image: mongodb/mongodb-community-server
