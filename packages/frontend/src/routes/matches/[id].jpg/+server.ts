@@ -2,9 +2,8 @@ import { trpc } from '$lib/server/trpc';
 import { error } from '@sveltejs/kit';
 import { MatchResultImageGenerator } from '$lib/server/MatchResultImageGenerator';
 
-const generator = new MatchResultImageGenerator('');
-
 export async function GET({ params }) {
+  const generator = new MatchResultImageGenerator('');
   const match = await trpc.matches.getByGameId.query(params.id);
 
   if (!match) {

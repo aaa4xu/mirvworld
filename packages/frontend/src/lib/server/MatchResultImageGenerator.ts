@@ -1,4 +1,4 @@
-import { createCanvas, CanvasRenderingContext2D, registerFont } from 'canvas';
+import { createCanvas, type CanvasRenderingContext2D, registerFont } from 'canvas';
 import InterFont from '../../fonts/Inter-VariableFont_opsz,wght.ttf';
 
 export class MatchResultImageGenerator {
