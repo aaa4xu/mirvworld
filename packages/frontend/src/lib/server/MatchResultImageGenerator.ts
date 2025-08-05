@@ -3,14 +3,16 @@ import interFontUrl from '$lib/fonts/Inter-VariableFont_opsz,wght.ttf';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-function resolveAsset(url: string): string {
-  if (import.meta.env.PROD) {
-    const here = path.dirname(fileURLToPath(import.meta.url)); // …/build/server/entries
-    const serverRoot = path.resolve(here, '..'); // …/build/server   ← без дублирования
-    return path.join(serverRoot, url.replace(/^\//, '')); // _app/immutable/…
+function resolveAsset(u: string): string {
+  if (import.meta.env.DEV) {
+    // /src/…  →  <repo>/src/…
+    return path.resolve(process.cwd(), u.slice(1));
   }
 
-  return path.resolve(process.cwd(), url.slice(1));
+  // …/build/server/entries/**  →  …/build/server
+  const modDir = path.dirname(fileURLToPath(import.meta.url));
+  const serverRoot = modDir.split(`${path.sep}entries${path.sep}`)[0];
+  return path.join(serverRoot, u.replace(/^\//, '')); // _app/immutable/…
 }
 
 const interFontPath = resolveAsset(interFontUrl);
