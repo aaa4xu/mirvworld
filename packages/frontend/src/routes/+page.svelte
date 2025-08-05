@@ -29,10 +29,6 @@
       {/each}
     </ul>
   </div>
-
-  <pre>
-    {JSON.stringify(form, null, 2)}
-  </pre>
 </section>
 
 <section>
