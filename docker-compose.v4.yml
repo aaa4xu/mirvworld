@@ -45,12 +45,6 @@ services:
     restart: unless-stopped
     command: redis-server --save 60 1 --loglevel warning
 
-  mysql:
-    image: mysql
-    restart: unless-stopped
-    environment:
-      - MYSQL_DATABASE=local
-
   gamelens:
     image: mirvworld/gamelens
     restart: unless-stopped

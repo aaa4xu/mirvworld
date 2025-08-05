@@ -31,15 +31,6 @@ services:
     ports:
       - 100.115.138.95:6379:6379
 
-  mysql:
-    restart: always
-    volumes:
-      - mysql:/var/lib/mysql
-    env_file:
-      - v4.env
-    ports:
-      - 100.115.138.95:3306:3306
-
   lurker:
     image: ghcr.io/aaa4xu/mirvworld/lurker
     restart: always
@@ -96,7 +87,6 @@ volumes:
   storage-data:
   storage-events:
   redis:
-  mysql:
   mongodb:
 
 networks:

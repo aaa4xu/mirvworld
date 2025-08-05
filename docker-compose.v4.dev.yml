@@ -23,14 +23,6 @@ services:
     ports:
       - 4173:80
 
-  mysql:
-    ports:
-      - 3306:3306
-    environment:
-      - MYSQL_ROOT_PASSWORD=mysecretpassword
-    volumes:
-      - ./storage/docker/mysql:/var/lib/mysql
-
   gamelens:
     build:
       context: .
