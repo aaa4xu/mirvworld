@@ -11,7 +11,7 @@ RUN apk update && apk add --no-cache \
 
 COPY . .
 RUN bun install
-RUN cd packages/frontend && bun run build && cd build && bun install
+RUN cd packages/frontend && bun run build && cd build && bun install canvas && bun install
 
 FROM oven/bun:1-alpine
 WORKDIR /app
