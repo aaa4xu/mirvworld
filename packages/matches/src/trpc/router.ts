@@ -12,7 +12,7 @@ export const appRouter = router({
     }),
 
     searchByPlayerName: publicProcedure.input(z.string()).query(async ({ ctx, input: playerName }) => {
-      return []; // @TODO
+      return ctx.matches.searchByPlayer(playerName);
     }),
 
     importById: publicProcedure.input(z.string().length(8)).mutation(async ({ ctx, input: id }) => {

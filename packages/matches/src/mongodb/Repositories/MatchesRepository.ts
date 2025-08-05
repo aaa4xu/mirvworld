@@ -9,6 +9,25 @@ export class MatchesRepository {
     this.collection = db.collection('matches');
   }
 
+  public async searchByPlayer(name: string): Promise<Array<MatchDTO>> {
+    const items = await this.collection
+      .aggregate<Match>([
+        {
+          $match: {
+            'players.name': {
+              $regex: name,
+              $options: 'i',
+            },
+          },
+        },
+        { $sort: { _id: -1 } },
+      ])
+      .limit(20)
+      .toArray();
+
+    return items.map((m) => this.toDTO(m));
+  }
+
   public async read(id: MatchDTO['id']): Promise<MatchDTO | null> {
     const item = await this.collection.findOne({ _id: new ObjectId(id) });
     return item ? this.toDTO(item) : null;

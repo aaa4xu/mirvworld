@@ -59,6 +59,10 @@ export class MatchesService {
     }
   }
 
+  public searchByPlayer(name: string) {
+    return this.repository.searchByPlayer(name);
+  }
+
   public latest() {
     return this.repository.latest();
   }
