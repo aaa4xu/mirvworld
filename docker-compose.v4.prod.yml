@@ -86,6 +86,8 @@ services:
     volumes:
       - ./docker/mongod.yaml:/etc/mongo/mongod.conf:ro
       - mongodb:/data/db
+    env_file:
+      - v4.env
     ports:
       - 100.115.138.95:27017:27017
     command: ["mongod", "--config", "/etc/mongod.conf"]
