@@ -2,8 +2,8 @@
 import leakyBucketScript from './LeakyBucket.lua' with { type: 'text' };
 import type { RedisClient } from 'bun';
 import { LeakyBucketResultSchema } from './Schema.ts';
-import { cancelableTimeout } from '../Utils.ts';
 import { RedisLuaScript } from '@mirvworld/redis-script';
+import { cancelableTimeout } from 'utils';
 
 /**
  * Implements a distributed leaky‐bucket rate limiter backed by Redis.
