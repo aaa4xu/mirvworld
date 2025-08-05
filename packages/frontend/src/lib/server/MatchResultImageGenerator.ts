@@ -5,9 +5,9 @@ import { fileURLToPath } from 'url';
 
 function resolveAsset(url: string): string {
   if (import.meta.env.PROD) {
-    const here = path.dirname(fileURLToPath(import.meta.url));
-    const serverRoot = here.split(path.sep + 'entries' + path.sep)[0] + path.sep + 'server';
-    return path.join(serverRoot, url.replace(/^\//, ''));
+    const here = path.dirname(fileURLToPath(import.meta.url)); // …/build/server/entries
+    const serverRoot = path.resolve(here, '..'); // …/build/server   ← без дублирования
+    return path.join(serverRoot, url.replace(/^\//, '')); // _app/immutable/…
   }
 
   return path.resolve(process.cwd(), url.slice(1));
