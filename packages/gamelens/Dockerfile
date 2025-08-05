@@ -1,11 +1,11 @@
 FROM oven/bun:1 AS build
 WORKDIR /app
-RUN apt-get update && apt-get install -y git
+RUN apt-get update && apt-get install -y git build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev # git + canvas deps
 COPY . .
 RUN bun install
 
 RUN git config --global user.email gamelens@mirv.world && git config --global user.name gamelens
-RUN cd packages/openfront/game && git rev-parse --short HEAD > ../game-commit.txt && ls -la && pwd
+RUN cd packages/openfront/game && git rev-parse --short HEAD > ../game-commit.txt
 RUN ./packages/openfront/scripts/apply_patches.sh
 
 RUN cd packages/gamelens && bun run build

@@ -1,5 +1,6 @@
 FROM oven/bun:1 AS build
-WORKDIR /usr/src/app
+WORKDIR /app
+RUN apt-get update && apt-get install -y git build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
 COPY . .
 RUN bun install
 
@@ -9,7 +10,7 @@ FROM oven/bun:1
 WORKDIR /app
 ENV PORT=80
 ENV BACKEND_ENDPOINT=http://matches
-COPY --from=build /usr/src/app/packages/frontend/build /app
+COPY --from=build /app/packages/frontend/build /app
 RUN bun install
 
 EXPOSE 80
