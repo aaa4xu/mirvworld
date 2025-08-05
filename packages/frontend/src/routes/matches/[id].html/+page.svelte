@@ -45,11 +45,11 @@
 
     return Array.from(teams.entries()).sort(([teamA], [teamB]) => {
       const sortByDeathTurn = (deaths.get(teamB) ?? 0) - (deaths.get(teamA) ?? 0);
-      if (sortByDeathTurn !== 0) {
+      if (sortByDeathTurn !== 0 && !Number.isNaN(sortByDeathTurn)) {
         return sortByDeathTurn;
       }
 
-      return (tiles.get(teamA) ?? 0) - (tiles.get(teamB) ?? 0);
+      return (tiles.get(teamB) ?? 0) - (tiles.get(teamA) ?? 0);
     });
   });
 
