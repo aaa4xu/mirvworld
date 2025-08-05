@@ -1,5 +1,13 @@
 import { createCanvas, type CanvasRenderingContext2D, registerFont } from 'canvas';
-import InterFont from '../../fonts/Inter-VariableFont_opsz,wght.ttf';
+import interFontUrl from '$lib/fonts/Inter-VariableFont_opsz,wght.ttf?url';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+
+const interFontPath = import.meta.env.PROD
+  ? fileURLToPath(new URL(`.${interFontUrl}`, import.meta.url))
+  : path.resolve(process.cwd(), interFontUrl.slice(1));
+
+console.log(interFontPath);
 
 export class MatchResultImageGenerator {
   private readonly width = 1200;
@@ -10,7 +18,7 @@ export class MatchResultImageGenerator {
   private readonly font = 'Inter';
 
   public constructor(maps: string) {
-    registerFont('.' + InterFont, { family: 'Inter' });
+    registerFont(interFontPath, { family: 'Inter' });
   }
 
   public async create(id: string, mode: string, map: string, winner: string) {
