@@ -52,6 +52,7 @@ services:
       - PROTOCOL_HEADER=x-forwarded-proto
       - HOST_HEADER=x-forwarded-host
       - ORIGIN=https://mirv.world
+      - ADDRESS_HEADER=cf-connecting-ip
     networks:
       - cloudflare
       - default
