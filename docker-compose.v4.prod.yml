@@ -48,6 +48,10 @@ services:
     restart: always
     env_file:
       - v4.env
+    environment:
+      - PROTOCOL_HEADER=x-forwarded-proto
+      - HOST_HEADER=x-forwarded-host
+      - ORIGIN=https://mirv.world
     networks:
       - cloudflare
       - default
