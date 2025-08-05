@@ -1,13 +1,19 @@
 import { createCanvas, type CanvasRenderingContext2D, registerFont } from 'canvas';
-import interFontUrl from '$lib/fonts/Inter-VariableFont_opsz,wght.ttf?url';
-import { fileURLToPath } from 'node:url';
-import path from 'node:path';
+import interFontUrl from '$lib/fonts/Inter-VariableFont_opsz,wght.ttf';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-const interFontPath = import.meta.env.PROD
-  ? fileURLToPath(new URL(`.${interFontUrl}`, import.meta.url))
-  : path.resolve(process.cwd(), interFontUrl.slice(1));
+function resolveAsset(url: string): string {
+  if (import.meta.env.PROD) {
+    const here = path.dirname(fileURLToPath(import.meta.url));
+    const serverRoot = here.split(path.sep + 'entries' + path.sep)[0] + path.sep + 'server';
+    return path.join(serverRoot, url.replace(/^\//, ''));
+  }
 
-console.log(interFontPath);
+  return path.resolve(process.cwd(), url.slice(1));
+}
+
+const interFontPath = resolveAsset(interFontUrl);
 
 export class MatchResultImageGenerator {
   private readonly width = 1200;
