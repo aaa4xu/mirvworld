@@ -31,10 +31,6 @@ services:
     volumes:
       - ./storage/docker/mysql:/var/lib/mysql
 
-  game-snapshot-v0-23-16:
-    ports:
-      - 12316:80
-
   gamelens:
     build:
       context: .
@@ -47,3 +43,7 @@ services:
     build:
       context: .
       dockerfile: packages/lurker/Dockerfile
+
+  mongodb:
+    ports:
+      - 27017:27017

@@ -1,0 +1,6 @@
+storage:
+  dbPath: /data/db
+  wiredTiger:
+    collectionConfig:
+      blockCompressor: none
+      configString: allocation_size=64k,internal_page_max=64k,leaf_page_max=64k

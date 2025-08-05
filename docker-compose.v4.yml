@@ -5,11 +5,24 @@ services:
     command: server /data --console-address ":9001"
     environment:
       - MINIO_COMPRESSION_ENABLE=on
+      # Legacy
       - MINIO_NOTIFY_REDIS_ENABLE_PRIMARY=on
       - MINIO_NOTIFY_REDIS_ADDRESS_PRIMARY=redis:6379
       - MINIO_NOTIFY_REDIS_KEY_PRIMARY=storage:bucketevents
       - MINIO_NOTIFY_REDIS_FORMAT_PRIMARY=access
       - MINIO_NOTIFY_REDIS_QUEUE_DIR_PRIMARY=/opt/minio/events
+      # Matches service
+      - MINIO_NOTIFY_REDIS_ENABLE_MATCHES=on
+      - MINIO_NOTIFY_REDIS_ADDRESS_MATCHES=redis:6379
+      - MINIO_NOTIFY_REDIS_KEY_MATCHES=matches:storage
+      - MINIO_NOTIFY_REDIS_FORMAT_MATCHES=access
+      - MINIO_NOTIFY_REDIS_QUEUE_DIR_MATCHES=/opt/minio/events/matches
+      # Gamelens
+      - MINIO_NOTIFY_REDIS_ENABLE_GAMELENS=on
+      - MINIO_NOTIFY_REDIS_ADDRESS_GAMELENS=redis:6379
+      - MINIO_NOTIFY_REDIS_KEY_GAMELENS=gamelens:storage
+      - MINIO_NOTIFY_REDIS_FORMAT_GAMELENS=access
+      - MINIO_NOTIFY_REDIS_QUEUE_DIR_GAMELENS=/opt/minio/events/gamelens
 
   lurker:
     image: mirvworld/lurker
@@ -51,3 +64,7 @@ services:
       - redis
       - storage
       - mysql
+
+  mongodb:
+    image: mongodb/mongodb-community-server
+    restart: unless-stopped

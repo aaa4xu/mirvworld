@@ -81,11 +81,21 @@ services:
       - storage
     cpus: 24
 
+  mongodb:
+    restart: always
+    volumes:
+      - ./docker/mongod.yaml:/etc/mongo/mongod.conf:ro
+      - mongodb:/data/db
+    ports:
+      - 100.115.138.95:27017:27017
+    command: ["mongod", "--config", "/etc/mongod.conf"]
+
 volumes:
   storage-data:
   storage-events:
   redis:
   mysql:
+  mongodb:
 
 networks:
   cloudflare:
