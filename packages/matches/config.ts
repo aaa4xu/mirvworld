@@ -8,12 +8,6 @@ export const config = {
       endpoint: createMinioClientOptions(env('MATCHES_REPLAYS_S3_URL', 'http://minioadmin:minioadmin@localhost:9000')),
     },
   },
-  gamelens: {
-    s3: {
-      bucket: env('MATCHES_GAMELENS_S3_BUCKET', 'gamelens'),
-      endpoint: createMinioClientOptions(env('MATCHES_GAMELENS_S3_URL', 'http://minioadmin:minioadmin@localhost:9000')),
-    },
-  },
   openfront: {
     api: env('MATCHES_OPENFRONT_API_ENDPOINT', 'https://api.openfront.io'),
   },
