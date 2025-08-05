@@ -1,4 +1,4 @@
-FROM oven/bun:1-alpine AS build
+FROM oven/bun:1-alpine AS base
 WORKDIR /app
 # Canvas deps
 RUN apk update && apk add --no-cache \
@@ -9,15 +9,16 @@ RUN apk update && apk add --no-cache \
                       pango-dev \
                       giflib-dev
 
+FROM base AS build
 COPY . .
 RUN bun install
-RUN cd packages/frontend && bun run build && cd build && bun install canvas && bun install
+RUN cd packages/frontend && bun run build
 
-FROM oven/bun:1-alpine
-WORKDIR /app
+FROM base
 ENV PORT=80
 ENV BACKEND_ENDPOINT=http://matches
 COPY --from=build /app/packages/frontend/build/ /app
+RUN bun install canvas
 
 EXPOSE 80
 ENTRYPOINT ["bun", "index.js"]
