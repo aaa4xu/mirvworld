@@ -1,24 +1,16 @@
 import { initTRPC } from '@trpc/server';
 import type { CreateHTTPContextOptions } from '@trpc/server/adapters/standalone';
-import type { MySql2Database } from 'drizzle-orm/mysql2/driver';
-import type { GamelensEventsStorage } from 'gamelens-events-storage';
 import superjson from 'superjson';
-import * as schema from '../db/schema.ts';
-import type { OpenFrontPublicAPI } from 'lurker/src/OpenFront/OpenFrontPublicAPI.ts';
+import type { OpenFrontPublicAPI } from '@mirvworld/openfront-api';
 import type { ReplayStorage } from 'replay-storage';
+import type { MatchesService } from '../Services/MatchesService.ts';
 
-export const createContext = (
-  db: MySql2Database<typeof schema>,
-  eventsStorage: GamelensEventsStorage,
-  api: OpenFrontPublicAPI,
-  storage: ReplayStorage,
-) => {
+export const createContext = (api: OpenFrontPublicAPI, storage: ReplayStorage, matches: MatchesService) => {
   return async (opts: CreateHTTPContextOptions) => {
     return {
-      db,
-      eventsStorage,
       api,
       storage,
+      matches,
     };
   };
 };

@@ -29,7 +29,7 @@ export interface WorkerOptions {
   heartbeatIntervalMs?: number;
   /** How long to sleep when no work is found (ms) */
   idleSleepMs?: number;
-  startFromBeginingOfQueue?: boolean;
+  startFromBeginningOfQueue?: boolean;
 }
 
 const log = debug('mirvworld:matches:task-worker');
@@ -72,6 +72,7 @@ export class TaskWorker {
   private readonly heartbeatIntervalMs: number;
   private readonly idleSleepMs: number;
   private readonly startFromBeginingOfQueue: boolean;
+  private stop = false;
 
   public constructor(redis: RedisClient, opts: WorkerOptions) {
     this.redis = redis;
@@ -82,7 +83,7 @@ export class TaskWorker {
     this.stealIdleMs = opts.stealIdleMs ?? 15_000;
     this.heartbeatIntervalMs = opts.heartbeatIntervalMs ?? 5_000;
     this.idleSleepMs = opts.idleSleepMs ?? 1_000;
-    this.startFromBeginingOfQueue = opts.startFromBeginingOfQueue ?? false;
+    this.startFromBeginingOfQueue = opts.startFromBeginningOfQueue ?? false;
   }
 
   /**
@@ -112,11 +113,10 @@ export class TaskWorker {
    * the task is acknowledged; when it rejects the task is moved to the
    * dead‑letter list. The loop then immediately continues with the next task.
    */
-  public async process(listener: (task: TaskMessage) => Promise<void>): Promise<never> {
+  public async process(listener: (task: TaskMessage) => Promise<void>): Promise<void> {
     await this.ensureGroup();
 
-    // eslint‑disable‑next‑line no‑constant‑condition
-    while (true) {
+    while (!this.stop) {
       const task = await this.fetchNext();
 
       if (!task) {
@@ -135,7 +135,6 @@ export class TaskWorker {
 
         await listener(task);
         await this.ack(task.id);
-        console.log('listener resolved for', task.id);
       } catch (err) {
         console.error(`[TaskWorker#${this.group}] listener rejected for ${task.id}`, err);
         await this.moveToDeadLetter(task, err instanceof Error ? err.message : String(err));
@@ -236,6 +235,10 @@ export class TaskWorker {
 
     await this.redis.send('RPUSH', [this.deadLetterKey, deadRecord]);
     await this.ack(task.id);
+  }
+
+  public dispose() {
+    this.stop = true;
   }
 
   // ────────────────────────────────────────────────────────────────────────────

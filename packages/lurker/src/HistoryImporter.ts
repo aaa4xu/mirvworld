@@ -1,5 +1,5 @@
 import type { ReplayStorage } from 'replay-storage';
-import type { OpenFrontPublicAPI } from './OpenFront/OpenFrontPublicAPI.ts';
+import type { OpenFrontPublicAPI } from '@mirvworld/openfront-api';
 
 export class HistoryImporter {
   public constructor(

@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "dev": "vite dev",
+    "serve": "vite dev",
     "build": "vite build",
     "preview": "vite preview",
     "prepare": "svelte-kit sync || echo ''",
@@ -58,6 +58,9 @@
   "nx": {
     "projectType": "application",
     "targets": {
+      "serve": {
+        "continuous": true
+      },
       "container": {
         "executor": "@nx-tools/nx-container:build",
         "options": {

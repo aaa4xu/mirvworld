@@ -18,9 +18,12 @@ export const config = {
     api: env('MATCHES_OPENFRONT_API_ENDPOINT', 'https://api.openfront.io'),
   },
   redis: env('MATCHES_REDIS_URL', 'redis://localhost:6379'),
+  mongodb: {
+    url: env('MATCHES_MONGODB_URL', 'mongodb://localhost:27017'),
+    database: env('MATCHES_MONGODB_DATABASE', 'mirvworld-matches'),
+  },
   http: {
     port: parseInt(env('MATCHES_HTTP_PORT', '3600'), 10),
   },
-  db: env('DATABASE_URL', 'mysql://root:mysecretpassword@localhost:3306/local'),
   readOnly: env('MATCHES_READ_ONLY', '0') === '1',
 };

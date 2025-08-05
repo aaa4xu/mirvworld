@@ -2,6 +2,7 @@
   import type { trpc } from '$lib/server/trpc';
   import TroopIconWhite from '$lib/icons/TroopIconWhite.svelte';
   import GoldCoinIcon from '$lib/icons/GoldCoinIcon.svelte';
+  import Duration from '$lib/components/Duration.svelte';
 
   const {
     players,
@@ -9,25 +10,20 @@
     team,
   }: {
     players: Array<
-      NonNullable<
-        NonNullable<Awaited<ReturnType<(typeof trpc)['matches']['getByGameId']['query']>>>['stats']
-      >['players'][string]
+      NonNullable<NonNullable<Awaited<ReturnType<(typeof trpc)['matches']['getByGameId']['query']>>>>['players'][number]
     >;
     duration: number;
     team?: string;
   } = $props();
 
-  const durationOfMatch = BigInt(Math.round(duration / 1000 / 60));
-  const total = (v: Record<string, bigint>) => Object.values(v).reduce((acc, v) => acc + v, 0n);
-  const formatK = (v: bigint) => (Number(v) / 1000).toFixed(1) + 'k';
   const sortedPlayers = players.sort((l, r) => {
-    if (l.killed < 0 && r.killed >= 0) return -1;
-    if (l.killed >= 0 && r.killed < 0) return 1;
+    if (l.death < 0 && r.death >= 0) return -1;
+    if (l.death >= 0 && r.death < 0) return 1;
 
-    if (l.killed < 0 && r.killed < 0) {
-      return Object.values(r.tiles).pop()! - Object.values(l.tiles).pop()!;
+    if (l.death < 0 && r.death < 0) {
+      return r.tiles - l.tiles;
     } else {
-      return r.killed - l.killed;
+      return r.death - l.death;
     }
   });
 </script>
@@ -42,8 +38,8 @@
           <th>Player</th>
           <th>First build</th>
           <th>Build order</th>
-          <th><span><TroopIconWhite /> Sent/min</span></th>
-          <th><span><TroopIconWhite /> Received/min</span></th>
+          <th><span><TroopIconWhite /> Out/min</span></th>
+          <th><span><TroopIconWhite /> In/min</span></th>
           <th><span><GoldCoinIcon /> Gold/min</span></th>
           <th>Max tiles</th>
           <th>Survived time</th>
@@ -52,31 +48,19 @@
 
       <tbody>
         {#each sortedPlayers as player, index (index)}
-          {@const alive =
-            player.killed < 0
-              ? durationOfMatch
-              : player.killed === 0
-                ? 1n
-                : BigInt(Math.round(player.killed / 10 / 60))}
           <tr>
             <td>{index + 1}</td>
             <td>{player.name}</td>
             <td>{player.firstBuild > 0 ? Math.round(player.firstBuild / 10) + 's' : '-'}</td>
-            <td>{player.buildHistory.length > 0 ? player.buildHistory.slice(0, 4) : '-'}</td>
-            <td>{formatK((player.terraAttacks + total(player.attacksSent)) / 10n / alive)}</td>
-            <td>{formatK(total(player.attacksReceived) / 10n / alive)}</td>
+            <td>{player.buildOrder.length > 0 ? player.buildOrder : '-'}</td>
+            <td>{player.outgoingTroopsPerMinute}k</td>
+            <td>{player.incomingTroopsPerMinute}k</td>
+            <td>{player.goldPerMinute.toFixed(1)}k</td>
+            <td>{(player.maxTiles * 100).toFixed(2)}%</td>
             <td
-              >{formatK(
-                (player.goldFromWorkers +
-                  total(player.goldFromTrade) +
-                  total(player.goldFromPiracy) +
-                  player.goldFromKills) /
-                  alive,
-              )}</td
-            >
-            <td>{(Math.max(0, ...Object.values(player.tiles)) * 100).toFixed(2)}%</td>
-            <td
-              >{#if player.killed >= 0}{Math.round(player.killed / 10)}s{:else}-{/if}</td
+              >{#if player.death >= 0}<Duration seconds={Math.round((player.death / 10) * 1000)} />{:else}<Duration
+                  seconds={Math.round(duration)}
+                />{/if}</td
             >
           </tr>
         {/each}

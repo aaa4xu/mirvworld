@@ -34,7 +34,7 @@ export class PlaybackEngine {
 
     stats.endGame(runner.game);
 
-    return stats.getEvents();
+    return stats.getStats();
   }
 
   private async createGameRunner(replay: GameEndInfo, stats: Stats): Promise<GameRunner> {

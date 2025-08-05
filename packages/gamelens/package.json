@@ -3,7 +3,8 @@
   "module": "index.ts",
   "scripts": {
     "build": "bun build --target=bun --sourcemap=external --outdir=dist index.ts",
-    "lint": "prettier --check ."
+    "lint": "prettier --check .",
+    "serve": "bun --watch index.ts"
   },
   "dependencies": {},
   "devDependencies": {
@@ -17,6 +18,9 @@
   "nx": {
     "projectType": "application",
     "targets": {
+      "serve": {
+        "continuous": true
+      },
       "build": {
         "cache": true
       },

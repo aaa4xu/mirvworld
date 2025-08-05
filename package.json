@@ -5,7 +5,8 @@
     "sync:db": "rsync -va --progress mirv.world:/var/lib/docker/volumes/mirvworld_backend-db/_data/ ./storage/db"
   },
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "libs/*"
   ],
   "devDependencies": {
     "@nx-tools/nx-container": "^6.8.0",

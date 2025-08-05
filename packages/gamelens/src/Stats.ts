@@ -1,32 +1,43 @@
 import { type Game, type Player, PlayerType, type TerraNullius } from 'openfront/game/src/core/game/Game';
 import type { Stats as GameStats } from 'openfront/game/src/core/game/Stats';
 import type { NukeType, OtherUnitType } from 'openfront/game/src/core/StatsSchemas';
-import { type GamelensEvent } from './Events.ts';
 import z from 'zod/v4';
 import type { TurnSchema } from 'openfront/game/src/core/Schemas.ts';
+import { GameStatsRecorder } from '@mirvworld/gamelens-stats/src/GameStatsRecorder.ts';
 
 export class Stats implements GameStats {
   private turn = 0;
-  private events: GamelensEvent[] = [];
-  private captureNewOwner: number | null = null;
-  private destroyer: number | null = null;
-  private dead = new Set<number>();
-  private goldFromWorkers = new Map<number, bigint>();
+  private readonly recorder = new GameStatsRecorder();
 
-  public getEvents() {
-    return this.events;
+  public getStats() {
+    return this.recorder.toStats();
   }
 
   public startTurn(turn: z.infer<typeof TurnSchema>, game: Game) {
     this.turn = turn.turnNumber;
 
-    if (this.captureNewOwner !== null) {
+    if (game.inSpawnPhase()) {
+      for (const player of game.allPlayers()) {
+        if (this.recorder.hasPlayer(player.smallID())) continue;
+
+        let clientId = player.clientID();
+
+        if (!clientId) {
+          console.warn(`Player #${player.smallID()} "${player.name()}" has no client id!`);
+          clientId = 's' + player.smallID().toString().padStart(7, '0');
+        }
+
+        this.recorder.addPlayer(player.smallID(), player.name(), player.team(), clientId, player.type());
+      }
+    }
+
+    /*if (this.captureNewOwner !== null) {
       throw new Error('Capture new owner is not null');
     }
 
     if (this.destroyer !== null) {
       throw new Error('Destroyer is not null');
-    }
+    }*/
 
     for (const intent of turn.intents) {
       if (game.inSpawnPhase() && intent.type === 'spawn') {
@@ -36,19 +47,12 @@ export class Stats implements GameStats {
           continue;
         }
 
-        this.events.push({
-          type: 'spawn',
-          turn: this.turn,
-          player: player.smallID(),
-          x: game.x(intent.tile),
-          y: game.y(intent.tile),
-        });
+        this.recorder.player(player.smallID()).setSpawn(game.x(intent.tile), game.y(intent.tile));
       }
     }
 
     if (!game.inSpawnPhase() && this.turn % 150 === 0) {
       // 150 turns = 15sec
-      this.addGoldFromWorkersEvent();
       this.addTilesEvent(game);
     }
   }
@@ -56,9 +60,9 @@ export class Stats implements GameStats {
   public endTurn(game: Game) {
     if (!game.inSpawnPhase()) {
       for (const player of game.allPlayers()) {
-        if (!player.isAlive() && !this.dead.has(player.smallID())) {
-          this.deathBySnuSnu(player);
-        }
+        if (player.isAlive()) continue;
+        if (this.recorder.player(player.smallID()).death >= 0) continue;
+        this.deathBySnuSnu(player);
       }
     }
   }
@@ -66,29 +70,16 @@ export class Stats implements GameStats {
   public startGame(game: Game) {}
 
   public endGame(game: Game) {
-    this.addGoldFromWorkersEvent();
+    this.recorder.setDuration(this.turn);
     this.addTilesEvent(game);
-    this.addPlayersMappingEvent(game);
   }
 
   public attack(player: Player, target: Player | TerraNullius, troops: number | bigint): void {
     troops = this.toBigInt(troops);
+    this.recorder.player(player.smallID()).increaseOutgoingTroops(troops);
 
     if (target.isPlayer()) {
-      this.events.push({
-        type: 'attack.player',
-        turn: this.turn,
-        player: player.smallID(),
-        target: target.smallID(),
-        troops: BigInt(troops),
-      });
-    } else {
-      this.events.push({
-        type: 'attack.terra',
-        turn: this.turn,
-        player: player.smallID(),
-        troops: BigInt(troops),
-      });
+      this.recorder.player(target.smallID()).increaseIncomingTroops(troops);
     }
   }
 
@@ -101,13 +92,9 @@ export class Stats implements GameStats {
   public boatArriveTrade(player: Player, target: Player, gold: number | bigint): void {
     // v0.24.0: нигде не вызывается, добавил через патчи
     // Торговец player прибыл в порт target
-    this.events.push({
-      type: 'trade.arrived',
-      turn: this.turn,
-      player: target.smallID(),
-      owner: player.smallID(),
-      gold: this.toBigInt(gold),
-    });
+    gold = this.toBigInt(gold);
+    this.recorder.player(player.smallID()).increaseGold(gold);
+    this.recorder.player(target.smallID()).increaseGold(gold);
   }
 
   public boatArriveTroops(player: Player, target: Player | TerraNullius, troops: number | bigint): void {
@@ -118,22 +105,16 @@ export class Stats implements GameStats {
   public boatCapturedTrade(player: Player, target: Player, gold: number | bigint): void {
     // v0.24.0: нигде не вызывается, добавил через патчи
     // Захваченный торговец target прибыл в порт player
-    this.events.push({
-      type: 'trade.captured',
-      turn: this.turn,
-      player: player.smallID(),
-      owner: target.smallID(),
-      gold: this.toBigInt(gold),
-    });
+    this.recorder.player(player.smallID()).increaseGold(this.toBigInt(gold));
   }
 
   public boatDestroyTrade(player: Player, target: Player): void {
-    this.events.push({
+    /*this.events.push({
       type: 'trade.destroyed',
       turn: this.turn,
       player: player.smallID(),
       owner: target.smallID(),
-    });
+    });*/
   }
 
   public boatDestroyTroops(player: Player, target: Player, troops: number | bigint): void {}
@@ -145,7 +126,7 @@ export class Stats implements GameStats {
   public bombIntercept(player: Player, type: NukeType, count: number | bigint): void {}
 
   public bombLand(player: Player, target: Player | TerraNullius, type: NukeType): void {
-    if (target.isPlayer()) {
+    /*if (target.isPlayer()) {
       this.events.push({
         type: 'bomb.landed.player',
         turn: this.turn,
@@ -160,11 +141,11 @@ export class Stats implements GameStats {
         player: player.smallID(),
         nukeType: type,
       });
-    }
+    }*/
   }
 
   public bombLaunch(player: Player, target: Player | TerraNullius, type: NukeType): void {
-    if (target.isPlayer()) {
+    /*if (target.isPlayer()) {
       this.events.push({
         type: 'bomb.launched.player',
         turn: this.turn,
@@ -179,54 +160,40 @@ export class Stats implements GameStats {
         player: player.smallID(),
         nukeType: type,
       });
-    }
+    }*/
   }
 
   public goldWar(player: Player, captured: Player, gold: number | bigint): void {
-    // v0.24.0: Трекает только убийства через аннексии, запатчил чтобы трекало и обычные убийства
-    this.events.push({
-      type: 'kill',
-      turn: this.turn,
-      player: player.smallID(),
-      target: captured.smallID(),
-      gold: this.toBigInt(gold),
-    });
-    this.dead.add(captured.smallID());
+    this.recorder.player(captured.smallID()).killed(this.turn);
+    this.recorder.player(player.smallID()).increaseGold(this.toBigInt(gold));
   }
 
   public goldWork(player: Player, gold: number | bigint): void {
-    gold = this.toBigInt(gold);
-    const value = this.goldFromWorkers.get(player.smallID()) ?? 0n;
-    this.goldFromWorkers.set(player.smallID(), value + gold);
+    this.recorder.player(player.smallID()).increaseGold(this.toBigInt(gold));
   }
 
   public unitBuild(player: Player, type: OtherUnitType): void {
-    this.events.push({
-      type: 'unit.build',
-      turn: this.turn,
-      player: player.smallID(),
-      unit: type,
-    });
+    this.recorder.player(player.smallID()).addBuild(this.turn, type);
   }
 
   public unitCapture(player: Player, type: OtherUnitType): void {
-    if (this.captureNewOwner !== null) {
+    /*if (this.captureNewOwner !== null) {
       throw new Error('Already capturing');
     }
 
-    this.captureNewOwner = player.smallID();
+    this.captureNewOwner = player.smallID();*/
   }
 
   public unitDestroy(player: Player, type: OtherUnitType): void {
-    if (this.destroyer !== null) {
+    /*if (this.destroyer !== null) {
       throw new Error('Already destroying');
     }
 
-    this.destroyer = player.smallID();
+    this.destroyer = player.smallID();*/
   }
 
   public unitLose(player: Player, type: OtherUnitType): void {
-    if (this.captureNewOwner !== null) {
+    /*if (this.captureNewOwner !== null) {
       this.events.push({
         type: 'unit.captured',
         turn: this.turn,
@@ -246,69 +213,27 @@ export class Stats implements GameStats {
       this.destroyer = null;
     } else {
       throw new Error('Unit destroyed by unknown action');
-    }
+    }*/
   }
 
   public unitUpgrade(player: Player, type: OtherUnitType): void {
-    this.events.push({
+    /*this.events.push({
       type: 'unit.build',
       turn: this.turn,
       player: player.smallID(),
       unit: type,
-    });
+    });*/
   }
 
   private deathBySnuSnu(player: Player) {
-    console.error('Death by SnuSnu', player.smallID(), player.name());
-    this.events.push({
-      type: 'death',
-      turn: this.turn,
-      player: player.smallID(),
-    });
-    this.dead.add(player.smallID());
+    console.warn('Death by SnuSnu:', 'smallId=', player.smallID(), 'name=', player.name());
+    this.recorder.player(player.smallID()).killed(this.turn);
   }
 
   private addTilesEvent(game: Game) {
-    const tiles = game.players().reduce(
-      (acc, p) => {
-        acc[p.smallID()] = p.numTilesOwned();
-        return acc;
-      },
-      {} as Record<number, number>,
-    );
-
-    this.events.push({
-      type: 'tiles',
-      turn: this.turn,
-      players: tiles,
-    });
-  }
-
-  private addGoldFromWorkersEvent() {
-    this.events.push({
-      type: 'gold.workers',
-      turn: this.turn,
-      players: Object.fromEntries(this.goldFromWorkers.entries()),
-    });
-    this.goldFromWorkers.clear();
-  }
-
-  private addPlayersMappingEvent(game: Game) {
-    const players = game.allPlayers().reduce(
-      (acc, p) => {
-        const clientId = p.clientID();
-        if (!clientId) return acc;
-        acc[clientId] = { id: p.smallID(), name: p.displayName(), type: p.type(), team: p.team() };
-        return acc;
-      },
-      {} as Record<string, { id: number; name: string; type: string; team: string | null }>,
-    );
-
-    this.events.push({
-      type: 'players.mapping',
-      turn: this.turn,
-      players,
-    });
+    for (const pl of game.players()) {
+      this.recorder.player(pl.smallID()).territoryHistory(this.turn, pl.numTilesOwned());
+    }
   }
 
   /* NOT IMPLEMENTED */

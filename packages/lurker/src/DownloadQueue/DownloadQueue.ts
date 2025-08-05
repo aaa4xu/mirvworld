@@ -2,8 +2,8 @@
 import popTaskScript from './PopTask.lua' with { type: 'text' };
 import { RedisClient } from 'bun';
 import { DownloadQueueResultSchema } from './Schema.ts';
-import { type MatchInfo, MatchInfoSchema } from '../OpenFront/Schema/MatchInfoSchema.ts';
-import { RedisLuaScript } from 'redis-script';
+import { type MatchInfo } from '@mirvworld/openfront-api';
+import { RedisLuaScript } from '@mirvworld/redis-script';
 
 export class DownloadQueue {
   private readonly script: RedisLuaScript<typeof DownloadQueueResultSchema>;

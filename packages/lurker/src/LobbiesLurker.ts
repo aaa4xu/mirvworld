@@ -1,5 +1,4 @@
-import type { OpenFrontServerAPI } from './OpenFront/OpenFrontServerAPI.ts';
-import { type MatchInfo } from './OpenFront/Schema/MatchInfoSchema.ts';
+import type { MatchInfo, OpenFrontServerAPI } from '@mirvworld/openfront-api';
 import { cancelableTimeout } from './Utils.ts';
 
 /**

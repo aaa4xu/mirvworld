@@ -4,11 +4,10 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "db:push": "bunx --bun drizzle-kit push",
-    "db:studio": "bunx drizzle-kit studio",
-    "db:generate": "bunx --bun drizzle-kit generate",
     "build": "bun build --target=bun --sourcemap=external --outdir=dist index.ts",
-    "lint": "prettier --check ."
+    "lint": "prettier --check .",
+    "test": "bun test",
+    "serve": "bun --watch index.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",
@@ -20,6 +19,7 @@
   "dependencies": {
     "@trpc/server": "^11.4.3",
     "drizzle-orm": "^0.44.3",
+    "mongodb": "^6.18.0",
     "mysql2": "^3.14.2",
     "superjson": "^2.2.2"
   },
@@ -31,6 +31,12 @@
       },
       "lint": {
         "cache": true
+      },
+      "test": {
+        "cache": true
+      },
+      "serve": {
+        "continuous": true
       },
       "container": {
         "executor": "@nx-tools/nx-container:build",

@@ -1,5 +1,6 @@
 <script lang="ts">
   import Crown from '$lib/icons/Crown.svelte';
+  import Duration from '$lib/components/Duration.svelte';
 
   const {
     winner,
@@ -54,9 +55,7 @@
       <div>
         <h5>Duration</h5>
         <p>
-          {#if durationH > 0}{durationH}:{/if}{durationM.toString().padStart(2, '0')}:{durationS
-            .toString()
-            .padStart(2, '0')}
+          <Duration seconds={duration} />
         </p>
       </div>
 

@@ -6,10 +6,11 @@ import { Client } from 'minio';
 import { GameLensStatsWorker } from './src/GameLensStatsWorker.ts';
 import { MinioStorage } from 'compressed-storage';
 import { ReplayStorage } from 'replay-storage';
-import { GamelensEventsStorage } from 'gamelens-events-storage';
+import { Streamify } from '@mirvworld/redis-streamify';
 
 if (cluster.isPrimary) {
-  const threads = os.availableParallelism();
+  const redis = new RedisClient(config.redis);
+  const threads = config.concurrency || os.availableParallelism();
   console.log(`[Main] Creating ${threads} threads`);
   for (let i = 0; i < threads; i++) {
     cluster.fork();
@@ -22,14 +23,18 @@ if (cluster.isPrimary) {
     cluster.fork();
   });
 
+  const streamify = new Streamify(redis, 'gamelens:storage', 'gamelens:queue');
+
   process.on('SIGINT', () => {
     stop = true;
     cluster.disconnect();
+    streamify.dispose();
   });
 
   process.on('SIGTERM', () => {
     stop = true;
     cluster.disconnect();
+    streamify.dispose();
   });
 } else {
   let gameCommit: string;
@@ -52,9 +57,7 @@ if (cluster.isPrimary) {
     new MinioStorage(config.replays.s3.bucket, new Client(config.replays.s3.endpoint)),
   );
 
-  const eventsStorage = new GamelensEventsStorage(new MinioStorage(config.s3.bucket, new Client(config.s3.endpoint)));
-
-  new GameLensStatsWorker(config.mapsPath, gameCommit, redis, replayStorage, eventsStorage);
+  new GameLensStatsWorker(config.mapsPath, gameCommit, redis, replayStorage);
   abort.signal.addEventListener('abort', () => {
     console.log(`[Worker#${process.pid}] Aborting...`);
     process.exit(1);

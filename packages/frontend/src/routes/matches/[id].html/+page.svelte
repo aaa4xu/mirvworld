@@ -5,12 +5,10 @@
   import GameResultsWithStatsPlayersTable from '$lib/components/GameResultsWithStatsPlayersTable.svelte';
 
   let { data }: { data: PageServerData } = $props();
-  type GameLensPlayerStats = NonNullable<PageServerData['match']['stats']>['players'][string];
+  type GameLensPlayerStats = NonNullable<PageServerData['match']['players']>[number];
 
   const teams = $derived.by(() => {
-    if (!data.match.stats) return new Map<string, Array<GameLensPlayerStats>>();
-
-    return Object.values(data.match.stats.players).reduce((acc, player) => {
+    return Object.values(data.match.players).reduce((acc, player) => {
       const team = player.team ?? 'noteam';
       if (!acc.has(team)) {
         acc.set(team, []);
@@ -26,24 +24,52 @@
     `${padDate(date.getUTCHours())}:${padDate(date.getUTCMinutes())} ${padDate(date.getDate())}.${padDate(date.getUTCMonth() + 1)}.${date.getUTCFullYear()} (UTC)`;
 
   const noteam = $derived(teams.get('noteam'));
-  const sortedTeams = $derived(
-    Array.from(teams.entries()).sort(([, a], [, b]) => {
-      const at = a.reduce((acc, player) => acc + (Object.values(player.tiles).pop() ?? 0), 0);
-      const bt = b.reduce((acc, player) => acc + (Object.values(player.tiles).pop() ?? 0), 0);
+  const sortedTeams = $derived.by(() => {
+    const deaths = new Map<string, number>();
+    const tiles = new Map<string, number>();
 
-      return bt - at;
-    }),
-  );
-
-  let winner = $derived.by(() => {
-    const winners = data.match.winner?.split(',');
-
-    if (winners && data.match.mode === 'ffa') {
-      return data.match.players.find((player) => player.clientId === winners[0])?.name ?? 'unknown';
+    for (const player of data.match.players) {
+      const playerTeam = player.team ?? 'noteam';
+      // Turn of death
+      deaths.set(
+        playerTeam,
+        Math.max(deaths.get(playerTeam) ?? 0, player.death >= 0 ? player.death : Number.POSITIVE_INFINITY),
+      );
+      // Tiles at the last turn
+      if (!tiles.has(playerTeam)) {
+        tiles.set(playerTeam, player.tiles);
+      } else {
+        tiles.set(playerTeam, tiles.get(playerTeam)! + player.tiles);
+      }
     }
 
-    if (winners && winners.length > 0 && data.match.mode === 'team') {
-      return winners[0];
+    return Array.from(teams.entries()).sort(([teamA], [teamB]) => {
+      const sortByDeathTurn = (deaths.get(teamB) ?? 0) - (deaths.get(teamA) ?? 0);
+      if (sortByDeathTurn !== 0) {
+        return sortByDeathTurn;
+      }
+
+      return (tiles.get(teamA) ?? 0) - (tiles.get(teamB) ?? 0);
+    });
+  });
+
+  let winner = $derived.by(() => {
+    if (data.match.mode === 'ffa') {
+      return data.match.players.sort((a, b) => b.tiles - a.tiles)[0]?.name ?? 'unknown';
+    }
+
+    if (data.match.mode === 'team') {
+      const teams = new Map<string, number>();
+      for (const player of data.match.players) {
+        if (!player.team) continue;
+        if (!teams.has(player.team)) {
+          teams.set(player.team, player.tiles);
+        } else {
+          teams.set(player.team, teams.get(player.team)! + player.tiles);
+        }
+      }
+      const winners = Array.from(teams.entries()).sort(([, a], [, b]) => b - a);
+      return winners[0][0];
     }
 
     return 'unknown';
@@ -73,9 +99,8 @@
   maxPlayers={data.match.maxPlayers}
 />
 
-{#if !data.match.stats}
+{#if data.match.players.length === 0}
   <GameNotParsedNotification />
-  <!--  <GameResultsNoStatsPlayersTable players={data.match.players} {duration} />-->
 {:else if teams.size === 1 && noteam}
   <GameResultsWithStatsPlayersTable players={noteam} {duration} />
 {:else}
@@ -83,16 +108,6 @@
     <GameResultsWithStatsPlayersTable players={team} team={teamId} {duration} />
   {/each}
 {/if}
-
-<!--<main>
-
-</main>
-
-<h4>Players</h4>
-<pre>{JSON.stringify(players, (key, value) => (typeof value === 'bigint' ? value.toString() : value), 2)}</pre>-->
-
-<!--<h4>Data</h4>-->
-<!--<pre>{JSON.stringify(data.match, (key, value) => (typeof value === 'bigint' ? value.toString() : value), 2)}</pre>-->
 
 <style>
 </style>

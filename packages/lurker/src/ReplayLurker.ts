@@ -1,8 +1,6 @@
 import type { DownloadQueue } from './DownloadQueue/DownloadQueue.ts';
-import type { OpenFrontPublicAPI } from './OpenFront/OpenFrontPublicAPI.ts';
+import { OpenFrontError, type OpenFrontPublicAPI, OpenFrontServerAPI } from '@mirvworld/openfront-api';
 import { cancelableTimeout } from './Utils.ts';
-import { OpenFrontError } from './OpenFront/Errors/OpenFrontError.ts';
-import type { OpenFrontServerAPI } from './OpenFront/OpenFrontServerAPI.ts';
 import type { ReplayStorage } from 'replay-storage';
 
 export class ReplayLurker {
