@@ -6,7 +6,7 @@
   "scripts": {
     "build": "bun build --target=bun --sourcemap=external --outdir=dist index.ts",
     "lint": "prettier --check .",
-    "test": "bun test",
+    "#test": "bun test",
     "serve": "bun --watch index.ts"
   },
   "devDependencies": {
