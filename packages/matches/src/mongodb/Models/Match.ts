@@ -10,7 +10,7 @@ export const MatchSchema = z.object({
   version: z.string().length(40),
   maxPlayers: z.number().int().min(1),
   players: z.array(MatchPlayerSchema),
-  winner: z.string().optional(),
+  winner: z.string().optional().nullable(),
   startedAt: z.date(),
   finishedAt: z.date(),
   createdAt: z.date(),
