@@ -40,9 +40,63 @@ export class GameStatsRecorder {
   }
 
   public toStats(): GameLensStats {
-    const players = Array.from(this.players.values());
+    const players = Array.from(this.players.values()).filter((p) => p.type === PlayerType.Human);
+    const tilesAt = this.createTilesCache(players);
+    const ranks = this.calculatePlayersRank(players, this.duration);
+    const matchDuration = BigInt(Math.round(this.duration / 10 / 60));
+
+    return {
+      players: players.map((pl) => {
+        const tiles = Object.fromEntries(
+          Array.from(pl.tiles.entries()).map(([turn, tiles]) => [turn, tiles / tilesAt(turn)]),
+        );
+        const maxTiles = Math.max(0, ...Object.values(tiles));
+        const lastTiles = tiles[this.duration] ?? 0;
+
+        return {
+          id: pl.clientId,
+          name: pl.name,
+          team: pl.team,
+          buildOrder: pl.buildOrder,
+          firstBuild: pl.firstBuild,
+          death: pl.death,
+          maxTiles,
+          tiles: lastTiles,
+          goldPerMinute: Number(pl.goldEarned / matchDuration) / 1000,
+          incomingTroopsPerMinute: Number(pl.incomingTroops / matchDuration / 1000n) / 10,
+          outgoingTroopsPerMinute: Number(pl.outgoingTroops / matchDuration / 1000n) / 10,
+          spawnX: pl.spawnX,
+          spawnY: pl.spawnY,
+          rank: ranks.indexOf(pl.id) + 1,
+        };
+      }),
+      game: {},
+    };
+  }
+
+  private calculatePlayersRank(players: PlayerStatsRecorder[], turn: number) {
+    return players
+      .map((p) => [p.id, p.tiles.get(turn) ?? 0, p.death] as const)
+      .sort((a, b) => {
+        const aDead = a[2] !== -1;
+        const bDead = b[2] !== -1;
+
+        if (aDead && !bDead) return 1;
+        if (!aDead && bDead) return -1;
+
+        if (aDead && bDead) {
+          return b[2] - a[2];
+        }
+
+        return b[1] - a[1];
+      })
+      .map(([id]) => id);
+  }
+
+  private createTilesCache(players: PlayerStatsRecorder[]) {
     const tiles = new Map<number, number>();
-    const getTotalTilesForTurn = (turn: number) => {
+
+    return (turn: number) => {
       if (!tiles.has(turn)) {
         tiles.set(
           turn,
@@ -53,37 +107,6 @@ export class GameStatsRecorder {
       }
 
       return tiles.get(turn)!;
-    };
-
-    const matchDuration = BigInt(Math.round(this.duration / 10 / 60));
-
-    return {
-      players: players
-        .filter((p) => p.type === PlayerType.Human)
-        .map((pl) => {
-          const tiles = Object.fromEntries(
-            Array.from(pl.tiles.entries()).map(([turn, tiles]) => [turn, tiles / getTotalTilesForTurn(turn)]),
-          );
-          const maxTiles = Math.max(0, ...Object.values(tiles));
-          const lastTiles = tiles[this.duration] ?? 0;
-
-          return {
-            id: pl.clientId,
-            name: pl.name,
-            team: pl.team,
-            buildOrder: pl.buildOrder,
-            firstBuild: pl.firstBuild,
-            death: pl.death,
-            maxTiles,
-            tiles: lastTiles,
-            goldPerMinute: Number(pl.goldEarned / matchDuration) / 1000,
-            incomingTroopsPerMinute: Number(pl.incomingTroops / matchDuration / 1000n) / 10,
-            outgoingTroopsPerMinute: Number(pl.outgoingTroops / matchDuration / 1000n) / 10,
-            spawnX: pl.spawnX,
-            spawnY: pl.spawnY,
-          };
-        }),
-      game: {},
     };
   }
 }

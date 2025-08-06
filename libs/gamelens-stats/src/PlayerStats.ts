@@ -15,6 +15,7 @@ export const PlayerStatsSchema = z.object({
   death: z.int(),
   spawnX: z.int(),
   spawnY: z.int(),
+  rank: z.int().min(1),
 });
 
 export type PlayerStats = z.infer<typeof PlayerStatsSchema>;
