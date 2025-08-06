@@ -6,7 +6,7 @@ export const MatchSchema = z.object({
   _id: z.instanceof(ObjectId),
   gameId: z.string().length(8),
   map: z.string(),
-  mode: z.enum(['ffa', 'team']),
+  mode: z.enum(['ffa', 'teams']),
   version: z.string().length(40),
   maxPlayers: z.number().int().min(1),
   players: z.array(PlayerStatsSchema),

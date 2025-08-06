@@ -32,7 +32,7 @@ export class MatchesService {
     await this.repository.add({
       gameId: replay.info.gameID,
       map: replay.info.config.gameMap,
-      mode: replay.info.config.gameMode === 'Free For All' ? 'ffa' : 'team',
+      mode: replay.info.config.gameMode === 'Free For All' ? 'ffa' : 'teams',
       version: replay.gitCommit,
       maxPlayers: replay.info.config.maxPlayers ?? 0,
       startedAt: new Date(replay.info.start),
