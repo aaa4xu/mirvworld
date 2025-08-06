@@ -40,6 +40,10 @@ export class GameStatsRecorder {
   }
 
   public toStats(): GameLensStats {
+    if (this.duration === 0) {
+      throw new Error('Duration must be greater than zero before generating stats');
+    }
+
     const players = Array.from(this.players.values()).filter((p) => p.type === PlayerType.Human);
     const tilesAt = this.createTilesCache(players);
     const ranks = this.calculatePlayersRank(players, this.duration);
