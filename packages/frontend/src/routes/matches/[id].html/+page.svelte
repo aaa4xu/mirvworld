@@ -11,11 +11,19 @@
     return Object.values(data.match.players).reduce((acc, player) => {
       const team = player.team ?? 'noteam';
       if (!acc.has(team)) {
-        acc.set(team, []);
+        acc.set(team, [player]);
+      } else {
+        acc.get(team)!.push(player);
       }
-      acc.get(team)!.push(player);
+
       return acc;
     }, new Map<string, Array<GameLensPlayerStats>>());
+  });
+
+  const sortedTeams = $derived.by(() => {
+    return Array.from(teams.entries()).sort(
+      ([aid, a], [bid, b]) => Math.min(...a.map((p) => p.rank)) - Math.min(...b.map((p) => p.rank)),
+    );
   });
 
   const duration = $derived(data.match.finishedAt.getTime() - data.match.startedAt.getTime());
@@ -23,57 +31,22 @@
   const formatDate = (date: Date) =>
     `${padDate(date.getUTCHours())}:${padDate(date.getUTCMinutes())} ${padDate(date.getDate())}.${padDate(date.getUTCMonth() + 1)}.${date.getUTCFullYear()} (UTC)`;
 
-  const noteam = $derived(teams.get('noteam'));
-  const sortedTeams = $derived.by(() => {
-    const deaths = new Map<string, number>();
-    const tiles = new Map<string, number>();
-
-    for (const player of data.match.players) {
-      const playerTeam = player.team ?? 'noteam';
-      // Turn of death
-      deaths.set(
-        playerTeam,
-        Math.max(deaths.get(playerTeam) ?? 0, player.death >= 0 ? player.death : Number.POSITIVE_INFINITY),
-      );
-      // Tiles at the last turn
-      if (!tiles.has(playerTeam)) {
-        tiles.set(playerTeam, player.tiles);
-      } else {
-        tiles.set(playerTeam, tiles.get(playerTeam)! + player.tiles);
-      }
-    }
-
-    return Array.from(teams.entries()).sort(([teamA], [teamB]) => {
-      const sortByDeathTurn = (deaths.get(teamB) ?? 0) - (deaths.get(teamA) ?? 0);
-      if (sortByDeathTurn !== 0 && !Number.isNaN(sortByDeathTurn)) {
-        return sortByDeathTurn;
-      }
-
-      return (tiles.get(teamB) ?? 0) - (tiles.get(teamA) ?? 0);
-    });
-  });
-
   let winner = $derived.by(() => {
+    if (data.match.players.length === 0) return 'unknown';
+
     if (data.match.mode === 'ffa') {
       return data.match.players.sort((a, b) => b.tiles - a.tiles)[0]?.name ?? 'unknown';
     }
 
-    if (data.match.mode === 'team') {
-      const teams = new Map<string, number>();
-      for (const player of data.match.players) {
-        if (!player.team) continue;
-        if (!teams.has(player.team)) {
-          teams.set(player.team, player.tiles);
-        } else {
-          teams.set(player.team, teams.get(player.team)! + player.tiles);
-        }
-      }
-      const winners = Array.from(teams.entries()).sort(([, a], [, b]) => b - a);
-      return winners[0][0];
+    if (data.match.mode === 'teams') {
+      console.log(sortedTeams);
+      return sortedTeams?.[0]?.[0] ?? 'unknown';
     }
 
     return 'unknown';
   });
+
+  $inspect(data.match);
 </script>
 
 <svelte:head>
@@ -101,8 +74,8 @@
 
 {#if data.match.players.length === 0}
   <GameNotParsedNotification />
-{:else if teams.size === 1 && noteam}
-  <GameResultsWithStatsPlayersTable players={noteam} {duration} />
+{:else if data.match.mode === 'ffa'}
+  <GameResultsWithStatsPlayersTable players={data.match.players} {duration} />
 {:else}
   {#each sortedTeams as [teamId, team] (teamId)}
     <GameResultsWithStatsPlayersTable players={team} team={teamId} {duration} />

@@ -16,16 +16,7 @@
     team?: string;
   } = $props();
 
-  const sortedPlayers = players.sort((l, r) => {
-    if (l.death < 0 && r.death >= 0) return -1;
-    if (l.death >= 0 && r.death < 0) return 1;
-
-    if (l.death < 0 && r.death < 0) {
-      return r.tiles - l.tiles;
-    } else {
-      return r.death - l.death;
-    }
-  });
+  const sortedPlayers = players.sort((l, r) => l.rank - r.rank);
 </script>
 
 <section>
