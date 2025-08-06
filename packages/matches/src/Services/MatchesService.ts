@@ -5,6 +5,8 @@ import { GameRecordSchema } from 'openfront/src/Schema.ts';
 import type { PlayerStats } from '@mirvworld/gamelens-stats';
 import type { MatchDTO } from '../mongodb/Models/Match.ts';
 import z from 'zod/v4';
+import type { MatchPlayer, MatchPlayerInfo } from '../mongodb/Models/MatchPlayer.ts';
+import type { ObjectId } from 'mongodb';
 
 export class MatchesService {
   public constructor(
@@ -45,7 +47,7 @@ export class MatchesService {
     });
   }
 
-  public async setPlayers(id: MatchDTO['id'], players: Array<PlayerStats>) {
+  public async setPlayers(id: MatchDTO['id'], players: Array<MatchPlayer>) {
     const match = await this.repository.readByGameId(id);
     if (!match) {
       throw new Error('Match not found');
@@ -76,6 +78,37 @@ export class MatchesService {
     }
 
     await this.repository.setPlayers(id, players, winner);
+  }
+
+  public async setMatchPlayerInfo(matchId: string, playerId: string, info: MatchPlayerInfo) {
+    const match = await this.read(matchId);
+    if (!match || match.players.length === 0) return;
+
+    const player = match.players.find((p) => p.id === playerId);
+    if (!player) {
+      console.error(`[${this.constructor.name}][${match.gameId}] Cannot find player with id ${playerId}`);
+      return;
+    }
+
+    player.info = info;
+    await this.repository.setPlayers(match.id, match.players);
+  }
+
+  public async updateMatchPlayerInfo(playerId: ObjectId, info: MatchPlayerInfo) {
+    const matches = await this.repository.searchByPlayerRef(playerId);
+
+    await Promise.all(
+      matches.map((match) => {
+        const player = match.players.find((p) => p.info?.id === playerId);
+        if (!player) {
+          console.error(`[${this.constructor.name}][${match.gameId}] Cannot find player with id ${playerId}`);
+          return;
+        }
+
+        player.info = info;
+        return this.repository.setPlayers(match.id, match.players);
+      }),
+    );
   }
 
   public async read(id: string) {

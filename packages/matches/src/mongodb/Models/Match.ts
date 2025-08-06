@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 import z from 'zod/v4';
-import { PlayerStatsSchema } from '@mirvworld/gamelens-stats';
+import { MatchPlayerSchema } from './MatchPlayer.ts';
 
 export const MatchSchema = z.object({
   _id: z.instanceof(ObjectId),
@@ -9,7 +9,7 @@ export const MatchSchema = z.object({
   mode: z.enum(['ffa', 'teams']),
   version: z.string().length(40),
   maxPlayers: z.number().int().min(1),
-  players: z.array(PlayerStatsSchema),
+  players: z.array(MatchPlayerSchema),
   winner: z.string().optional(),
   startedAt: z.date(),
   finishedAt: z.date(),

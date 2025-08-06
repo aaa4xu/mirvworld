@@ -14,6 +14,10 @@ import { MatchInfoImporter } from './src/Workers/MatchInfoImporter.ts';
 import { Streamify } from '@mirvworld/redis-streamify';
 import { MatchesService } from './src/Services/MatchesService.ts';
 import { LeakyBucket } from '@mirvworld/redis-leaky-bucket';
+import { PlayersRepository } from './src/mongodb/Repositories/PlayersRepository.ts';
+import { PlayersService } from './src/Services/PlayersService.ts';
+import { PlayerMatchesImporter } from './src/Workers/PlayerMatchesImporter.ts';
+import { LeaderboardPlayersImporter } from './src/Workers/LeaderboardPlayersImporter.ts';
 
 const abort = new AbortController();
 process.on('SIGTERM', () => abort.abort('SIGTERM'));
@@ -32,6 +36,8 @@ const replaysS3 = new Client(config.replays.s3.endpoint);
 const replayStorage = new ReplayStorage(new MinioStorage(config.replays.s3.bucket, replaysS3));
 const matchesRepository = new MatchesRepository(mongoDatabase);
 const matchesService = new MatchesService(matchesRepository, replayStorage, api);
+const playersRepository = new PlayersRepository(mongoDatabase);
+const playersService = new PlayersService(playersRepository, api, matchesService);
 
 if (!config.readOnly) {
   const streamify = new Streamify(redis, 'matches:storage', 'matches:queue');
@@ -40,8 +46,14 @@ if (!config.readOnly) {
   const gamelensImporter = new GameLensImporter('matches:gamelens', redis, matchesService);
   abort.signal.addEventListener('abort', () => gamelensImporter.dispose(), { once: true });
 
-  const importer = new MatchInfoImporter('matches:queue', redis, matchesService);
-  abort.signal.addEventListener('abort', () => importer.dispose(), { once: true });
+  const matchesImporter = new MatchInfoImporter('matches:queue', redis, matchesService);
+  abort.signal.addEventListener('abort', () => matchesImporter.dispose(), { once: true });
+
+  const playersImporter = new PlayerMatchesImporter(playersService);
+  abort.signal.addEventListener('abort', () => playersImporter.stop(), { once: true });
+
+  const leaderboardImporter = new LeaderboardPlayersImporter(playersService, api);
+  abort.signal.addEventListener('abort', () => leaderboardImporter.stop(), { once: true });
 }
 
 const server = createHTTPServer({

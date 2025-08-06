@@ -12,7 +12,7 @@ export class MatchInfoImporter {
   ) {
     this.worker = new TaskWorker(redis, {
       consumer: `matches-processor-${process.pid}`,
-      group: 'MatchInfoImporter',
+      group: this.constructor.name,
       deadLetterKey: 'matches:deadletter',
       streamKey: streamKey,
     });
@@ -37,8 +37,15 @@ export class MatchInfoImporter {
         }
 
         const filename = decodeURIComponent(event.s3.object.key);
-        await this.matches.importFromReplay(filename);
-        console.log(`[${this.constructor.name}][${taskId}] Imported ${filename}`);
+        try {
+          await this.matches.importFromReplay(filename);
+          console.log(`[${this.constructor.name}][${filename}] Imported ${filename}`);
+        } catch (err) {
+          console.error(
+            `[${this.constructor.name}][${filename}] Failed to import replay:`,
+            err instanceof Error ? err.stack : err,
+          );
+        }
       }
     }
   };

@@ -33,7 +33,7 @@ export class MatchesRepository {
     return this.toDTO(await this.collection.findOne({ _id: new ObjectId(id) }));
   }
 
-  public async readByGameId(gameId: string): Promise<MatchDTO | null> {
+  public async readByGameId(gameId: MatchDTO['gameId']): Promise<MatchDTO | null> {
     return this.toDTO(await this.collection.findOne({ gameId: gameId }));
   }
 
@@ -58,6 +58,16 @@ export class MatchesRepository {
           ...(winner ? { winner } : {}),
         },
       },
+    );
+  }
+
+  public async searchByPlayerRef(playerId: ObjectId) {
+    return this.toArrayDTO(
+      await this.collection
+        .find({
+          'players.info.id': playerId,
+        })
+        .toArray(),
     );
   }
 

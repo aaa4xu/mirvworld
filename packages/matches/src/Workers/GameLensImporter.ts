@@ -14,7 +14,7 @@ export class GameLensImporter {
   ) {
     this.worker = new TaskWorker(redis, {
       consumer: `${os.hostname()}-${process.pid}`,
-      group: 'MatchInfoImporter',
+      group: this.constructor.name,
       deadLetterKey: 'matches:players-deadletter',
       streamKey: streamKey,
     });
