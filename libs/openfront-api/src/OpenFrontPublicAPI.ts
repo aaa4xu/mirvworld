@@ -1,8 +1,9 @@
 import { OpenFrontClient } from './OpenFrontClient.ts';
 import { APIErrorResponseSchema } from './Schema/APIErrorResponse.ts';
 import { OpenFrontError } from './Errors/OpenFrontError.ts';
-import { PlayerStatsSchema } from './Schema/PlayerStats.ts';
+import { PlayerInfoSchema } from './Schema/PlayerInfo.ts';
 import { GenericReplaySchema } from 'openfront/src/Schema.ts';
+import { LeaderboardResponseSchema } from './Schema/LeaderboardResponse.ts';
 
 export class OpenFrontPublicAPI extends OpenFrontClient {
   public async player(id: string, signal?: AbortSignal) {
@@ -12,7 +13,7 @@ export class OpenFrontPublicAPI extends OpenFrontClient {
     this.validateContentType(response, 'application/json');
 
     const json = await response.json();
-    return PlayerStatsSchema.parse(json);
+    return PlayerInfoSchema.parse(json);
   }
 
   public async game(id: string, signal?: AbortSignal) {
@@ -26,6 +27,15 @@ export class OpenFrontPublicAPI extends OpenFrontClient {
     this.validateContentType(response, 'application/json');
 
     return GenericReplaySchema.parse(await response.json());
+  }
+
+  public async leaderboard(signal?: AbortSignal) {
+    const response = await this.request(this.url('/leaderboard/public/ffa'), signal);
+
+    await this.processError(response);
+    this.validateContentType(response, 'application/json');
+
+    return LeaderboardResponseSchema.parse(await response.json());
   }
 
   private playerUrl(id: string) {

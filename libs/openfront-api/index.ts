@@ -6,7 +6,7 @@ export * from './src/Schema/GameExistsResponseSchema.ts';
 export * from './src/Schema/GameInfo.ts';
 export * from './src/Schema/LobbiesResponse.ts';
 export * from './src/Schema/MatchInfoSchema.ts';
-export * from './src/Schema/PlayerStats.ts';
+export * from './src/Schema/PlayerInfo.ts';
 
 export * from './src/GameId.ts';
 export * from './src/OpenFrontClient.ts';
