@@ -12,7 +12,7 @@ export async function GET({ params }) {
     });
   }
 
-  const image = await generator.create(match.gameId, match.mode, match.map, 'unknown');
+  const image = await generator.create(match.gameId, match.mode, match.map, match.winner ?? 'unknown');
 
   return new Response(image, {
     headers: {

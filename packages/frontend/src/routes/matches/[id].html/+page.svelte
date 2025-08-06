@@ -26,27 +26,12 @@
     );
   });
 
+  const winner = $derived(data.match.winner ?? 'unknown');
+
   const duration = $derived(data.match.finishedAt.getTime() - data.match.startedAt.getTime());
   const padDate = (time: number) => time.toString().padStart(2, '0');
   const formatDate = (date: Date) =>
     `${padDate(date.getUTCHours())}:${padDate(date.getUTCMinutes())} ${padDate(date.getDate())}.${padDate(date.getUTCMonth() + 1)}.${date.getUTCFullYear()} (UTC)`;
-
-  let winner = $derived.by(() => {
-    if (data.match.players.length === 0) return 'unknown';
-
-    if (data.match.mode === 'ffa') {
-      return data.match.players.sort((a, b) => b.tiles - a.tiles)[0]?.name ?? 'unknown';
-    }
-
-    if (data.match.mode === 'teams') {
-      console.log(sortedTeams);
-      return sortedTeams?.[0]?.[0] ?? 'unknown';
-    }
-
-    return 'unknown';
-  });
-
-  $inspect(data.match);
 </script>
 
 <svelte:head>

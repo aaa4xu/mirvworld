@@ -29,12 +29,15 @@ export class MatchesService {
     const genericReplay = await this.replays.read(filename);
 
     const replay = GameRecordSchema.parse(genericReplay);
+    const winner = replay.info.players.find((p) => p.clientID === replay.info.winner?.[1])?.username ?? undefined;
+
     await this.repository.add({
       gameId: replay.info.gameID,
       map: replay.info.config.gameMap,
       mode: replay.info.config.gameMode === 'Free For All' ? 'ffa' : 'teams',
       version: replay.gitCommit,
       maxPlayers: replay.info.config.maxPlayers ?? 0,
+      winner: winner,
       startedAt: new Date(replay.info.start),
       finishedAt: new Date(replay.info.end),
       createdAt: new Date(),
@@ -43,7 +46,36 @@ export class MatchesService {
   }
 
   public async setPlayers(id: MatchDTO['id'], players: Array<PlayerStats>) {
-    await this.repository.setPlayers(id, players);
+    const match = await this.repository.readByGameId(id);
+    if (!match) {
+      throw new Error('Match not found');
+    }
+
+    let winner = match.winner;
+    if (match.mode === 'ffa') {
+      winner = players.sort((a, b) => b.tiles - a.tiles)[0]?.name ?? winner;
+    }
+
+    if (match.mode === 'teams') {
+      const teams = Object.values(players).reduce((acc, player) => {
+        const team = player.team ?? 'noteam';
+        if (!acc.has(team)) {
+          acc.set(team, [player]);
+        } else {
+          acc.get(team)!.push(player);
+        }
+
+        return acc;
+      }, new Map<string, Array<PlayerStats>>());
+
+      const sortedTeams = Array.from(teams.entries()).sort(
+        ([aid, a], [bid, b]) => Math.min(...a.map((p) => p.rank)) - Math.min(...b.map((p) => p.rank)),
+      );
+
+      winner = sortedTeams?.[0]?.[0] ?? winner;
+    }
+
+    await this.repository.setPlayers(id, players, winner);
   }
 
   public async read(id: string) {

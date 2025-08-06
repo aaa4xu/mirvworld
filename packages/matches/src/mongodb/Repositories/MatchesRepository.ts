@@ -47,7 +47,7 @@ export class MatchesRepository {
     return this.toArrayDTO(items);
   }
 
-  public async setPlayers(id: MatchDTO['id'], players: Array<PlayerStats>) {
+  public async setPlayers(id: MatchDTO['id'], players: Array<PlayerStats>, winner?: string) {
     await this.collection.updateOne(
       {
         gameId: id,
@@ -55,6 +55,7 @@ export class MatchesRepository {
       {
         $set: {
           players,
+          ...(winner ? { winner } : {}),
         },
       },
     );

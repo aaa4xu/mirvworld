@@ -39,7 +39,12 @@ export class MatchResultImageGenerator {
 
     // Title
     this.drawCenteredText(ctx, 'MATCH RESULTS', `bold 96px '${this.font}'`, 90);
-    this.drawCenteredText(ctx, `${mode === 'ffa' ? 'FFA' : mode} · ${map}`, `32px '${this.font}'`, 160);
+    this.drawCenteredText(
+      ctx,
+      `${mode === 'ffa' ? 'FFA' : mode.slice(0, 1).toUpperCase() + mode.slice(1)} · ${map}`,
+      `32px '${this.font}'`,
+      160,
+    );
 
     // Winner
     const hexCenterY = 370;
