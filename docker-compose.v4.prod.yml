@@ -50,7 +50,7 @@ services:
     environment:
       - LURKER_LOBBY_INTERVAL=1100
       - LURKER_OPENFRONT_SERVER_ENDPOINT=http://gateway-dev
-      - LURKER_REDIS_URL=redis://localhost:6379/1
+      - LURKER_REDIS_URL=redis://redis:6379/1
     depends_on:
       - gateway-dev
       - redis
