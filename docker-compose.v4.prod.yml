@@ -32,16 +32,27 @@ services:
       - 100.115.138.95:6379:6379
 
   lurker:
+    image: ghcr.io/aaa4xu/mirvworld/lurker@sha256:c1e39aa8c7aded6f82e7376bd4aa3f1e0df0ad12f38c1df639f7d05df41d68d4 # v0.24.12
+    restart: always
+    env_file:
+      - v4.env
+    environment:
+      - LURKER_LOBBY_INTERVAL=1100
+      - LURKER_OPENFRONT_SERVER_ENDPOINT=http://gateway-prod
+    depends_on:
+      - gateway-prod
+
+  lurker-dev:
     image: ghcr.io/aaa4xu/mirvworld/lurker
     restart: always
     env_file:
       - v4.env
     environment:
-      - LURKER_LOBBY_INTERVAL=1000
-    dns:
-      - 100.100.100.100
-    dns_search:
-      - elf-chameleon.ts.net
+      - LURKER_LOBBY_INTERVAL=1100
+      - LURKER_OPENFRONT_SERVER_ENDPOINT=http://gateway-dev
+      - LURKER_REDIS_URL=redis://localhost:6379/1
+    depends_on:
+      - gateway-dev
 
   frontend:
     image: ghcr.io/aaa4xu/mirvworld/frontend
@@ -95,6 +106,16 @@ services:
       - v4.env
     ports:
       - 100.115.138.95:3110:80
+
+  gateway-dev:
+    image: ghcr.io/aaa4xu/mirvworld/gateway:latest
+    restart: always
+    environment:
+      - GW_ENDPOINT=https://main.openfront.dev
+    env_file:
+      - v4.env
+    ports:
+      - 100.115.138.95:3120:80
 
 volumes:
   storage-data:
