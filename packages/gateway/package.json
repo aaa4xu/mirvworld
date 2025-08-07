@@ -16,28 +16,31 @@
   "dependencies": {
     "prom-client": "^15.1.3"
   },
-  "targets": {
-    "serve": {
-      "continuous": true
-    },
-    "build": {
-      "cache": true
-    },
-    "lint": {
-      "cache": true
-    },
-    "container": {
-      "executor": "@nx-tools/nx-container:build",
-      "options": {
-        "tags": [
-          "ghcr.io/aaa4xu/mirvworld/gateway:latest"
-        ],
-        "cache-from": [
-          "type=gha"
-        ],
-        "cache-to": [
-          "type=gha,mode=max"
-        ]
+  "nx": {
+    "projectType": "application",
+    "targets": {
+      "serve": {
+        "continuous": true
+      },
+      "build": {
+        "cache": true
+      },
+      "lint": {
+        "cache": true
+      },
+      "container": {
+        "executor": "@nx-tools/nx-container:build",
+        "options": {
+          "tags": [
+            "ghcr.io/aaa4xu/mirvworld/gateway:latest"
+          ],
+          "cache-from": [
+            "type=gha"
+          ],
+          "cache-to": [
+            "type=gha,mode=max"
+          ]
+        }
       }
     }
   }
