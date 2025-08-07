@@ -48,6 +48,8 @@ const lobbiesLurker = new LobbiesLurker(
   serverClient,
   (lobbies) => {
     for (const lobby of lobbies) {
+      if (lobby.numClients ?? 0 === 0) continue;
+
       if (!lastTickLobbies.has(lobby.gameID)) {
         console.log(`[Lurker][${lobby.gameID}] 💡 New game detected`);
       }
