@@ -111,7 +111,7 @@ services:
     image: ghcr.io/aaa4xu/mirvworld/gateway:latest
     restart: always
     environment:
-      - GW_ENDPOINT=https://main.openfront.dev
+      - GW_ENDPOINT=https://beta.openfront.io
     env_file:
       - v4.env
     ports:
