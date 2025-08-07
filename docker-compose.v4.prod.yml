@@ -38,23 +38,9 @@ services:
       - v4.env
     environment:
       - LURKER_LOBBY_INTERVAL=1100
-      - LURKER_OPENFRONT_SERVER_ENDPOINT=http://gateway-prod
+      - LURKER_OPENFRONT_SERVER_ENDPOINT=http://gateway
     depends_on:
-      - gateway-prod
-
-  lurker-dev:
-    image: ghcr.io/aaa4xu/mirvworld/lurker
-    restart: always
-    env_file:
-      - v4.env
-    environment:
-      - LURKER_LOBBY_INTERVAL=1100
-      - LURKER_OPENFRONT_SERVER_ENDPOINT=http://gateway-dev
-      - LURKER_REDIS_URL=redis://redis:6379/1
-    depends_on:
-      - gateway-dev
-      - redis
-      - storage
+      - gateway
 
   frontend:
     image: ghcr.io/aaa4xu/mirvworld/frontend
@@ -101,23 +87,13 @@ services:
       - 100.115.138.95:27017:27017
     command: ["mongod", "--config", "/etc/mongo/mongod.conf"]
 
-  gateway-prod:
+  gateway:
     image: ghcr.io/aaa4xu/mirvworld/gateway:latest
     restart: always
     env_file:
       - v4.env
     ports:
       - 100.115.138.95:3110:80
-
-  gateway-dev:
-    image: ghcr.io/aaa4xu/mirvworld/gateway:latest
-    restart: always
-    environment:
-      - GW_ENDPOINT=https://beta.openfront.io
-    env_file:
-      - v4.env
-    ports:
-      - 100.115.138.95:3120:80
 
 volumes:
   storage-data:
