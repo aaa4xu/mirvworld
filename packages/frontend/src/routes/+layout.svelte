@@ -13,7 +13,7 @@
     </nav>
 
     <div class="user">
-      <a href="#/login/discord/">Login with Discord</a>
+      <a href="#/auth/discord/">Login with Discord</a>
     </div>
   </div>
 </header>

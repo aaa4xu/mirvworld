@@ -38,6 +38,7 @@
     "@nx-tools/nx-container@6.8.0": "patches/@nx-tools%2Fnx-container@6.8.0.patch"
   },
   "dependencies": {
+    "arctic": "^3.7.0",
     "debug": "^4.4.1"
   }
 }
