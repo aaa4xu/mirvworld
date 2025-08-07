@@ -1,7 +1,7 @@
 import * as arctic from 'arctic';
 import { error, redirect } from '@sveltejs/kit';
 import { discord } from '$lib/server/oauth/discord';
-import { z } from 'zod/v4';
+import z from 'zod';
 
 export async function GET({ params, url }) {
   try {

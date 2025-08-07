@@ -1,5 +1,5 @@
 import { PlayerStatsSchema } from '@mirvworld/gamelens-stats';
-import z from 'zod/v4';
+import z from 'zod';
 import { ObjectId } from 'mongodb';
 
 export const MatchPlayerInfoSchema = z.object({

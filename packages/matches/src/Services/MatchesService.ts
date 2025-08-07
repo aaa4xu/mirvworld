@@ -4,7 +4,7 @@ import type { OpenFrontPublicAPI } from '@mirvworld/openfront-api';
 import { GameRecordSchema } from 'openfront/src/Schema.ts';
 import type { PlayerStats } from '@mirvworld/gamelens-stats';
 import type { MatchDTO } from '../mongodb/Models/Match.ts';
-import z from 'zod/v4';
+import z from 'zod';
 import type { MatchPlayer, MatchPlayerInfo } from '../mongodb/Models/MatchPlayer.ts';
 import type { ObjectId } from 'mongodb';
 
@@ -77,7 +77,7 @@ export class MatchesService {
       winner = sortedTeams?.[0]?.[0] ?? winner;
     }
 
-    await this.repository.setPlayers(id, players, winner);
+    await this.repository.setPlayers(id, players, winner === null ? undefined : winner);
   }
 
   public async setMatchPlayerInfo(matchId: string, playerId: string, info: MatchPlayerInfo) {

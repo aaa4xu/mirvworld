@@ -91,7 +91,7 @@
         "mysql2": "^3.12.0",
         "superjson": "^2.2.2",
         "twemoji": "^14.0.2",
-        "zod": "^3.25.75",
+        "zod": "^4.0.5",
       },
       "devDependencies": {
         "@eslint/compat": "^1.2.5",
@@ -148,7 +148,7 @@
         "ioredis": "^5.6.1",
         "minio": "^8.0.5",
         "nanoid": "^5.1.5",
-        "zod": "^3.25.75",
+        "zod": "^4.0.5",
       },
       "devDependencies": {
         "@types/bun": "latest",
@@ -195,7 +195,7 @@
     "packages/replay-storage": {
       "name": "replay-storage",
       "dependencies": {
-        "zod": "^3.25.75",
+        "zod": "^4.0.5",
       },
       "devDependencies": {
         "@types/bun": "latest",
@@ -1733,7 +1733,7 @@
 
     "zimmerframe": ["zimmerframe@1.1.2", "", {}, "sha512-rAbqEGa8ovJy4pyBxZM70hg4pE6gDgaQ0Sl9M3enG3I0d6H4XSAM3GeNGLKnsBpuijUow064sf7ww1nutC5/3w=="],
 
-    "zod": ["zod@3.25.76", "", {}, "sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ=="],
+    "zod": ["zod@4.0.15", "", {}, "sha512-2IVHb9h4Mt6+UXkyMs0XbfICUh1eUrlJJAOupBHUhLRnKkruawyDddYRCs0Eizt900ntIMk9/4RksYl+FgSpcQ=="],
 
     "@babel/core/semver": ["semver@6.3.1", "", { "bin": { "semver": "bin/semver.js" } }, "sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA=="],
 

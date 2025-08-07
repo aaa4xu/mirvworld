@@ -1,5 +1,5 @@
 import type { Storage } from './Storage.ts';
-import { z } from 'zod/v4';
+import z from 'zod';
 
 export class JSONStorage<T> {
   public constructor(

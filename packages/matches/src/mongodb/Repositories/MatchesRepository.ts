@@ -1,7 +1,7 @@
 import { Collection, type Db, ObjectId } from 'mongodb';
 import { type Match, type MatchDTO, MatchDTOSchema, type MatchInsert, MatchInsertSchema } from '../Models/Match.ts';
 import type { PlayerStats } from '@mirvworld/gamelens-stats';
-import z from 'zod/v4';
+import z from 'zod';
 
 export class MatchesRepository {
   private readonly collection: Collection<Omit<Match, '_id'>>;

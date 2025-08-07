@@ -1,7 +1,7 @@
 import { JSONStorage } from 'compressed-storage/src/JSONStorage.ts';
 import { CompressedStorage, type Storage } from 'compressed-storage';
 import { type GenericReplay, GenericReplaySchema } from 'openfront/src/Schema.ts';
-import z from 'zod/v4';
+import z from 'zod';
 
 export class ReplayStorage {
   private readonly storage: JSONStorage<GenericReplay>;

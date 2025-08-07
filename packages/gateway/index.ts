@@ -1,7 +1,7 @@
 import { withMetrics } from './src/withMetrics.ts';
 import { httpRequestsTotal, register, upstreamRequestDuration } from './src/prometheus.ts';
 import { LobbiesResponse } from '@mirvworld/openfront-api';
-import z from 'zod/v4';
+import z from 'zod';
 import { config } from './config.ts';
 import { HttpError } from './src/HttpError.ts';
 import os from 'node:os';

@@ -1,7 +1,7 @@
 import { type Game, type Player, PlayerType, type TerraNullius } from 'openfront/game/src/core/game/Game';
 import type { Stats as GameStats } from 'openfront/game/src/core/game/Stats';
 import type { NukeType, OtherUnitType } from 'openfront/game/src/core/StatsSchemas';
-import z from 'zod/v4';
+import z from 'zod';
 import type { TurnSchema } from 'openfront/game/src/core/Schemas.ts';
 import { GameStatsRecorder } from '@mirvworld/gamelens-stats/src/GameStatsRecorder.ts';
 

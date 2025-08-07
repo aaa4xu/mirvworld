@@ -1,4 +1,4 @@
-import z from 'zod/v4';
+import z from 'zod';
 import { GenericReplaySchema } from 'openfront/src/Schema.ts';
 
 export type ArchivedGameRecord = z.infer<typeof GenericReplaySchema>;

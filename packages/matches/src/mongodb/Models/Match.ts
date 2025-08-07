@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import z from 'zod/v4';
+import z from 'zod';
 import { MatchPlayerSchema } from './MatchPlayer.ts';
 
 export const MatchSchema = z.object({

@@ -1,4 +1,4 @@
-import z from 'zod/v4';
+import z from 'zod';
 import { ObjectId } from 'mongodb';
 
 export const PlayerSchema = z.object({

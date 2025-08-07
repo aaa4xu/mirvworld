@@ -3,7 +3,7 @@ import {
   PlayerRecordSchema as GamePlayerRecordSchema,
   GameRecordSchema as GameGameRecordSchema,
 } from '../game/src/core/Schemas.ts';
-import z from 'zod/v4';
+import z from 'zod';
 
 export const PlayerRecordSchema = GamePlayerRecordSchema.omit({
   persistentID: true,

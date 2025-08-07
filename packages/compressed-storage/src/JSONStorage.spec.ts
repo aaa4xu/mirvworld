@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeEach, spyOn } from 'bun:test';
-import { z } from 'zod/v4';
+import z from 'zod';
 import { JSONStorage } from './JSONStorage';
 import { MockStorage } from './MockStorage';
 
 describe('JSONStorage', () => {
   let mockStorage: MockStorage;
-  let jsonStorage: JSONStorage<typeof TestSchema>;
+  let jsonStorage: JSONStorage<z.infer<typeof TestSchema>>;
 
   beforeEach(() => {
     mockStorage = new MockStorage();

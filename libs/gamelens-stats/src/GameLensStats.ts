@@ -1,4 +1,4 @@
-import z from 'zod/v4';
+import z from 'zod';
 import { GameStatsSchema } from './GameStats.ts';
 import { PlayerStatsSchema } from './PlayerStats.ts';
 

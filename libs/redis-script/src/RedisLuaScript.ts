@@ -1,5 +1,5 @@
 import type { RedisClient } from 'bun';
-import z from 'zod/v4';
+import z from 'zod';
 
 /**
  * A type‑safe wrapper around a Lua script stored in Redis.

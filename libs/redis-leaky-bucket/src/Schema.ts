@@ -1,4 +1,4 @@
-import z from 'zod/v4';
+import z from 'zod';
 
 export const LeakyBucketResultSchema = z.tuple([
   z.union([z.literal(0), z.literal(1)]), // 0 | 1  – token granted?
