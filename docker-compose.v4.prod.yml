@@ -32,7 +32,7 @@ services:
       - 100.115.138.95:6379:6379
 
   lurker:
-    image: ghcr.io/aaa4xu/mirvworld/lurker@sha256:9c3dab4e9a5a2c7f2d656f67b44d10b4edb8c5580ab0f89e0e0dea92f43bfaf6
+    image: ghcr.io/aaa4xu/mirvworld/lurker@sha256:2f570bf02025f8558a2ec122fd32797d8f32990858d13b18463768e73e24dc7b
     restart: always
     env_file:
       - v4.env
