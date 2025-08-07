@@ -88,6 +88,14 @@ services:
       - 100.115.138.95:27017:27017
     command: ["mongod", "--config", "/etc/mongo/mongod.conf"]
 
+  gateway-prod:
+    image: ghcr.io/aaa4xu/mirvworld/gateway:latest
+    restart: always
+    env_file:
+      - v4.env
+    ports:
+      - 100.115.138.95:3110:80
+
 volumes:
   storage-data:
   storage-events:
