@@ -7,6 +7,9 @@ import type { MatchDTO } from '../mongodb/Models/Match.ts';
 import z from 'zod';
 import type { MatchPlayer, MatchPlayerInfo } from '../mongodb/Models/MatchPlayer.ts';
 import type { ObjectId } from 'mongodb';
+import debug from 'debug';
+
+const logger = debug('mirvworld:matches:MatchesService');
 
 export class MatchesService {
   public constructor(
@@ -28,11 +31,15 @@ export class MatchesService {
   }
 
   public async importFromReplay(filename: string) {
+    logger(`Downloading replay file ${filename}`);
     const genericReplay = await this.replays.read(filename);
 
-    const replay = GameRecordSchema.parse(genericReplay);
+    logger(`Parsing replay file ${filename}`);
+    const replay = GameRecordSchema.pick({ info: true, gitCommit: true }).parse(genericReplay);
+
     const winner = replay.info.players.find((p) => p.clientID === replay.info.winner?.[1])?.username ?? undefined;
 
+    logger(`Importing data from ${filename} to database`);
     await this.repository.add({
       gameId: replay.info.gameID,
       map: replay.info.config.gameMap,
@@ -45,6 +52,7 @@ export class MatchesService {
       createdAt: new Date(),
       players: [],
     });
+    logger(`Imported data from ${filename} to database`);
   }
 
   public async setPlayers(id: MatchDTO['id'], players: Array<MatchPlayer>) {
