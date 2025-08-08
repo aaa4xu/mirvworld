@@ -1,6 +1,7 @@
 import { MinioPutEventSchema, type TaskMessage, TaskWorker } from 'utils';
 import { RedisClient } from 'bun';
 import type { MatchesService } from '../Services/MatchesService.ts';
+import { ZodError, z } from 'zod';
 
 export class MatchInfoImporter {
   private readonly worker: TaskWorker;
@@ -41,10 +42,14 @@ export class MatchInfoImporter {
           await this.matches.importFromReplay(filename);
           console.log(`[${this.constructor.name}][${filename}] Imported ${filename}`);
         } catch (err) {
-          console.error(
-            `[${this.constructor.name}][${filename}] Failed to import replay:`,
-            err instanceof Error ? err.stack : err,
-          );
+          if (err instanceof ZodError) {
+            console.error(`[${this.constructor.name}][${filename}] Failed to import replay:`, z.prettifyError(err));
+          } else {
+            console.error(
+              `[${this.constructor.name}][${filename}] Failed to import replay:`,
+              err instanceof Error ? err.stack : err,
+            );
+          }
         }
       }
     }
