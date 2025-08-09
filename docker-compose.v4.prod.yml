@@ -65,7 +65,7 @@ services:
       - 100.115.138.95:3700:80
 
   gamelens:
-    image: ghcr.io/aaa4xu/mirvworld/gamelens
+    image: ghcr.io/aaa4xu/mirvworld/gamelens@sha256:e93008bf76d88840de5b893108492f9335e66d61530bc4e49f71b9a2985311db
     restart: always
     environment:
       - GAMELENS_REDIS_URL=redis://redis:6379
