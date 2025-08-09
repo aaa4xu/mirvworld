@@ -8,7 +8,7 @@ export const MatchSchema = z.object({
   map: z.string(),
   mode: z.enum(['ffa', 'teams']),
   version: z.string().length(40),
-  maxPlayers: z.number().int().min(1),
+  maxPlayers: z.number().int().min(0).optional(),
   players: z.array(MatchPlayerSchema),
   winner: z.string().optional().nullable(),
   startedAt: z.date(),
