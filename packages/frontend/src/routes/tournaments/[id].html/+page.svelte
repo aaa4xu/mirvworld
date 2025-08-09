@@ -199,7 +199,7 @@
     font-family: monospace;
   }
 
-  .matches {
+  .block.matches {
     width: 100%;
   }
 </style>
