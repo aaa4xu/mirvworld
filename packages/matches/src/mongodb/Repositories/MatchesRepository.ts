@@ -4,10 +4,12 @@ import type { PlayerStats } from '@mirvworld/gamelens-stats';
 import z from 'zod';
 
 export class MatchesRepository {
+  public static readonly collectionName = 'matches';
+
   private readonly collection: Collection<Omit<Match, '_id'>>;
 
   public constructor(db: Db) {
-    this.collection = db.collection('matches');
+    this.collection = db.collection(MatchesRepository.collectionName);
   }
 
   public async searchByPlayer(name: string): Promise<Array<MatchDTO>> {
@@ -76,7 +78,7 @@ export class MatchesRepository {
     await this.collection.insertOne(parsed);
   }
 
-  private toDTO(match: Match | null): MatchDTO | null {
+  public toDTO(match: Match | null): MatchDTO | null {
     if (!match) return null;
 
     const dto = {
@@ -94,7 +96,7 @@ export class MatchesRepository {
     }
   }
 
-  private toArrayDTO(matches: Array<Match>): Array<MatchDTO> {
+  public toArrayDTO(matches: Array<Match>): Array<MatchDTO> {
     return matches.map((m) => this.toDTO(m)).filter((m): m is MatchDTO => m !== null);
   }
 }

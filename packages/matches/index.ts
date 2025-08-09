@@ -18,6 +18,8 @@ import { PlayersRepository } from './src/mongodb/Repositories/PlayersRepository.
 import { PlayersService } from './src/Services/PlayersService.ts';
 import { PlayerMatchesImporter } from './src/Workers/PlayerMatchesImporter.ts';
 import { LeaderboardPlayersImporter } from './src/Workers/LeaderboardPlayersImporter.ts';
+import { TournamentsRepository } from './src/mongodb/Repositories/TournamentsRepository.ts';
+import { TournamentsService } from './src/Services/TournamentsService.ts';
 
 const abort = new AbortController();
 process.on('SIGTERM', () => abort.abort('SIGTERM'));
@@ -38,6 +40,8 @@ const matchesRepository = new MatchesRepository(mongoDatabase);
 const matchesService = new MatchesService(matchesRepository, replayStorage, api);
 const playersRepository = new PlayersRepository(mongoDatabase);
 const playersService = new PlayersService(playersRepository, api, matchesService);
+const tournamentsRepository = new TournamentsRepository(mongoDatabase, matchesRepository);
+const tournamentsService = new TournamentsService(tournamentsRepository);
 
 if (!config.readOnly) {
   const streamify = new Streamify(redis, 'matches:storage', 'matches:queue');
@@ -58,7 +62,18 @@ if (!config.readOnly) {
 
 const server = createHTTPServer({
   router: appRouter,
-  createContext: createContext(api, replayStorage, matchesService),
+  createContext: createContext(config.http.secret, api, replayStorage, matchesService, tournamentsService),
 });
+
+/*tournamentsRepository.add({
+  rules: {
+    id: 'max-tiles',
+    params: [10, 8, 6, 4, 2],
+  },
+  name: 'Tournament of Brilliance',
+  slug: 'tournament-of-brilliance',
+  startAt: new Date(),
+  endAt: new Date(),
+});*/
 
 server.listen(config.http.port);

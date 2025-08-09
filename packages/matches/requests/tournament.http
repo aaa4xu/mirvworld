@@ -1,0 +1,8 @@
+@base = http://localhost:3600
+@id = 6895b2d9a4f02a6a0ceb3c25
+# {"0":{"json":"<id>"}} (URL-encoded)
+@input = %7B%220%22%3A%7B%22json%22%3A%22{{id}}%22%7D%7D
+
+### tournaments.getById
+GET {{base}}/tournaments.getById?batch=1&input={{input}}
+Accept: application/json

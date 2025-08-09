@@ -1,11 +1,24 @@
 :root {
-  --primary-bg-color: #0b1215;
-  --primary-text-color: #c2c2c2;
+  --primary-bg-color: #1c1c1f;
+  --primary-text-color: #b6b6b6;
   --accent-color1: #ebb409;
   --accent-color2: #fff;
   --content-max-width: 1200px;
   --content-padding: 1rem;
   --header-height: 3.5rem;
+  --border-radius: 0.3rem;
+
+  --link-underline-offset: 0.125rem;
+  --link-underline-thickness: 0.0625rem;
+  --link-focus-outline-width: 0.125rem;
+  --link-focus-outline-offset: 0.2rem;
+  --link-focus-outline-color: var(--accent-color1);
+
+  --btn-font-size: 1rem;
+  --btn-radius: var(--border-radius);
+  --btn-padding-y: 0.55rem;
+  --btn-padding-x: 1.125rem;
+  --btn-gap: 0.5rem;
 }
 
 html,
@@ -15,7 +28,15 @@ body {
   background-color: var(--primary-bg-color);
   color: var(--primary-text-color);
 
-  font-family: 'Open Sans', sans-serif;
+  font-family:
+    'Open Sans',
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Arial,
+    sans-serif;
+
   font-optical-sizing: auto;
   font-weight: 400;
   font-style: normal;
@@ -26,8 +47,95 @@ body {
 a {
   text-decoration: none;
   color: var(--accent-color1);
+  transition:
+    color 0.15s ease,
+    text-decoration-color 0.15s ease,
+    outline-color 0.15s ease;
+  text-decoration-thickness: var(--link-underline-thickness);
+  text-underline-offset: var(--link-underline-offset);
 }
 
 a:hover {
   text-decoration: underline;
+}
+
+a:focus-visible {
+  outline: var(--link-focus-outline-width) solid var(--link-focus-outline-color);
+  outline-offset: var(--link-focus-outline-offset);
+  border-radius: 0.25rem;
+  text-decoration: underline;
+}
+
+a[aria-disabled='true'] {
+  color: color-mix(in oklab, var(--primary-text-color), black 30%);
+  text-decoration: none;
+  pointer-events: none;
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+a[target='_blank']::after {
+  content: '↗';
+  font-size: 0.85em;
+  margin-inline-start: 0.25em;
+  line-height: 1;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+  font: inherit;
+  font-size: var(--btn-font-size);
+  border-radius: var(--btn-radius);
+  padding: var(--btn-padding-y) var(--btn-padding-x);
+  line-height: 1.2;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--btn-gap);
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.1s ease,
+    opacity 0.15s ease;
+  position: relative;
+
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--accent-color2);
+  border: 0.075rem solid color-mix(in oklab, var(--accent-color2), transparent 70%);
+}
+
+button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: color-mix(in oklab, var(--accent-color2), transparent 50%);
+}
+
+button[type='submit'] {
+  border-color: color-mix(in oklab, var(--accent-color1), transparent 20%);
+}
+
+button[type='submit']:hover:not(:disabled) {
+  border-color: var(--accent-color1);
+}
+
+button:focus-visible {
+  outline: 0.125rem solid var(--accent-color1);
+  outline-offset: 0.125rem;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  a {
+    transition: none;
+  }
+
+  button {
+    transition: none;
+  }
 }

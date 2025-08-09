@@ -1,4 +1,4 @@
-import { publicProcedure, router } from './trpc';
+import { adminProcedure, publicProcedure, router } from './trpc';
 import z from 'zod';
 
 export const appRouter = router({
@@ -18,6 +18,17 @@ export const appRouter = router({
     importById: publicProcedure.input(z.string().length(8)).mutation(async ({ ctx, input: id }) => {
       return ctx.matches.enqueue(id);
     }),
+  },
+  tournaments: {
+    getById: publicProcedure.input(z.string()).query(async ({ ctx, input: id }) => {
+      return ctx.tournaments.readBySlug(id);
+    }),
+
+    addMatch: adminProcedure
+      .input(z.object({ id: z.string(), matchId: z.string() }))
+      .mutation(async ({ ctx, input }) => {
+        return ctx.tournaments.addMatch(input.id, input.matchId);
+      }),
   },
 });
 

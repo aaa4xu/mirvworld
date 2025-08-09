@@ -1,0 +1,18 @@
+@base = http://localhost:3600
+@id = 6895b2d9a4f02a6a0ceb3c25
+@matchId = 68913d485687f621e1f389e0
+
+### tournaments.addMatch
+POST {{base}}/tournaments.addMatch?batch=1
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY3AiOlsiYWRtaW4iXSwiaWF0IjoxNzU0NjQ2ODgxLCJleHAiOjE3NTUyNTE2ODEsImlzcyI6Im1pcnZ3b3JsZCJ9.1uCjqOweYNUHMzwAVRjtOSBgS4_f6r2UhaZSB0xDzaY
+
+{
+  "0": {
+    "json": {
+      "id": "{{id}}",
+      "matchId": "{{matchId}}"
+    }
+  }
+}

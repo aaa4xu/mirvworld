@@ -18,6 +18,7 @@ export const config = {
   },
   http: {
     port: parseInt(env('MATCHES_HTTP_PORT', '3600'), 10),
+    secret: env('MATCHES_HTTP_SECRET', 'somesupersecretstringfordevenviroment'),
   },
   readOnly: env('MATCHES_READ_ONLY', '0') === '1',
 };
