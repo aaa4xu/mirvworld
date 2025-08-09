@@ -11,24 +11,24 @@ export class MaxTilesScoringRule {
   public leaderboard(tournament: TournamentWithMatches) {
     const aliasMap = this.buildAliasMap(tournament.aliases);
 
-    const totals = new Map<string, { score: number; matches: number; player: MatchPlayer }>();
+    const totals = new Map<string, { score: number; matches: number; player: MatchPlayer; displayName: string }>();
 
     for (const match of tournament.matchesData) {
       const perMatch = this.scoreSingleMatch(match, aliasMap);
-      for (const [key, { points, player }] of perMatch) {
+      for (const [key, { points, player, displayName }] of perMatch) {
         const prev = totals.get(key);
         if (prev) {
           prev.score += points;
           prev.matches += 1;
         } else {
-          totals.set(key, { score: points, matches: 1, player });
+          totals.set(key, { score: points, matches: 1, player, displayName });
         }
       }
     }
 
     const rows: LeaderboardEntry[] = [];
-    for (const { player, score, matches } of totals.values()) {
-      rows.push({ score, matches, name: this.applyAliases(player.name, aliasMap) });
+    for (const { displayName, score, matches } of totals.values()) {
+      rows.push({ score, matches, name: displayName });
     }
     // Sort by score desc, then by name asc for stable output
     rows.sort((a, b) => b.score - a.score || a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
@@ -38,7 +38,7 @@ export class MaxTilesScoringRule {
   private scoreSingleMatch(
     match: MatchDTO,
     aliasMap: Map<string, string>,
-  ): Map<string, { points: number; player: MatchPlayer }> {
+  ): Map<string, { points: number; player: MatchPlayer; displayName: string }> {
     match.players.sort((a, b) => b.maxTiles - a.maxTiles);
 
     const groups: Array<{ start: number; size: number; rank: number }> = [];
@@ -50,18 +50,17 @@ export class MaxTilesScoringRule {
       i = j;
     }
 
-    const result = new Map<string, { points: number; player: MatchPlayer }>();
+    const result = new Map<string, { points: number; player: MatchPlayer; displayName: string }>();
     for (const g of groups) {
       const avgPoints = this.averagePointsForSpan(g.rank, g.size);
       for (let k = 0; k < g.size; k++) {
         const idx = g.start + k;
-        const displayName = this.applyAliases(match.players[idx]!.name, aliasMap);
-        const key = this.normalizePlayerName(displayName); // stable map key
+        const { key, display } = this.resolveCanonical(match.players[idx]!.name, aliasMap);
         const prev = result.get(key);
         if (prev) {
           prev.points += avgPoints;
         } else {
-          result.set(key, { points: avgPoints, player: match.players[idx]! });
+          result.set(key, { points: avgPoints, player: match.players[idx]!, displayName: display });
         }
       }
     }
@@ -85,8 +84,16 @@ export class MaxTilesScoringRule {
     return name.normalize('NFKC').trim().toLowerCase();
   }
 
-  private applyAliases(name: string, aliasMap: Map<string, string>): string {
-    return aliasMap.get(this.normalizePlayerName(name)) ?? name;
+  private resolveCanonical(name: string, aliasMap: Map<string, string>): { key: string; display: string } {
+    let display = name;
+    let key = this.normalizePlayerName(display);
+    const seen = new Set<string>();
+    while (aliasMap.has(key) && !seen.has(key)) {
+      seen.add(key);
+      display = aliasMap.get(key)!;
+      key = this.normalizePlayerName(display);
+    }
+    return { key, display };
   }
 
   private buildAliasMap(aliases: Record<string, string>): Map<string, string> {
