@@ -68,20 +68,22 @@
         </div>
       </div>
 
-      <div class="block matches">
-        <h3>Matches</h3>
-        <div class="block-content">
-          <ul>
-            {#each Object.values(data.tournament.matchesData) as match (match.gameId)}
-              <li>
-                <a href="/matches/{match.gameId}.html"
-                  ><span class="gameid">{match.gameId}</span> - {match.mode} @ {match.map}</a
-                >
-              </li>
-            {/each}
-          </ul>
+      {#if data.tournament.matches.length > 0}
+        <div class="block matches">
+          <h3>Matches</h3>
+          <div class="block-content">
+            <ul>
+              {#each Object.values(data.tournament.matchesData) as match (match.gameId)}
+                <li>
+                  <a href="/matches/{match.gameId}.html"
+                    ><span class="gameid">{match.gameId}</span> - {match.mode} @ {match.map}</a
+                  >
+                </li>
+              {/each}
+            </ul>
+          </div>
         </div>
-      </div>
+      {/if}
     </div>
   </div>
 </div>
