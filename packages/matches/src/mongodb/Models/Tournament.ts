@@ -13,7 +13,7 @@ export const TournamentSchema = z.object({
   _id: z.instanceof(ObjectId),
   slug: z.string(),
   name: z.string(),
-  matches: z.array(z.instanceof(ObjectId)),
+  matches: z.array(z.string()),
   rules: z.discriminatedUnion('id', [TournamentMaxTilesScoringRuleSchema]),
   mode: z.enum(['ffa', 'teams']),
   startAt: z.date(),

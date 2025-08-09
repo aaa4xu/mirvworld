@@ -19,6 +19,6 @@ export class TournamentsService {
   }
 
   public async addMatch(id: string, matchId: string) {
-    await this.repository.addMatch(new ObjectId(id), new ObjectId(matchId));
+    await this.repository.addMatch(new ObjectId(id), matchId);
   }
 }

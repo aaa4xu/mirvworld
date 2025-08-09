@@ -31,9 +31,9 @@ export class TournamentsRepository {
           let: { matchIds: '$matches' }, // keep original array (may contain duplicates)
           pipeline: [
             // Fetch only matches whose _id is in the provided list
-            { $match: { $expr: { $in: ['$_id', '$$matchIds'] } } },
+            { $match: { $expr: { $in: ['$gameId', '$$matchIds'] } } },
             // Tag each match with its order based on the tournament's matches
-            { $addFields: { __order: { $indexOfArray: ['$$matchIds', '$_id'] } } },
+            { $addFields: { __order: { $indexOfArray: ['$$matchIds', '$gameId'] } } },
             { $sort: { __order: 1 } },
             { $project: { __order: 0 } },
           ],
@@ -75,7 +75,7 @@ export class TournamentsRepository {
     return id.insertedId;
   }
 
-  public async addMatch(tournamentId: ObjectId, matchIds: ObjectId | ObjectId[]) {
+  public async addMatch(tournamentId: ObjectId, matchIds: string | string[]) {
     const ids = Array.isArray(matchIds) ? matchIds : [matchIds];
 
     await this.collection.updateOne(
@@ -92,7 +92,7 @@ export class TournamentsRepository {
     );
   }
 
-  public async removeMatch(tournamentId: ObjectId, matchIds: ObjectId | ObjectId[]) {
+  public async removeMatch(tournamentId: ObjectId, matchIds: string | string[]) {
     const ids = Array.isArray(matchIds) ? matchIds : [matchIds];
 
     await this.collection.updateOne(
