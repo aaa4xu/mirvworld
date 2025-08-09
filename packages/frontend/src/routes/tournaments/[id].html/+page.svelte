@@ -67,6 +67,21 @@
           {/each}
         </div>
       </div>
+
+      <div class="block matches">
+        <h3>Matches</h3>
+        <div class="block-content">
+          <ul>
+            {#each Object.values(data.tournament.matchesData) as match (match.gameId)}
+              <li>
+                <a href="/matches/{match.gameId}.html"
+                  ><span class="gameid">{match.gameId}</span> - {match.mode} @ {match.map}</a
+                >
+              </li>
+            {/each}
+          </ul>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -128,6 +143,10 @@
     gap: 1rem;
   }
 
+  .block {
+    margin-bottom: 2rem;
+  }
+
   .block h3 {
     color: var(--accent-color2);
     margin: 0 0 1rem 0;
@@ -172,5 +191,13 @@
   .matches,
   .average {
     width: 5rem;
+  }
+
+  .gameid {
+    font-family: monospace;
+  }
+
+  .matches {
+    width: 100%;
   }
 </style>
