@@ -72,7 +72,7 @@
         <div class="block matches">
           <h3>Matches</h3>
           <div class="block-content">
-            <ul>
+            <ol>
               {#each Object.values(data.tournament.matchesData) as match (match.gameId)}
                 <li>
                   <a href="/matches/{match.gameId}.html"
@@ -80,7 +80,7 @@
                   >
                 </li>
               {/each}
-            </ul>
+            </ol>
           </div>
         </div>
       {/if}
