@@ -11,7 +11,7 @@ import z from 'zod';
  *  - parsing the raw Redis reply through a caller‑supplied Zod schema so that
  *    the returned value is fully type‑checked
  */
-export class RedisLuaScript<ResultSchema extends z.ZodTypeAny> {
+export class RedisLuaScript<ResultSchema extends z.ZodType> {
   private scriptId: Promise<string> | null = null;
   private readonly keysSchema: z.ZodArray<z.ZodString>;
   private readonly argsSchema: z.ZodArray<z.ZodString>;
