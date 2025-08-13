@@ -1,4 +1,4 @@
-import { Collection, type Db, ObjectId } from 'mongodb';
+import { Collection, type Db, type Document, ObjectId } from 'mongodb';
 import { type Match, type MatchDTO, MatchDTOSchema, type MatchInsert, MatchInsertSchema } from '../Models/Match.ts';
 import type { PlayerStats } from '@mirvworld/gamelens-stats';
 import z from 'zod';
@@ -98,5 +98,53 @@ export class MatchesRepository {
 
   public toArrayDTO(matches: Array<Match>): Array<MatchDTO> {
     return matches.map((m) => this.toDTO(m)).filter((m): m is MatchDTO => m !== null);
+  }
+
+  public async *iterateTeamMatchesWithRanks(opts?: {
+    batchSize?: number; // default 500
+  }): AsyncGenerator<{ gameId: string; players: Array<PlayerStats> }> {
+    const batchSize = opts?.batchSize ?? 500;
+
+    // Pipeline ensures:
+    //  - mode == 'teams'
+    //  - players array is non-empty
+    //  - EVERY player has rank present and >= 1
+    const pipeline: Document[] = [
+      { $match: { mode: 'teams' } },
+      { $match: { 'players.0': { $exists: true } } }, // non-empty players
+      { $sort: { _id: 1 } }, // chronological order
+      { $project: { gameId: 1, players: 1 } }, // keep only needed fields
+      {
+        $match: {
+          $expr: {
+            $eq: [
+              { $size: '$players' },
+              {
+                $size: {
+                  $filter: {
+                    input: '$players',
+                    as: 'p',
+                    cond: {
+                      $and: [{ $ne: ['$$p.rank', null] }, { $gte: ['$$p.rank', 1] }],
+                    },
+                  },
+                },
+              },
+            ],
+          },
+        },
+      },
+    ];
+
+    const cursor = this.collection.aggregate<{ gameId: string; players: Array<PlayerStats> }>(pipeline, {
+      allowDiskUse: true,
+    });
+
+    // Set batch size to keep memory bounded
+    if (typeof cursor.batchSize === 'function') cursor.batchSize(batchSize);
+
+    for await (const doc of cursor) {
+      yield { gameId: doc.gameId, players: doc.players };
+    }
   }
 }
