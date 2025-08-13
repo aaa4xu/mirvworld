@@ -1,6 +1,7 @@
 import type { PlayersRepository } from '../mongodb/Repositories/PlayersRepository.ts';
 import { OpenFrontPublicAPI } from '@mirvworld/openfront-api';
 import type { MatchesService } from './MatchesService.ts';
+import type { MatchPlayerInfo } from '../mongodb/Models/MatchPlayer.ts';
 
 export class PlayersService {
   public constructor(
@@ -30,14 +31,18 @@ export class PlayersService {
       throw new Error(`Player ${publicId} not found`);
     }
 
+    const info: MatchPlayerInfo = {
+      id: player._id,
+      name: player.name,
+      avatar: player.avatar,
+    };
+
     // Update player info for old matches
     if (updateExistingMatches) {
-      await this.matches.updateMatchPlayerInfo(player._id, {
-        id: player._id,
-        name: player.name,
-        avatar: player.avatar,
-      });
+      await this.matches.updateMatchPlayerInfo(player._id, info);
     }
+
+    await Promise.all(data.games.map((game) => this.matches.setMatchPlayerInfo(game.gameId, game.clientId, info)));
   }
 
   public updateBatch() {
