@@ -14,6 +14,8 @@ export class OpenSkill {
     if (rows.length < 2) return; // not enough clan-bearing teams
 
     const tags = this.collectTags(rows);
+    if (tags.length < 2) return; // not enough clans
+
     const priors = await this.getCurrentRating(tags);
     const before = this.buildModelInput(rows, priors);
     const after = rate(before, { rank: rows.map((r) => r.placement) });
@@ -89,7 +91,7 @@ export class OpenSkill {
       }
       rows.push({ placement, tags, weights });
     }
-    return rows;
+    return rows.sort((a, b) => a.placement - b.placement).map((r, i) => ({ ...r, placement: i + 1 }));
   }
 
   /**
