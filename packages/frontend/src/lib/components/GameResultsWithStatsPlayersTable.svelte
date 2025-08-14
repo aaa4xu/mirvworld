@@ -70,9 +70,17 @@
   }
 
   table {
-    text-align: right;
-    line-height: 0.75rem;
+    margin-top: 1rem;
+    text-align: center;
+    line-height: 0.85rem;
     min-width: 100%;
+    border-collapse: collapse;
+    background: #282830;
+    border-radius: var(--border-radius);
+  }
+
+  thead {
+    color: var(--accent-color2);
   }
 
   td,
@@ -84,7 +92,7 @@
     line-height: 2rem;
   }
 
-  tr:hover {
+  tbody tr:hover {
     background: rgba(255, 255, 255, 0.1);
   }
 
