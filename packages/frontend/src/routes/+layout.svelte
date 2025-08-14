@@ -37,6 +37,7 @@
     width: 100%;
     background: rgba(255, 255, 255, 0.1);
     box-shadow: rgba(0, 0, 0, 0.23) 2px 2px 3px -2px;
+    z-index: 100;
   }
 
   .header-wrapper {

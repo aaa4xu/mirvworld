@@ -2,6 +2,7 @@
   import type { PageProps } from './$types';
   import { enhance } from '$app/forms';
   import ImportMatchByLobbyIdForm from '$lib/components/ImportMatchByLobbyIdForm.svelte';
+  import Game from '$lib/components/Game.svelte';
 
   let { data, form }: PageProps = $props();
   const matches = $derived(form && form.results ? form.results : data.matches);
@@ -11,24 +12,22 @@
   <div class="latest">
     <h1>Latest matches</h1>
 
-    <form method="POST" action="?/search" use:enhance>
-      <label>
-        Search by player
-        <input name="player" type="text" required />
-      </label>
-      <button>Search</button>
-    </form>
-
-    <ul>
-      {#each matches as match (match.gameId)}
-        <li>
-          <a href="/matches/{match.gameId}.html"
-            ><span class="gameid">{match.gameId}</span> - {match.mode} @ {match.map}</a
-          >
-        </li>
-      {/each}
-    </ul>
+    {#each matches as match (match.id)}
+      <div class="game">
+        <Game {match} />
+      </div>
+    {/each}
   </div>
+</section>
+
+<section>
+  <form method="POST" action="?/search" use:enhance>
+    <label>
+      Search by player
+      <input name="player" type="text" required />
+    </label>
+    <button>Search</button>
+  </form>
 </section>
 
 <section>
@@ -44,7 +43,7 @@
     box-sizing: border-box;
   }
 
-  .gameid {
-    font-family: monospace;
+  .game {
+    padding-bottom: 2rem;
   }
 </style>
