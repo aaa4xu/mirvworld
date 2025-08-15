@@ -16,6 +16,7 @@
     "@swc/helpers": "~0.5.11",
     "@types/bun": "latest",
     "@types/debug": "^4.1.12",
+    "@types/simpleheat": "^0.4.3",
     "nx": "21.3.7",
     "prettier": "^3.6.2"
   },
@@ -39,6 +40,7 @@
   },
   "dependencies": {
     "arctic": "^3.7.0",
-    "debug": "^4.4.1"
+    "debug": "^4.4.1",
+    "simpleheat": "^0.4.0"
   }
 }
