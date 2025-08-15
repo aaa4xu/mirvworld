@@ -28,9 +28,19 @@
   ];
 </script>
 
+<svelte:head>
+  <title>Maps - MIRV.World</title>
+</svelte:head>
+
 <section>
   <h1>Maps</h1>
-
+  <p>
+    These heatmaps visualize the average final rank of players based on their chosen spawn locations. To interpret the
+    image, observe the color gradients: areas marked in green indicate locations where players, on average, achieved a
+    good final standing in the match. Yellow areas represent spawn points that typically led to an average performance,
+    while red signifies areas where players generally had a poor final rank. These maps were generated using data from
+    over 700,000 players across numerous FFA matches.
+  </p>
   {#each heatmaps as map}
     <div>
       <h2>{map}</h2>
@@ -49,5 +59,9 @@
 
   img {
     width: 100%;
+  }
+
+  h1 {
+    color: var(--accent-color2);
   }
 </style>
