@@ -8,6 +8,10 @@
   const matches = $derived(form && form.results ? form.results : data.matches);
 </script>
 
+<svelte:head>
+  <title>MIRV.World</title>
+</svelte:head>
+
 <section>
   <div class="latest">
     <h1>Latest matches</h1>
