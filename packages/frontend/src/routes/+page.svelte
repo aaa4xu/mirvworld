@@ -13,18 +13,6 @@
 </svelte:head>
 
 <section>
-  <div class="latest">
-    <h1>Latest matches</h1>
-
-    {#each matches as match (match.id)}
-      <div class="game">
-        <Game {match} />
-      </div>
-    {/each}
-  </div>
-</section>
-
-<section>
   <form method="POST" action="?/search" use:enhance>
     <label>
       Search by player
@@ -45,9 +33,5 @@
     margin: 0 auto;
     padding: 0 var(--content-padding);
     box-sizing: border-box;
-  }
-
-  .game {
-    padding-bottom: 2rem;
   }
 </style>
