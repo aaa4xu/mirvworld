@@ -9,15 +9,15 @@ export class PlayersRepository {
   }
 
   public async read(id: string | ObjectId): Promise<Player | null> {
-    if (typeof id === 'string') {
+    if (typeof id === 'string' && id.length === 24) {
       id = new ObjectId(id);
     }
 
-    return this.collection.findOne({ _id: id });
-  }
-
-  public async readByPublicId(publicId: string): Promise<Player | null> {
-    return this.collection.findOne({ publicId });
+    if (id instanceof ObjectId) {
+      return this.collection.findOne({ _id: id });
+    } else {
+      return this.collection.findOne({ publicId: id });
+    }
   }
 
   public async updateBatch() {

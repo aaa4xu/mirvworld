@@ -31,8 +31,8 @@ export const appRouter = router({
       }),
   },
   players: {
-    getById: publicProcedure.input(z.string().length(8)).query(async ({ ctx, input: id }) => {
-      let player = await ctx.players.getByPublicId(id);
+    getById: publicProcedure.input(z.string().max(24)).query(async ({ ctx, input: id }) => {
+      let player = await ctx.players.read(id);
       if (!player) {
         player = await ctx.players.updateByPublicId(id);
       }

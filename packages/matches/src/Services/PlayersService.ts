@@ -2,6 +2,7 @@ import type { PlayersRepository } from '../mongodb/Repositories/PlayersRepositor
 import { OpenFrontPublicAPI } from '@mirvworld/openfront-api';
 import type { MatchesService } from './MatchesService.ts';
 import type { MatchPlayerInfo } from '../mongodb/Models/MatchPlayer.ts';
+import type { ObjectId } from 'mongodb';
 
 export class PlayersService {
   public constructor(
@@ -10,8 +11,8 @@ export class PlayersService {
     private readonly matches: MatchesService,
   ) {}
 
-  public async getByPublicId(id: string) {
-    return this.repository.readByPublicId(id);
+  public async read(id: string | ObjectId) {
+    return this.repository.read(id);
   }
 
   public async updateByPublicId(publicId: string) {
@@ -30,7 +31,7 @@ export class PlayersService {
       registeredAt: new Date(data.createdAt),
     });
 
-    const player = await this.repository.readByPublicId(publicId);
+    const player = await this.repository.read(publicId);
     if (!player) {
       throw new Error(`Player ${publicId} not found`);
     }
