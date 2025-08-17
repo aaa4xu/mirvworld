@@ -50,9 +50,9 @@ export class MatchesRepository {
   }
 
   public async setPlayers(id: MatchDTO['id'], players: Array<PlayerStats>, winner?: string) {
-    await this.collection.updateOne(
+    const res = await this.collection.updateOne(
       {
-        gameId: id,
+        _id: new ObjectId(id),
       },
       {
         $set: {
@@ -61,6 +61,8 @@ export class MatchesRepository {
         },
       },
     );
+
+    return res.matchedCount > 0;
   }
 
   public async searchByPlayerRef(playerId: ObjectId) {
