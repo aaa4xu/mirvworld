@@ -85,7 +85,7 @@ export class MatchesService {
       winner = sortedTeams?.[0]?.[0] ?? winner;
     }
 
-    await this.repository.setPlayers(id, players, winner === null ? undefined : winner);
+    await this.repository.setPlayers(match.id, players, winner === null ? undefined : winner);
   }
 
   public async setMatchPlayerInfo(matchId: string, playerId: string, info: MatchPlayerInfo) {
