@@ -1,8 +1,7 @@
 import type { PageServerLoad } from './$types';
 import { trpc } from '$lib/server/trpc';
 import type { Actions } from './$types';
-import { isRedirect, redirect } from '@sveltejs/kit';
-import type { MatchBlockInfo } from '$lib/MatchBlockInfo';
+import { error, isRedirect, redirect } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async () => {
   return {};
@@ -14,25 +13,15 @@ export const actions = {
     const player = data.get('player');
 
     if (!player || typeof player !== 'string') {
-      throw redirect(302, '/');
+      throw error(404, 'Invalid player ID');
     }
 
-    const results = await trpc.matches.searchByPlayerName.query(player);
+    const id = player.trim();
+    if (player.length !== 8) {
+      throw error(404, 'Invalid player ID');
+    }
 
-    return {
-      results: results.map((match): MatchBlockInfo => {
-        return {
-          map: match.map,
-          mode: match.mode,
-          startedAt: match.startedAt,
-          maxPlayers: match.maxPlayers,
-          players: match.players.length,
-          id: match.gameId,
-          finishedAt: match.finishedAt,
-          winner: match.winner ?? 'unknown',
-        };
-      }),
-    };
+    return redirect(303, `/players/${id}.html`);
   },
 
   importMatch: async ({ request }) => {
