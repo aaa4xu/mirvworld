@@ -3,7 +3,11 @@ import { trpc } from '$lib/server/trpc';
 import { error, redirect } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({ params }) => {
-  const player = await trpc.players.getById.query(params.id).catch(() => null);
+  const player = await trpc.players.getById.query(params.id).catch((err) => {
+    console.error('Failed to get player info from backend:', err);
+    return null;
+  });
+
   if (!player) {
     throw error(404, 'Player not found');
   }
