@@ -54,7 +54,7 @@
   {duration}
   {winner}
   players={data.match.players.length}
-  maxPlayers={data.match.maxPlayers}
+  maxPlayers={data.match.maxPlayers ?? 0}
 />
 
 {#if data.match.players.length === 0}

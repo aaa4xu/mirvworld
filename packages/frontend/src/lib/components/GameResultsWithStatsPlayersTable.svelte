@@ -41,7 +41,11 @@
         {#each sortedPlayers as player, index (index)}
           <tr>
             <td>{index + 1}</td>
-            <td>{player.name}</td>
+            <td class="player"
+              >{#if player.info?.avatar}<a href="/players/{player.info.id}.html"
+                  ><img src={player.info.avatar} alt="{player.name} avatar" class="avatar" />{player.name}</a
+                >{:else}{player.name}{/if}</td
+            >
             <td>{player.firstBuild > 0 ? Math.round(player.firstBuild / 10) + 's' : '-'}</td>
             <td>{player.buildOrder.length > 0 ? player.buildOrder : '-'}</td>
             <td>{player.outgoingTroopsPerMinute}k</td>
@@ -101,6 +105,29 @@
     flex-direction: row;
     justify-content: flex-end;
     align-items: center;
+    gap: 0.35rem;
+  }
+
+  tr {
+    line-height: 1rem;
+  }
+
+  .avatar {
+    border-radius: 50%;
+    height: 1.2em;
+    padding-right: 0.3em;
+  }
+
+  .player {
+    padding: 0;
+    line-height: 1.85em;
+  }
+
+  .player a {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     gap: 0.35rem;
   }
 </style>
