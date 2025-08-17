@@ -90,16 +90,27 @@ export class MatchesService {
 
   public async setMatchPlayerInfo(matchId: string, playerId: string, info: MatchPlayerInfo) {
     const match = await this.read(matchId);
-    if (!match || match.players.length === 0) return;
+    if (!match) {
+      console.warn(`[${this.constructor.name}][${matchId}] Failed to update player info in match: match not found`);
+      return;
+    }
+
+    if (match.players.length === 0) {
+      console.warn(`[${this.constructor.name}][${matchId}] Failed to update player info in match: players is empty`);
+      return;
+    }
 
     const player = match.players.find((p) => p.id === playerId);
     if (!player) {
-      console.error(`[${this.constructor.name}][${match.gameId}] Cannot find player with id ${playerId}`);
+      console.error(
+        `[${this.constructor.name}][${match.gameId}] Failed to update player info in match: Cannot find player with id ${playerId}`,
+      );
       return;
     }
 
     player.info = info;
     await this.repository.setPlayers(match.id, match.players);
+    console.log(`[${this.constructor.name}][${match.gameId}] Updated info for player ${playerId}`);
   }
 
   public async updateMatchPlayerInfo(playerId: ObjectId, info: MatchPlayerInfo) {
