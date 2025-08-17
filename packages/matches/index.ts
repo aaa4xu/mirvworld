@@ -62,7 +62,14 @@ if (!config.readOnly) {
 
 const server = createHTTPServer({
   router: appRouter,
-  createContext: createContext(config.http.secret, api, replayStorage, matchesService, tournamentsService),
+  createContext: createContext(
+    config.http.secret,
+    api,
+    replayStorage,
+    matchesService,
+    tournamentsService,
+    playersService,
+  ),
 });
 
 /*tournamentsRepository.add({

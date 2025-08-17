@@ -30,6 +30,16 @@ export const appRouter = router({
         return ctx.tournaments.addMatch(input.id, input.matchId);
       }),
   },
+  players: {
+    getById: publicProcedure.input(z.string().length(8)).query(async ({ ctx, input: id }) => {
+      let player = await ctx.players.getByPublicId(id);
+      if (!player) {
+        player = await ctx.players.updateByPublicId(id);
+      }
+
+      return player;
+    }),
+  },
 });
 
 // Export type router type signature,

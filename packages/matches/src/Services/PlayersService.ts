@@ -10,6 +10,10 @@ export class PlayersService {
     private readonly matches: MatchesService,
   ) {}
 
+  public async getByPublicId(id: string) {
+    return this.repository.readByPublicId(id);
+  }
+
   public async updateByPublicId(publicId: string) {
     const data = await this.api.player(publicId);
 
@@ -43,6 +47,7 @@ export class PlayersService {
     }
 
     await Promise.all(data.games.map((game) => this.matches.setMatchPlayerInfo(game.gameId, game.clientId, info)));
+    return player;
   }
 
   public updateBatch() {

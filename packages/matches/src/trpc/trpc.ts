@@ -7,6 +7,7 @@ import type { MatchesService } from '../Services/MatchesService.ts';
 import type { TournamentsService } from '../Services/TournamentsService.ts';
 import jwt from 'jsonwebtoken';
 import { TokenPayloadSchema } from '../Schema/TokenPayload.ts';
+import type { PlayersService } from '../Services/PlayersService.ts';
 
 export const createContext = (
   secret: string,
@@ -14,6 +15,7 @@ export const createContext = (
   storage: ReplayStorage,
   matches: MatchesService,
   tournaments: TournamentsService,
+  players: PlayersService,
 ) => {
   return async (opts: CreateHTTPContextOptions) => {
     const authorization = opts.req.headers.authorization?.split(' ');
@@ -38,6 +40,7 @@ export const createContext = (
       storage,
       matches,
       tournaments,
+      players,
       hasScope: (scp: string) => scope.includes(scp),
     };
   };
