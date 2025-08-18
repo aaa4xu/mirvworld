@@ -53,12 +53,11 @@ export class PlayerStatsRecorder {
   }
 
   public killed(turn: number) {
-    if (this.death < 0) {
-      this.death = turn;
-    } else {
-      console.error(`[${this.constructor.name}][${this.name}] Killed twice: at turn ${this.death} and ${turn}`);
+    if (this.death >= 0 && turn >= 0) {
+      console.warn(`[${this.constructor.name}][${this.name}] Killed multiple times: at turn ${this.death} and ${turn}`);
     }
 
+    this.death = turn;
     return this;
   }
 
