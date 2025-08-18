@@ -71,6 +71,15 @@ export class Stats implements GameStats {
 
   public endGame(game: Game) {
     this.recorder.setDuration(this.turn);
+
+    // Mitigation for false deaths
+    // @see https://github.com/openfrontio/OpenFrontIO/issues/1846
+    for (const player of game.players()) {
+      if (!player.isAlive()) continue;
+      // Reset killed flag for all players lived at the end of the game
+      this.recorder.player(player.smallID()).killed(-1);
+    }
+
     this.addTilesEvent(game);
   }
 
