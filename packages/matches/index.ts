@@ -20,6 +20,8 @@ import { PlayerMatchesImporter } from './src/Workers/PlayerMatchesImporter.ts';
 import { LeaderboardPlayersImporter } from './src/Workers/LeaderboardPlayersImporter.ts';
 import { TournamentsRepository } from './src/mongodb/Repositories/TournamentsRepository.ts';
 import { TournamentsService } from './src/Services/TournamentsService.ts';
+import { RedisClanRatingRepository } from './src/Repositories/RedisClanRatingRepository.ts';
+import { OpenSkill } from './src/OpenSkill.ts';
 
 const abort = new AbortController();
 process.on('SIGTERM', () => abort.abort('SIGTERM'));
@@ -42,12 +44,14 @@ const playersRepository = new PlayersRepository(mongoDatabase);
 const playersService = new PlayersService(playersRepository, api, matchesService);
 const tournamentsRepository = new TournamentsRepository(mongoDatabase, matchesRepository);
 const tournamentsService = new TournamentsService(tournamentsRepository);
+const clanRatingRepository = new RedisClanRatingRepository(redis);
+const openskill = new OpenSkill(clanRatingRepository);
 
 if (!config.readOnly) {
   const streamify = new Streamify(redis, 'matches:storage', 'matches:queue');
   abort.signal.addEventListener('abort', () => streamify.dispose(), { once: true });
 
-  const gamelensImporter = new GameLensImporter('matches:gamelens', redis, matchesService);
+  const gamelensImporter = new GameLensImporter('matches:gamelens', redis, matchesService, openskill);
   abort.signal.addEventListener('abort', () => gamelensImporter.dispose(), { once: true });
 
   const matchesImporter = new MatchInfoImporter('matches:queue', redis, matchesService);
@@ -71,16 +75,5 @@ const server = createHTTPServer({
     playersService,
   ),
 });
-
-/*tournamentsRepository.add({
-  rules: {
-    id: 'max-tiles',
-    params: [10, 8, 6, 4, 2],
-  },
-  name: 'Tournament of Brilliance',
-  slug: 'tournament-of-brilliance',
-  startAt: new Date(),
-  endAt: new Date(),
-});*/
 
 server.listen(config.http.port);
