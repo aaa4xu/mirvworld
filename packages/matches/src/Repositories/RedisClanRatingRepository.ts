@@ -47,7 +47,18 @@ export class RedisClanRatingRepository implements ClanRatingRepository {
     ]);
     const arr = Array.isArray(res) ? res : [];
 
-    return arr.map((r) => ({ tag: r[0], score: parseFloat(r[1]), games: 0 }));
+    const data = arr.map((r) => ({ tag: r[0], score: parseFloat(r[1]), games: 0 }));
+
+    return Promise.all(
+      data.map(async (clan) => {
+        const [games] = await this.redis.hmget(`${this.ratingKeyPrefix}:${clan.tag}`, ['games']);
+
+        return {
+          ...clan,
+          games: parseInt(games ?? '0', 10),
+        };
+      }),
+    );
   }
 
   public async applyDeltas(gameId: string, deltas: ClanDelta[]): Promise<void> {
