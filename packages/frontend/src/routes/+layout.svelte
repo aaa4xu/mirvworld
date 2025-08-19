@@ -6,8 +6,9 @@
   <div class="header-wrapper">
     <nav>
       <a href="/">MIRV World</a>
-      <a href="/matches/">Matches</a>
+      <a href="/leaderboard.html">Leaderboard</a>
       <a href="/maps/">Maps</a>
+      <a href="/matches/">Matches</a>
       <a href="/tournaments/tournament-of-brilliance.html">Tournament of Brilliance</a>
       <!--      <a href="#/players/">Players</a>-->
       <!--      <a href="#/meta/">Meta</a>-->
