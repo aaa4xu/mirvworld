@@ -77,4 +77,14 @@ const server = createHTTPServer({
   ),
 });
 
+redis.onclose = () => {
+  console.error('Disconnected from Redis, exiting...');
+  process.exit(1);
+};
+
+mongo.on('close', () => {
+  console.error('Disconnected from MongoDB, exiting...');
+  process.exit(1);
+});
+
 server.listen(config.http.port);
