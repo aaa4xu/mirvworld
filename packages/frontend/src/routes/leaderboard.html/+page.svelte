@@ -11,6 +11,13 @@
 
 <div class="content">
   <h1>Clans</h1>
+  <p>
+    This leaderboard ranks clans based on their performance in competitive team-based matches using the OpenSkill rating
+    system. The score reflects a conservative estimate of skill, rewarding consistent participation and success over
+    time. For a full breakdown of the rules and calculations, <a href="/about/clan-rating.html"
+      >read our detailed explanation</a
+    >.
+  </p>
 
   <table>
     <thead>
