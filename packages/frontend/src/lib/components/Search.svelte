@@ -1,9 +1,28 @@
 <script lang="ts">
   const { action }: { action: string } = $props();
+  let value = $state('');
+
+  function handleInputValue(event: Event) {
+    const input = event.target as HTMLInputElement;
+
+    const matches = input.value.trim().match(/https:\/\/openfront\.io\/#join=([A-Za-z0-9]{8})/);
+    if (matches) {
+      event.preventDefault();
+      value = matches[1];
+    }
+  }
 </script>
 
 <form method="POST" {action}>
-  <input name="player" type="text" placeholder="Player ID" maxlength="8" minlength="8" required />
+  <input
+    name="search"
+    type="text"
+    placeholder="Match ID / Match link / Player ID"
+    minlength="8"
+    onkeyup={handleInputValue}
+    bind:value
+    required
+  />
   <button type="submit">Search</button>
 </form>
 

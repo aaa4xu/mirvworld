@@ -10,15 +10,20 @@ export const load: PageServerLoad = async () => {
 export const actions = {
   search: async ({ request }) => {
     const data = await request.formData();
-    const player = data.get('player');
+    const search = data.get('search');
 
-    if (!player || typeof player !== 'string') {
-      throw error(404, 'Invalid player ID');
+    if (!search || typeof search !== 'string') {
+      throw error(422, 'Invalid search value');
     }
 
-    const id = player.trim();
-    if (player.length !== 8) {
-      throw error(404, 'Invalid player ID');
+    const id = search.trim();
+    if (id.length !== 8) {
+      throw error(422, 'Invalid ID');
+    }
+
+    const match = await trpc.matches.getByGameId.query(id).catch(() => null);
+    if (match) {
+      return redirect(303, `/matches/${id}.html`);
     }
 
     return redirect(303, `/players/${id}.html`);

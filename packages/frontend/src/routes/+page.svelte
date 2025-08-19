@@ -1,9 +1,6 @@
 <script lang="ts">
   import type { PageProps } from './$types';
-  import { enhance } from '$app/forms';
-  import ImportMatchByLobbyIdForm from '$lib/components/ImportMatchByLobbyIdForm.svelte';
-  import Game from '$lib/components/Game.svelte';
-  import SearchByPlayerId from '$lib/components/SearchByPlayerId.svelte';
+  import Search from '$lib/components/Search.svelte';
 
   let { data, form }: PageProps = $props();
 </script>
@@ -15,13 +12,8 @@
 <h1>MIRV.World</h1>
 
 <section id="search">
-  <SearchByPlayerId action="?/search" />
+  <Search action="?/search" />
 </section>
-
-<!--<section>-->
-<!--  <h2>Import private match</h2>-->
-<!--  <ImportMatchByLobbyIdForm action="?/importMatch" error={form?.importError} />-->
-<!--</section>-->
 
 <style>
   h1 {
