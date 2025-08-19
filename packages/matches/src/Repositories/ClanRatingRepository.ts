@@ -30,4 +30,5 @@ export interface DefaultParams {
 export interface ClanRatingScore {
   tag: string;
   score: number;
+  games: number;
 }

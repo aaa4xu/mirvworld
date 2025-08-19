@@ -47,7 +47,7 @@ export class RedisClanRatingRepository implements ClanRatingRepository {
     ]);
     const arr = Array.isArray(res) ? res : [];
 
-    return arr.map((r) => ({ tag: r[0], score: parseFloat(r[1]) }));
+    return arr.map((r) => ({ tag: r[0], score: parseFloat(r[1]), games: 0 }));
   }
 
   public async applyDeltas(gameId: string, deltas: ClanDelta[]): Promise<void> {
