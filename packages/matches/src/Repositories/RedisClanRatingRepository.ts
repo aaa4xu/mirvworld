@@ -46,11 +46,8 @@ export class RedisClanRatingRepository implements ClanRatingRepository {
       'WITHSCORES',
     ]);
     const arr = Array.isArray(res) ? res : [];
-    const out: Array<ClanRatingScore> = [];
-    for (let i = 0; i < arr.length; i += 2) {
-      out.push({ tag: arr[i], score: parseFloat(arr[i + 1]) });
-    }
-    return out;
+
+    return arr.map((r) => ({ tag: r[0], score: parseFloat(r[1]) }));
   }
 
   public async applyDeltas(gameId: string, deltas: ClanDelta[]): Promise<void> {
