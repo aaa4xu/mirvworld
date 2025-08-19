@@ -1,3 +1,10 @@
+<script>
+</script>
+
+<svelte:head>
+  <title>How the Clan Rating System Works - MIRV.World</title>
+</svelte:head>
+
 <article>
   <h1>How the Clan Rating System Works</h1>
   <p>
