@@ -32,13 +32,13 @@ export class InMemoryClanRatingRepository implements ClanRatingRepository {
   }
 
   /** Retrieves top-N by score (descending). */
-  public async getTop(limit = 50): Promise<ClanRatingScore[]> {
+  public async getTop(limit = 50, offset = 0): Promise<ClanRatingScore[]> {
     const all: ClanRatingScore[] = [];
     for (const [tag, r] of this.ratings) {
       all.push({ tag, score: this.score(r) });
     }
     all.sort((a, b) => b.score - a.score);
-    return all.slice(0, Math.max(0, limit));
+    return all.slice(offset, Math.max(0, limit));
   }
 
   /**

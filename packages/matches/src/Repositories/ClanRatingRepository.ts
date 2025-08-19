@@ -9,7 +9,7 @@ export interface ClanRatingRepository {
   /**
    * Retrieves the top elements from the leaderboard, sorted by score in descending order
    */
-  getTop(limit?: number): Promise<Array<ClanRatingScore>>;
+  getTop(limit?: number, offset?: number): Promise<Array<ClanRatingScore>>;
 
   applyDeltas(gameId: string, deltas: ClanDelta[]): Promise<void>;
 }

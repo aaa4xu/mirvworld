@@ -38,17 +38,17 @@ export class RedisClanRatingRepository implements ClanRatingRepository {
   /**
    * Retrieves the top elements from the leaderboard, sorted by score in descending order
    */
-  public async getTop(limit = 50): Promise<Array<ClanRatingScore>> {
+  public async getTop(limit = 50, offset = 0): Promise<Array<ClanRatingScore>> {
     const res = await this.redis.send('ZREVRANGE', [
       this.leaderboardKey,
-      '0',
-      String(Math.max(0, limit - 1)),
+      offset.toString(),
+      Math.max(0, limit - 1).toString(),
       'WITHSCORES',
     ]);
     const arr = Array.isArray(res) ? res : [];
     const out: Array<ClanRatingScore> = [];
     for (let i = 0; i < arr.length; i += 2) {
-      out.push({ tag: String(arr[i]), score: Number(arr[i + 1]) });
+      out.push({ tag: arr[i], score: parseFloat(arr[i + 1]) });
     }
     return out;
   }
