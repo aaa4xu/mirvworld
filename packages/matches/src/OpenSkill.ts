@@ -8,6 +8,10 @@ export class OpenSkill {
 
   public constructor(private readonly repository: ClanRatingRepository) {}
 
+  public leaderboard(page = 1, limit = 100) {
+    return this.repository.getTop(limit, (page - 1) * limit);
+  }
+
   public async apply(gameId: string, players: Array<PlayerStats>) {
     const teams = this.groupByTeam(players);
     const rows = this.buildTeamRows(teams);

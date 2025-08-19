@@ -73,6 +73,7 @@ const server = createHTTPServer({
     matchesService,
     tournamentsService,
     playersService,
+    openskill,
   ),
 });
 

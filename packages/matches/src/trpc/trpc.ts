@@ -8,6 +8,7 @@ import type { TournamentsService } from '../Services/TournamentsService.ts';
 import jwt from 'jsonwebtoken';
 import { TokenPayloadSchema } from '../Schema/TokenPayload.ts';
 import type { PlayersService } from '../Services/PlayersService.ts';
+import type { OpenSkill } from '../OpenSkill.ts';
 
 export const createContext = (
   secret: string,
@@ -16,6 +17,7 @@ export const createContext = (
   matches: MatchesService,
   tournaments: TournamentsService,
   players: PlayersService,
+  clanRating: OpenSkill,
 ) => {
   return async (opts: CreateHTTPContextOptions) => {
     const authorization = opts.req.headers.authorization?.split(' ');
@@ -41,6 +43,7 @@ export const createContext = (
       matches,
       tournaments,
       players,
+      clanRating,
       hasScope: (scp: string) => scope.includes(scp),
     };
   };

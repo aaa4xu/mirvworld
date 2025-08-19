@@ -40,6 +40,11 @@ export const appRouter = router({
       return player;
     }),
   },
+  leaderboard: {
+    clans: publicProcedure.input(z.number().min(1)).query(async ({ ctx, input: page }) => {
+      return ctx.clanRating.leaderboard(page);
+    }),
+  },
 });
 
 // Export type router type signature,
