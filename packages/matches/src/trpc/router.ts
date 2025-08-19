@@ -41,7 +41,7 @@ export const appRouter = router({
     }),
   },
   leaderboard: {
-    clans: publicProcedure.input(z.number().min(1)).query(async ({ ctx, input: page }) => {
+    clans: publicProcedure.input(z.number().min(1).optional()).query(async ({ ctx, input: page }) => {
       return ctx.clanRating.leaderboard(page);
     }),
   },
