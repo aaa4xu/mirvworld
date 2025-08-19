@@ -66,5 +66,10 @@ const lobbiesLurker = new LobbiesLurker(
 );
 abortController.signal.addEventListener('abort', () => lobbiesLurker.dispose());
 
+redis.onclose = () => {
+  console.error('Disconnected from Redis, exiting...');
+  process.exit(1);
+};
+
 const replaysLurker = new ReplayLurker(apiClient, serverClient, replayStorage, downloadQueue);
 abortController.signal.addEventListener('abort', () => replaysLurker.dispose(), { once: true });
