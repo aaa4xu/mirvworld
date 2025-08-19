@@ -42,7 +42,7 @@ export class RedisClanRatingRepository implements ClanRatingRepository {
     const res = await this.redis.send('ZREVRANGE', [
       this.leaderboardKey,
       offset.toString(),
-      Math.max(0, limit - 1).toString(),
+      (offset + limit - 1).toString(),
       'WITHSCORES',
     ]);
     const arr = Array.isArray(res) ? res : [];
