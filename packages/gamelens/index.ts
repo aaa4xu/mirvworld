@@ -36,6 +36,11 @@ if (cluster.isPrimary) {
     cluster.disconnect();
     streamify.dispose();
   });
+
+  redis.onclose = () => {
+    console.error(`[Master] Disconnected from Redis, exiting...`);
+    process.exit(1);
+  };
 } else {
   let gameCommit: string;
   if (await Bun.file('game-commit.txt').exists()) {
@@ -62,4 +67,9 @@ if (cluster.isPrimary) {
     console.log(`[Worker#${process.pid}] Aborting...`);
     process.exit(1);
   });
+
+  redis.onclose = () => {
+    console.error(`[Worker#${process.pid}] Disconnected from Redis, exiting...`);
+    process.exit(1);
+  };
 }
