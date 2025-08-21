@@ -13,6 +13,9 @@ export class MatchesRepository {
   }
 
   public async searchByPlayer(name: string): Promise<Array<MatchDTO>> {
+    // Escape all regex significant characters
+    name = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
     const items = await this.collection
       .aggregate<Match>([
         {
