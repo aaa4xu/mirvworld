@@ -17,8 +17,8 @@
   <input
     name="search"
     type="text"
-    placeholder="Match ID / Match link / Player ID"
-    minlength="8"
+    placeholder="Match ID / Match link / Player name"
+    minlength="1"
     onkeyup={handleInputValue}
     bind:value
     required

@@ -12,7 +12,10 @@
 
 <section>
   <div class="latest">
-    <h1>Latest matches</h1>
+    <h1>
+      Latest matches{#if data.playerSearch}
+        &nbsp;with {data.playerSearch}{/if}
+    </h1>
 
     {#each matches as match (match.id)}
       <div class="game">

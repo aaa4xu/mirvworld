@@ -16,36 +16,23 @@ export const actions = {
       throw error(422, 'Invalid search value');
     }
 
-    const id = search.trim();
-    if (id.length !== 8) {
-      throw error(422, 'Invalid ID');
-    }
+    const query = search.trim();
 
-    const match = await trpc.matches.getByGameId.query(id).catch(() => null);
-    if (match) {
-      return redirect(303, `/matches/${id}.html`);
-    }
+    if (query.length === 8) {
+      const [match, player] = await Promise.all([
+        await trpc.matches.getByGameId.query(query).catch(() => null),
+        await trpc.players.getById.query(query).catch(() => null),
+      ]);
 
-    return redirect(303, `/players/${id}.html`);
-  },
-
-  importMatch: async ({ request }) => {
-    const data = await request.formData();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const id = data.get('lobby') as any;
-
-    try {
-      await trpc.matches.importById.mutate(id);
-      throw redirect(303, `/matches/${id}.html`);
-    } catch (err) {
-      if (isRedirect(err)) {
-        throw err;
+      if (match) {
+        return redirect(303, `/matches/${query}.html`);
       }
 
-      console.error(err);
-      return {
-        importError: err instanceof Error ? err.message : String(err),
-      };
+      if (player) {
+        return redirect(303, `/players/${query}.html`);
+      }
     }
+
+    return redirect(303, `/matches?player=${encodeURIComponent(query)}`);
   },
 } satisfies Actions;
