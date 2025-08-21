@@ -16,6 +16,7 @@
     "fastpriorityqueue": "^0.7.5",
     "jose": "^6.0.12",
     "obscenity": "^0.4.4",
+    "seedrandom": "^3.0.5",
     "twemoji": "^14.0.2"
   }
 }
