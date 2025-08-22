@@ -132,6 +132,12 @@ export class Stats implements GameStats {
 
   public boatSendTroops(player: Player, target: Player | TerraNullius, troops: number | bigint): void {}
 
+  public trainArrived(trainOwner: Player, target: Player, gold: bigint) {
+    // v0.25.3: события не существует в коде игры, добавил через патчи
+    // Поезд trainOwner принес золото игроку target
+    this.recorder.player(target.smallID()).increaseGold(this.toBigInt(gold));
+  }
+
   public bombIntercept(player: Player, type: NukeType, count: number | bigint): void {}
 
   public bombLand(player: Player, target: Player | TerraNullius, type: NukeType): void {
