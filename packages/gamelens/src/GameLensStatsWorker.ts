@@ -16,10 +16,11 @@ export class GameLensStatsWorker {
     private readonly version: string,
     private readonly redis: RedisClient,
     private readonly replayStorage: ReplayStorage,
+    groupSuffix = '',
   ) {
     this.worker = new TaskWorker(redis, {
       streamKey: 'gamelens:queue',
-      group: `${this.constructor.name}-${version}`,
+      group: `${this.constructor.name}-${version}${groupSuffix}`,
       deadLetterKey: 'gamelens:deadletter',
       consumer: `${os.hostname()}-${process.pid}`,
       startFromBeginningOfQueue: true,

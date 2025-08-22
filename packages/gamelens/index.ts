@@ -62,7 +62,7 @@ if (cluster.isPrimary) {
     new MinioStorage(config.replays.s3.bucket, new Client(config.replays.s3.endpoint)),
   );
 
-  new GameLensStatsWorker(config.mapsPath, gameCommit, redis, replayStorage);
+  new GameLensStatsWorker(config.mapsPath, gameCommit, redis, replayStorage, config.groupSuffix);
   abort.signal.addEventListener('abort', () => {
     console.log(`[Worker#${process.pid}] Aborting...`);
     process.exit(1);

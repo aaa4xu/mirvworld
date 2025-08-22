@@ -10,4 +10,5 @@ export const config = {
   redis: env('GAMELENS_REDIS_URL', 'redis://localhost:6379'),
   mapsPath: env('GAMELENS_MAPS_PATH', './../openfront/game/resources/maps'),
   concurrency: parseInt(env('GAMELENS_CONCURRENCY', '0'), 10),
+  groupSuffix: env('GAMELENS_GROUP_SUFFIX', ''),
 };
