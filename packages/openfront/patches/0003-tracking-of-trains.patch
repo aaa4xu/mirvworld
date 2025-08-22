@@ -1,0 +1,53 @@
+From 42f0eb99db1d3a8170c0b2df49e68baa6ff718a2 Mon Sep 17 00:00:00 2001
+From: Aleksey Orekhovsky <aaa4xu@gmail.com>
+Date: Fri, 22 Aug 2025 10:04:25 +0700
+Subject: [PATCH] Update stats interface to log stats for trains
+
+---
+ src/core/game/Stats.ts        | 2 ++
+ src/core/game/TrainStation.ts | 4 ++++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/src/core/game/Stats.ts b/src/core/game/Stats.ts
+index d328c6d7..34a8a8f7 100644
+--- a/src/core/game/Stats.ts
++++ b/src/core/game/Stats.ts
+@@ -29,6 +29,8 @@ export interface Stats {
+   // Player's trade ship arrives at target, both players earn gold
+   boatArriveTrade(player: Player, target: Player, gold: number | bigint): void;
+ 
++  trainArrived(trainOwner: Player, target: Player, gold: bigint): void;
++
+   // Player's trade ship, captured from target, arrives. Player earns gold.
+   boatCapturedTrade(
+     player: Player,
+diff --git a/src/core/game/TrainStation.ts b/src/core/game/TrainStation.ts
+index b804755c..d592e87b 100644
+--- a/src/core/game/TrainStation.ts
++++ b/src/core/game/TrainStation.ts
+@@ -29,8 +29,10 @@ class CityStopHandler implements TrainStopHandler {
+     // Share revenue with the station owner if it's not the current player
+     if (trainOwner !== stationOwner) {
+       stationOwner.addGold(goldBonus, station.tile());
++      mg.stats().trainArrived(trainOwner, stationOwner, goldBonus);
+     }
+     trainOwner.addGold(goldBonus, station.tile());
++    mg.stats().trainArrived(trainOwner, trainOwner, goldBonus);
+   }
+ }
+ 
+@@ -46,9 +48,11 @@ class PortStopHandler implements TrainStopHandler {
+     const goldBonus = mg.config().trainGold(rel(trainOwner, stationOwner));
+ 
+     trainOwner.addGold(goldBonus, station.tile());
++    mg.stats().trainArrived(trainOwner, trainOwner, goldBonus);
+     // Share revenue with the station owner if it's not the current player
+     if (trainOwner !== stationOwner) {
+       stationOwner.addGold(goldBonus, station.tile());
++      mg.stats().trainArrived(trainOwner, stationOwner, goldBonus);
+     }
+   }
+ }
+-- 
+2.39.5 (Apple Git-154)
+
