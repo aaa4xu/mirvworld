@@ -69,12 +69,12 @@ services:
     restart: always
     environment:
       - GAMELENS_REDIS_URL=redis://redis:6379
+      - GAMELENS_CONCURRENCY=12
     env_file:
       - v4.env
     depends_on:
       - redis
       - storage
-    cpus: 24
 
   mongodb:
     restart: always
