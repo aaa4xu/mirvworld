@@ -18,4 +18,9 @@ export const ClanRatingSchema = z.object({
   }),
 });
 
+export const ClanRatingDeltaSchema = ClanRatingSchema.extend({
+  tag: z.string(),
+});
+
 export type ClanRating = z.infer<typeof ClanRatingSchema>;
+export type ClanRatingDelta = z.infer<typeof ClanRatingDeltaSchema>;

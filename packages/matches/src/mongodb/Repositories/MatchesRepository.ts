@@ -2,6 +2,7 @@ import { Collection, type Db, type Document, ObjectId } from 'mongodb';
 import { type Match, type MatchDTO, MatchDTOSchema, type MatchInsert, MatchInsertSchema } from '../Models/Match.ts';
 import type { PlayerStats } from '@mirvworld/gamelens-stats';
 import z from 'zod';
+import type { ClanRatingDelta } from '../../Schema/ClanRating.ts';
 
 export class MatchesRepository {
   public static readonly collectionName = 'matches';
@@ -61,6 +62,21 @@ export class MatchesRepository {
         $set: {
           players,
           ...(winner ? { winner } : {}),
+        },
+      },
+    );
+
+    return res.matchedCount > 0;
+  }
+
+  public async setRatingDeltas(id: MatchDTO['id'], deltas: MatchDTO['ratingDeltas']) {
+    const res = await this.collection.updateOne(
+      {
+        _id: new ObjectId(id),
+      },
+      {
+        $set: {
+          ratingDeltas: deltas,
         },
       },
     );

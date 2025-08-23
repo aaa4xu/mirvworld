@@ -1,10 +1,10 @@
 // @ts-ignore - lua script
 import applyRatingScript from '../Redis/ApplyRating/ApplyRating.lua' with { type: 'text' };
 import { RedisClient } from 'bun';
-import { type ClanRating, ClanRatingSchema } from '../Schema/ClanRating.ts';
+import { type ClanRating, ClanRatingSchema, type ClanRatingDelta } from '../Schema/ClanRating.ts';
 import { RedisLuaScript } from '@mirvworld/redis-script';
 import { ApplyRatingResultSchema } from '../Redis/ApplyRating/Schema.ts';
-import type { ClanDelta, ClanRatingRepository, ClanRatingScore, DefaultParams } from './ClanRatingRepository.ts';
+import type { ClanRatingRepository, ClanRatingScore, DefaultParams } from './ClanRatingRepository.ts';
 
 export class RedisClanRatingRepository implements ClanRatingRepository {
   private readonly k: number;
@@ -61,7 +61,7 @@ export class RedisClanRatingRepository implements ClanRatingRepository {
     );
   }
 
-  public async applyDeltas(gameId: string, deltas: ClanDelta[]): Promise<void> {
+  public async applyDeltas(gameId: string, deltas: ClanRatingDelta[]): Promise<void> {
     deltas = deltas.map((d) => ({ ...d, tag: this.normalizeClanTag(d.tag) }));
 
     if (deltas.length === 0) return;
@@ -74,7 +74,7 @@ export class RedisClanRatingRepository implements ClanRatingRepository {
       String(this.k),
       String(this.mu0),
       String(this.sigma0),
-      ...deltas.flatMap((d) => [d.tag, String(d.dMu), String(d.dSigma), String(d.dGames)]),
+      ...deltas.flatMap((d) => [d.tag, String(d.mu), String(d.sigma), String(d.games)]),
     ];
 
     const script = new RedisLuaScript({

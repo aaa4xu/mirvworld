@@ -1,4 +1,4 @@
-import { type ClanRating } from '../Schema/ClanRating.ts';
+import { type ClanRating, type ClanRatingDelta } from '../Schema/ClanRating.ts';
 
 export interface ClanRatingRepository {
   /**
@@ -11,15 +11,15 @@ export interface ClanRatingRepository {
    */
   getTop(limit?: number, offset?: number): Promise<Array<ClanRatingScore>>;
 
-  applyDeltas(gameId: string, deltas: ClanDelta[]): Promise<void>;
+  applyDeltas(gameId: string, deltas: ClanRatingDelta[]): Promise<void>;
 }
 
-export interface ClanDelta {
-  tag: string; // normalized tag
-  dMu: number;
-  dSigma: number;
-  dGames: number; // usually 1 per match per participating clan
-}
+// export interface ClanDelta {
+//   tag: string; // normalized tag
+//   dMu: number;
+//   dSigma: number;
+//   dGames: number; // usually 1 per match per participating clan
+// }
 
 export interface DefaultParams {
   k: number;

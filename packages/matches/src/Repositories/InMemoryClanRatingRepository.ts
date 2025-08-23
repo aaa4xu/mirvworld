@@ -1,5 +1,5 @@
-import type { ClanRating } from '../Schema/ClanRating.ts';
-import type { ClanDelta, ClanRatingRepository, ClanRatingScore, DefaultParams } from './ClanRatingRepository.ts';
+import type { ClanRating, ClanRatingDelta } from '../Schema/ClanRating.ts';
+import type { ClanRatingRepository, ClanRatingScore, DefaultParams } from './ClanRatingRepository.ts';
 
 export class InMemoryClanRatingRepository implements ClanRatingRepository {
   private readonly k: number;
@@ -44,7 +44,7 @@ export class InMemoryClanRatingRepository implements ClanRatingRepository {
   /**
    * Applies rating deltas for a single match.
    */
-  public async applyDeltas(gameId: string, deltas: ClanDelta[]): Promise<void> {
+  public async applyDeltas(gameId: string, deltas: ClanRatingDelta[]): Promise<void> {
     if (this.processed.has(gameId)) return;
     if (!Array.isArray(deltas) || deltas.length === 0) {
       this.processed.add(gameId);
@@ -55,9 +55,9 @@ export class InMemoryClanRatingRepository implements ClanRatingRepository {
       const tag = this.normalize(d.tag);
       const cur = this.ratings.get(tag) ?? { mu: this.mu0, sigma: this.sigma0, games: 0 };
 
-      const mu = cur.mu + d.dMu;
-      const sigma = Math.max(0.001, cur.sigma + d.dSigma);
-      const games = Math.max(0, cur.games + d.dGames);
+      const mu = cur.mu + d.mu;
+      const sigma = Math.max(0.001, cur.sigma + d.sigma);
+      const games = Math.max(0, cur.games + d.games);
 
       this.ratings.set(tag, { mu, sigma, games });
     }

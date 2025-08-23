@@ -1,6 +1,6 @@
 import { rate, type Team } from 'openskill';
 import type { PlayerStats } from '@mirvworld/gamelens-stats';
-import type { ClanRating } from './Schema/ClanRating.ts';
+import type { ClanRating, ClanRatingDelta } from './Schema/ClanRating.ts';
 import type { ClanRatingRepository } from './Repositories/ClanRatingRepository.ts';
 
 export class OpenSkill {
@@ -15,16 +15,17 @@ export class OpenSkill {
   public async apply(gameId: string, players: Array<PlayerStats>) {
     const teams = this.groupByTeam(players);
     const rows = this.buildTeamRows(teams);
-    if (rows.length < 2) return; // not enough clan-bearing teams
+    if (rows.length < 2) return []; // not enough clan-bearing teams
 
     const tags = this.collectTags(rows);
-    if (tags.length < 2) return; // not enough clans
+    if (tags.length < 2) return []; // not enough clans
 
     const priors = await this.getCurrentRating(tags);
     const before = this.buildModelInput(rows, priors);
     const after = rate(before, { rank: rows.map((r) => r.placement) });
     const deltas = this.aggregateDeltas(rows, before, after);
     await this.applyDeltas(gameId, deltas);
+    return deltas;
   }
 
   /** Collects distinct clan tags across all team rows. */
@@ -115,7 +116,7 @@ export class OpenSkill {
     rows: Array<{ tags: string[]; weights: number[] }>,
     before: Array<Array<ClanRating>>,
     after: Team[],
-  ) {
+  ): Array<ClanRatingDelta> {
     const agg = new Map<string, { dMu: number; dSigma: number }>();
     for (let ti = 0; ti < rows.length; ti++) {
       const wSum = rows[ti]!.weights.reduce((a, b) => a + b, 0) || 1;
@@ -130,14 +131,11 @@ export class OpenSkill {
         agg.set(tag, cur);
       }
     }
-    return Array.from(agg, ([tag, v]) => ({ tag, dMu: v.dMu, dSigma: v.dSigma, dGames: 1 }));
+    return Array.from(agg, ([tag, v]) => ({ tag, mu: v.dMu, sigma: v.dSigma, games: 1 }));
   }
 
   /** Applies deltas atomically via repository Lua script (idempotent by gameId). */
-  private async applyDeltas(
-    gameId: string,
-    deltas: Array<{ tag: string; dMu: number; dSigma: number; dGames: number }>,
-  ) {
+  private async applyDeltas(gameId: string, deltas: Array<ClanRatingDelta>) {
     if (deltas.length === 0) return;
     await this.repository.applyDeltas(gameId, deltas);
   }

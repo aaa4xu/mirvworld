@@ -38,7 +38,10 @@ export class GameLensImporter {
     await this.matches.setPlayers(gameId, stats.players);
     console.log(`[${this.constructor.name}][${taskId}] GameLens stats for ${gameId} imported`);
 
-    await this.openskill.apply(gameId, stats.players);
+    const deltas = await this.openskill.apply(gameId, stats.players);
+    if (deltas.length > 0) {
+      await this.matches.setRatingDelta(gameId, deltas);
+    }
     console.log(`[${this.constructor.name}][${taskId}] Clans rating is updated from game ${gameId}`);
   };
 }

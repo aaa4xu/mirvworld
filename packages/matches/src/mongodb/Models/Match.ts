@@ -1,6 +1,7 @@
 import { ObjectId } from 'mongodb';
 import z from 'zod';
 import { MatchPlayerSchema } from './MatchPlayer.ts';
+import { ClanRatingDeltaSchema } from '../../Schema/ClanRating.ts';
 
 export const MatchSchema = z.object({
   _id: z.instanceof(ObjectId),
@@ -14,6 +15,7 @@ export const MatchSchema = z.object({
   startedAt: z.date(),
   finishedAt: z.date(),
   createdAt: z.date(),
+  ratingDeltas: z.array(ClanRatingDeltaSchema).optional(),
 });
 
 export const MatchInsertSchema = MatchSchema.omit({
