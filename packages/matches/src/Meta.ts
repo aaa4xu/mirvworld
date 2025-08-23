@@ -10,18 +10,27 @@ export class Meta {
   ) {}
 
   public async stats() {
-    const [matchDuration, goldPerMinute, goldPerMinuteTop5, goldPerMinuteTop10] = await Promise.all([
-      this.matchDuration(),
-      this.goldPerMinute(),
-      this.goldPerMinute(5),
-      this.goldPerMinute(10),
-    ]);
+    const [matchDuration, goldPerMinute, goldPerMinuteTop5, goldPerMinuteTop10, ffaBuildOrder, teamsBuildOrder] =
+      await Promise.all([
+        this.matchDuration(),
+        this.goldPerMinute(),
+        this.goldPerMinute(5),
+        this.goldPerMinute(10),
+        this.buildOrderPerformance('ffa', 4, 0.004),
+        this.buildOrderPerformance('teams', 4, 0.004),
+      ]);
 
     return {
       matchDuration,
-      goldPerMinute,
-      goldPerMinuteTop5,
-      goldPerMinuteTop10,
+      gpm: {
+        goldPerMinute,
+        goldPerMinuteTop5,
+        goldPerMinuteTop10,
+      },
+      buildOrders: {
+        ffa: ffaBuildOrder.slice(0, 10),
+        teams: teamsBuildOrder.slice(0, 10),
+      },
     };
   }
 
@@ -101,5 +110,88 @@ export class Meta {
       .toArray();
 
     return results[0]?.median ?? 0;
+  }
+
+  public buildOrderPerformance(mode: string, buildPrefixLen: number, minShare = 0.01) {
+    return this.db
+      .collection(MatchesRepository.collectionName)
+      .aggregate<{ median: number }>([
+        // Only selected mode and versions
+        { $match: { mode, version: { $in: this.versions } } },
+        // Compute lobby size per match
+        {
+          $project: {
+            players: 1,
+            lobbySize: { $size: '$players' },
+          },
+        },
+        // One row per player
+        { $unwind: '$players' },
+        // Extract rank, original buildOrder, and build key (first N chars)
+        {
+          $project: {
+            lobbySize: 1,
+            rank: '$players.rank',
+            buildOrder: '$players.buildOrder',
+            buildKey: { $substrBytes: ['$players.buildOrder', 0, buildPrefixLen] }, // first N builds
+          },
+        },
+        // Keep valid rank, lobby size, and ORIGINAL buildOrder length >= N
+        {
+          $match: {
+            rank: { $type: 'number', $gte: 1 },
+            lobbySize: { $gte: 2 },
+            $expr: { $gte: [{ $strLenBytes: '$buildOrder' }, buildPrefixLen] },
+          },
+        },
+        // Compute placement percentile in [0..1]
+        {
+          $addFields: {
+            placementPct: {
+              $divide: [{ $subtract: ['$rank', 1] }, { $subtract: ['$lobbySize', 1] }],
+            },
+          },
+        },
+        // Group by build key; median placement percentile and players count
+        {
+          $group: {
+            _id: '$buildKey',
+            playersCount: { $sum: 1 },
+            avgPlacementPct: { $avg: '$placementPct' }, // average instead of median
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            buildOrder: '$_id',
+            playersCount: 1,
+            avgPlacementPct: '$avgPlacementPct',
+          },
+        },
+        // Keep only build orders with a significant share
+        {
+          $group: {
+            _id: null,
+            totalPlayers: { $sum: '$playersCount' },
+            rows: { $push: '$$ROOT' },
+          },
+        },
+        { $unwind: '$rows' },
+        { $addFields: { share: { $divide: ['$rows.playersCount', '$totalPlayers'] } } },
+        { $match: { share: { $gte: minShare } } },
+        // Final shape
+        {
+          $project: {
+            _id: 0,
+            buildOrder: '$rows.buildOrder',
+            playersCount: '$rows.playersCount',
+            sharePct: '$share',
+            avgPlacementPct: '$rows.avgPlacementPct',
+          },
+        },
+        // Sort by better builds first
+        { $sort: { avgPlacementPct: 1 } },
+      ])
+      .toArray();
   }
 }
