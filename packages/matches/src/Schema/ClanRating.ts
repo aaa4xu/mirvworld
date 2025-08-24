@@ -9,11 +9,9 @@ const numberFromStrOrNum = (field: string) =>
 const nonNegIntFromStrOrNum = (field: string) =>
   z.preprocess(
     (v) => (typeof v === 'string' ? Number.parseInt(v, 10) : v),
-    z
-      .number()
-      .refine((n) => Number.isFinite(n) && Number.isInteger(n) && n >= 0, {
-        message: `${field} is not a valid non-negative int`,
-      }),
+    z.number().refine((n) => Number.isFinite(n) && Number.isInteger(n) && n >= 0, {
+      message: `${field} is not a valid non-negative int`,
+    }),
   );
 
 export const ClanRatingSchema = z.object({
