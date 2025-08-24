@@ -69,10 +69,10 @@ export class MatchesRepository {
     return res.matchedCount > 0;
   }
 
-  public async setRatingDeltas(id: MatchDTO['id'], deltas: MatchDTO['ratingDeltas']) {
+  public async setRatingDeltas(gameId: MatchDTO['gameId'], deltas: MatchDTO['ratingDeltas']) {
     const res = await this.collection.updateOne(
       {
-        _id: new ObjectId(id),
+        gameId,
       },
       {
         $set: {

@@ -88,8 +88,8 @@ export class MatchesService {
     await this.repository.setPlayers(match.id, players, winner === null ? undefined : winner);
   }
 
-  public async setRatingDelta(id: MatchDTO['id'], delta: MatchDTO['ratingDeltas']) {
-    await this.repository.setRatingDeltas(id, delta);
+  public async setRatingDelta(gameId: MatchDTO['gameId'], delta: MatchDTO['ratingDeltas']) {
+    await this.repository.setRatingDeltas(gameId, delta);
   }
 
   public async setMatchPlayerInfo(matchId: string, playerId: string, info: MatchPlayerInfo) {
